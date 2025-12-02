@@ -24,18 +24,106 @@ class NotificationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getNotifications()
+    public function getNotifications(Request $request)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
+            
+            $notifications = Notification::where('user_id', $user->user_id)
+                ->orderBy('created_at', 'desc')
+                ->get();
+            
+            // Check if request wants HTML response (for office head dashboard)
+            if ($request->wantsJson() === false && $request->headers->get('Accept') && strpos($request->headers->get('Accept'), 'text/html') !== false) {
+                return $this->renderNotificationsHTML($notifications);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'notifications' => $notifications
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching notifications: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching notifications'
+            ], 500);
+        }
+    }
+    
+    /**
+     * Render notifications as HTML for office head dashboard
+     */
+    private function renderNotificationsHTML($notifications)
+    {
+        if ($notifications->isEmpty()) {
+            return response()->make('<div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+                <h5>No notifications</h5>
+                <p class="text-muted">You don\'t have any notifications at the moment.</p>
+              </div>');
+        }
         
-        $notifications = Notification::where('user_id', $user->user_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        try {
+            $html = '<div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <button id="markAllReadBtn" class="btn btn-sm btn-outline-primary me-2">
+                        <i class="fas fa-check-double me-1"></i>Mark All Read
+                    </button>
+                    <button id="deleteAllBtn" class="btn btn-sm btn-outline-danger">
+                        <i class="fas fa-trash-alt me-1"></i>Delete All
+                    </button>
+                </div>
+                <div>
+                    <span class="text-muted small">' . $notifications->count() . ' notifications</span>
+                </div>
+              </div>';
+            
+            $html .= '<div class="list-group">';
+            
+            foreach ($notifications as $notification) {
+                $isUnreadClass = !$notification->is_read ? 'list-group-item-warning unread' : '';
+                $unreadIndicator = !$notification->is_read ? '<span class="badge bg-warning me-2">NEW</span>' : '';
+                
+                // Process message to convert proof references to links
+                $processedMessage = $this->processNotificationMessage($notification->message);
+                
+                $html .= '<div class="list-group-item ' . $isUnreadClass . '" data-notification-id="' . $notification->id . '">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">' . $unreadIndicator . e($notification->title) . '</h6>
+                        <small class="text-muted">' . $notification->created_at->diffForHumans() . '</small>
+                    </div>
+                    <p class="mb-1">' . $processedMessage . '</p>
+                </div>';
+            }
+            
+            $html .= '</div>';
+            
+            return response()->make($html);
+        } catch (\Exception $e) {
+            \Log::error('Error rendering notifications HTML: ' . $e->getMessage());
+            return response()->make('<div class="alert alert-danger">Error loading notifications. Please try again.</div>');
+        }
+    }
+    
+    /**
+     * Process notification message to convert proof references to links
+     */
+    private function processNotificationMessage($message)
+    {
+        try {
+            // Convert proof references to clickable links
+            $message = preg_replace_callback('/\[View Proof\]\(proof:(\d+)\)/', function($matches) {
+                $proofId = $matches[1];
+                return '<a href="' . route('training_proofs.view', $proofId) . '" target="_blank" class="btn btn-sm btn-outline-primary me-2">View Proof</a>' .
+                       '<a href="' . route('training_proofs.view', ['id' => $proofId, 'download' => 1]) . '" class="btn btn-sm btn-outline-secondary">Download</a>';
+            }, e($message));
+        } catch (\Exception $e) {
+            // If there's an error processing the message, return the original message
+            \Log::error('Error processing notification message: ' . $e->getMessage());
+        }
         
-        return response()->json([
-            'success' => true,
-            'notifications' => $notifications
-        ]);
+        return nl2br($message ?? '');
     }
     
     /**
@@ -51,9 +139,15 @@ class NotificationController extends Controller
         $ids = $request->input('ids', []);
         
         if (!empty($ids)) {
-            Notification::whereIn('id', $ids)
-                ->where('user_id', $user->user_id)
-                ->update(['is_read' => 1]);
+            if ($ids === 'all') {
+                // Mark all notifications as read
+                Notification::where('user_id', $user->user_id)
+                    ->update(['is_read' => 1]);
+            } else {
+                Notification::whereIn('id', $ids)
+                    ->where('user_id', $user->user_id)
+                    ->update(['is_read' => 1]);
+            }
         }
         
         return response()->json([
@@ -75,9 +169,14 @@ class NotificationController extends Controller
         $ids = $request->input('ids', []);
         
         if (!empty($ids)) {
-            Notification::whereIn('id', $ids)
-                ->where('user_id', $user->user_id)
-                ->delete();
+            if ($ids === 'all') {
+                // Delete all notifications
+                Notification::where('user_id', $user->user_id)->delete();
+            } else {
+                Notification::whereIn('id', $ids)
+                    ->where('user_id', $user->user_id)
+                    ->delete();
+            }
         }
         
         return response()->json([
@@ -93,16 +192,24 @@ class NotificationController extends Controller
      */
     public function getUnreadCount()
     {
-        $user = Auth::user();
-        
-        $count = Notification::where('user_id', $user->user_id)
-            ->where('is_read', 0)
-            ->count();
-        
-        return response()->json([
-            'success' => true,
-            'count' => $count
-        ]);
+        try {
+            $user = Auth::user();
+            
+            $count = Notification::where('user_id', $user->user_id)
+                ->where('is_read', 0)
+                ->count();
+            
+            return response()->json([
+                'success' => true,
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching unread count: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'count' => 0
+            ]);
+        }
     }
     
     /**
@@ -150,6 +257,53 @@ class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Notification broadcast successfully to ' . $recipients->count() . ' users.'
+        ]);
+    }
+
+/**
+     * Send notification to staff of the authenticated user's office and to unit director(s).
+     * Accessible by Office Heads.
+     */
+    public function officeBroadcast(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'audience' => 'required|in:unit_director,office_staff',
+            'subject' => 'nullable|string|max:255',
+            'message' => 'required|string|max:1000'
+        ]);
+
+        $officeCode = $user->office_code;
+
+        $recipients = collect();
+
+        if ($validated['audience'] === 'office_staff') {
+            if (!empty($officeCode)) {
+                $recipients = User::where('office_code', $officeCode)->pluck('user_id');
+            }
+        } elseif ($validated['audience'] === 'unit_director') {
+            // Include unit director(s). Support both role variants.
+            $recipients = User::whereIn('role', ['unit_director', 'unit director'])->pluck('user_id');
+        }
+
+        // Remove duplicates and exclude the sender if present
+        $recipients = $recipients->unique()->filter(function ($id) use ($user) {
+            return $id !== $user->user_id;
+        });
+
+        foreach ($recipients as $recipientId) {
+            Notification::create([
+                'user_id' => $recipientId,
+                'title' => $validated['subject'] ?? 'Office Head Message',
+                'message' => $validated['message'],
+                'is_read' => 0
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification sent to ' . $recipients->count() . ' users.'
         ]);
     }
 }

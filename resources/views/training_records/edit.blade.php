@@ -76,26 +76,33 @@
                         </div>
                         
                         <div class="form-group mb-3">
-                            <label for="venue">Venue</label>
-                            <input type="text" class="form-control" id="venue" name="venue" value="{{ old('venue', $trainingRecord->venue) }}">
+                            <label for="venue">Venue *</label>
+                            <input type="text" class="form-control" id="venue" name="venue" value="{{ old('venue', $trainingRecord->venue) }}" required>
                         </div>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="nature">Nature</label>
-                                    <select class="form-control" id="nature" name="nature">
-                                        <option value="">Select Nature</option>
-                                        <option value="Internal" {{ old('nature', $trainingRecord->nature) == 'Internal' ? 'selected' : '' }}>Internal</option>
-                                        <option value="External" {{ old('nature', $trainingRecord->nature) == 'External' ? 'selected' : '' }}>External</option>
-                                        <option value="Probationary" {{ old('nature', $trainingRecord->nature) == 'Probationary' ? 'selected' : '' }}>Probationary</option>
+                                    <label for="nature_of_training">Nature of Training</label>
+                                    <select class="form-control" id="nature_of_training" name="nature_of_training">
+                                        <option value="">Select Nature of Training</option>
+                                        <option value="Leadership training" {{ old('nature_of_training', $trainingRecord->nature_of_training) == 'Leadership training' ? 'selected' : '' }}>Leadership training</option>
+                                        <option value="Technical skills training" {{ old('nature_of_training', $trainingRecord->nature_of_training) == 'Technical skills training' ? 'selected' : '' }}>Technical skills training</option>
+                                        <option value="Management training" {{ old('nature_of_training', $trainingRecord->nature_of_training) == 'Management training' ? 'selected' : '' }}>Management training</option>
+                                        <option value="Community development training" {{ old('nature_of_training', $trainingRecord->nature_of_training) == 'Community development training' ? 'selected' : '' }}>Community development training</option>
+                                        <option value="Advocacy-related training" {{ old('nature_of_training', $trainingRecord->nature_of_training) == 'Advocacy-related training' ? 'selected' : '' }}>Advocacy-related training</option>
+                                        <option value="Other" {{ old('nature_of_training', $trainingRecord->nature_of_training) == 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
+                                </div>
+                                <div class="form-group mb-3" id="other_nature_group" style="display: none;">
+                                    <label for="nature_of_training_other">Please specify</label>
+                                    <input type="text" class="form-control" id="nature_of_training_other" name="nature_of_training_other" value="{{ old('nature_of_training_other', $trainingRecord->nature_of_training_other) }}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label for="scope">Scope</label>
-                                    <select class="form-control" id="scope" name="scope">
+                                    <label for="scope">Scope *</label>
+                                    <select class="form-control" id="scope" name="scope" required>
                                         <option value="">Select Scope</option>
                                         <option value="Local" {{ old('scope', $trainingRecord->scope) == 'Local' ? 'selected' : '' }}>Local</option>
                                         <option value="Regional" {{ old('scope', $trainingRecord->scope) == 'Regional' ? 'selected' : '' }}>Regional</option>
@@ -127,4 +134,26 @@
 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
     @csrf
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const natureSelect = document.getElementById('nature_of_training');
+        const otherGroup = document.getElementById('other_nature_group');
+        const otherInput = document.getElementById('nature_of_training_other');
+        
+        function toggleOtherField() {
+            if (natureSelect.value === 'Other') {
+                otherGroup.style.display = 'block';
+            } else {
+                otherGroup.style.display = 'none';
+                otherInput.value = '';
+            }
+        }
+        
+        natureSelect.addEventListener('change', toggleOtherField);
+        
+        // Initialize on page load
+        toggleOtherField();
+    });
+</script>
 @endsection

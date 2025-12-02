@@ -79,7 +79,7 @@ class OfficeHeadController extends Controller
         
         // Upcoming trainings for this head (for dashboard list)
         $result_head_upcoming_list = DB::table('training_records')
-            ->select('id', 'title', 'start_date', 'end_date', 'nature', 'scope')
+            ->select('id', 'title', 'start_date', 'end_date', 'nature_of_training as nature', 'scope')
             ->where('user_id', $user->user_id)
             ->where('status', 'upcoming')
             ->orderBy('start_date', 'ASC')
@@ -88,11 +88,30 @@ class OfficeHeadController extends Controller
         
         // Recent activity (head)
         $result_head_activities = DB::table('training_records')
-            ->select('id', 'title', 'start_date', 'end_date', 'created_at', 'status', 'nature', 'scope')
+            ->select('id', 'title', 'start_date', 'end_date', 'created_at', 'status', 'nature_of_training as nature', 'scope')
             ->where('user_id', $user->user_id)
             ->orderBy('created_at', 'DESC')
             ->limit(6)
             ->get();
+        
+        // Training records (for training-records view)
+        $training_records = DB::table('training_records')
+            ->select('id', 'title', 'description', 'start_date', 'end_date', 'venue', 'nature_of_training as nature', 'scope', 'status')
+            ->where('user_id', $user->user_id)
+            ->orderBy('created_at', 'DESC')
+            ->get();
+        
+        // Office staff (for office-directory view)
+        $office_staff = collect();
+        if ($office) {
+            $office_staff = DB::table('users')
+                ->leftJoin('staff_details', 'users.user_id', '=', 'staff_details.user_id')
+                ->select('users.user_id', 'users.full_name', 'users.email', 'staff_details.position', 'staff_details.program', 'staff_details.job_function')
+                ->where('users.role', 'staff')
+                ->where('users.office_code', $office)
+                ->orderBy('users.full_name')
+                ->get();
+        }
         
         // Pass all data to the view
         return view('office_head.dashboard', compact(
@@ -106,7 +125,9 @@ class OfficeHeadController extends Controller
             'training_pending',
             'training_overdue',
             'result_head_upcoming_list',
-            'result_head_activities'
+            'result_head_activities',
+            'training_records',
+            'office_staff'
         ));
     }
 }

@@ -38,7 +38,8 @@ class TrainingRecord extends Model
         'venue',
         'proof_uploaded',
         'office_code',
-        'nature',
+        'nature_of_training',
+        'nature_of_training_other',
         'scope',
     ];
 

@@ -235,7 +235,6 @@ body {
 
   <div class="content-box">
     <h2>Staff Directory & Training Reports</h2>
-    <hr style="border-color:#e6edf3;margin-top:-6px;margin-bottom:1.5rem">
 
     <!-- Filters & Actions -->
     <div class="d-flex flex-wrap align-items-center mb-3 gap-2">
@@ -362,63 +361,60 @@ body {
     <!-- User Directory -->
     <div class="row">
         <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>User Directory</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="staffTable">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Full Name</th>
-                                    <th scope="col">Role</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Office</th>
-                                    <th scope="col">Position</th>
-                                    <th scope="col">Program</th>
-                                    <th scope="col">Job Function</th>
-                                    <th scope="col">Degree Attained</th>
-                                    <th scope="col">Approved</th>
-                                    <th scope="col">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="staffBody">
-                                @foreach($users as $user)
-                                <tr>
-                                    <td>{{ $user->full_name }}</td>
-                                    <td>{{ ucfirst($user->role) }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>{{ $user->office ? $user->office->name : 'N/A' }}</td>
-                                    <td>{{ $user->staffDetail ? $user->staffDetail->position : 'N/A' }}</td>
-                                    <td>{{ $user->staffDetail ? $user->staffDetail->program : 'N/A' }}</td>
-                                    <td>{{ $user->staffDetail ? $user->staffDetail->job_function : 'N/A' }}</td>
-                                    <td>{{ $user->staffDetail ? $user->staffDetail->degree_attained : 'N/A' }}</td>
-                                    <td>
-                                        @if($user->is_approved)
-                                            <span class="badge bg-success">Yes</span>
-                                        @else
-                                            <span class="badge bg-warning">No</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info btn-view-trainings" 
-                                                data-user-id="{{ $user->user_id }}" 
-                                                data-user-name="{{ $user->full_name }}">
-                                            View Trainings
-                                        </button>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="content-box">
+                <h2>User Directory</h2>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="staffTable">
+                        <thead>
+                            <tr>
+                                <th scope="col">Full Name</th>
+                                <th scope="col">Role</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Office</th>
+                                <th scope="col">Position</th>
+                                <th scope="col">Program</th>
+                                <th scope="col">Job Function</th>
+                                <th scope="col">Employment Status</th>
+                                <th scope="col">Degree Attained</th>
+                                <th scope="col">Approved</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffBody">
+                            @foreach($users as $user)
+                            <tr>
+                                <td>{{ $user->full_name }}</td>
+                                <td>{{ ucfirst($user->role) }}</td>
+                                <td>{{ $user->email }}</td>
+                                <td>{{ $user->office ? $user->office->name : 'N/A' }}</td>
+                                <td>{{ $user->staffDetail ? $user->staffDetail->position : 'N/A' }}</td>
+                                <td>{{ $user->staffDetail ? $user->staffDetail->program : 'N/A' }}</td>
+                                <td>{{ $user->staffDetail ? $user->staffDetail->job_function : 'N/A' }}</td>
+                                <td>{{ $user->staffDetail ? ucfirst(str_replace('_', ' ', $user->staffDetail->employment_status)) : 'N/A' }}</td>
+                                <td>{{ $user->staffDetail ? $user->staffDetail->degree_attained : 'N/A' }}</td>
+                                <td>
+                                    @if($user->is_approved)
+                                        <span class="badge bg-success">Yes</span>
+                                    @else
+                                        <span class="badge bg-warning">No</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-info btn-view-trainings" 
+                                            data-user-id="{{ $user->user_id }}" 
+                                            data-user-name="{{ $user->full_name }}">
+                                        View Trainings
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
   </div>
-</div>
 
 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
     @csrf
@@ -563,6 +559,7 @@ const staffList = [];
         position: "{{ $user->staffDetail ? $user->staffDetail->position : '' }}",
         program: "{{ $user->staffDetail ? $user->staffDetail->program : '' }}",
         job_function: "{{ $user->staffDetail ? $user->staffDetail->job_function : '' }}",
+        employment_status: "{{ $user->staffDetail ? ucfirst(str_replace('_', ' ', $user->staffDetail->employment_status)) : '' }}",
         degree_attained: "{{ $user->staffDetail ? $user->staffDetail->degree_attained : '' }}"
     });
     

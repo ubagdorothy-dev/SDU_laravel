@@ -11,12 +11,17 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TrainingRecordController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TrainingProofController;
+use App\Http\Controllers\TrainingAssignmentController;
 
 /*
 |--------------------------------------------------------------------------
 | Authentication Routes (Login/Register/Logout)
 |--------------------------------------------------------------------------
 */
+
+Route::get('/', function () {
+    return redirect('/login');
+});
 
 // Group routes that should only be accessible to guests (not logged in)
 Route::middleware('guest')->group(function () {
@@ -90,6 +95,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/broadcast', [NotificationController::class, 'broadcast'])
         ->middleware('checkrole:unit_director,unit director')
         ->name('notifications.broadcast');
+
+    // Office Head: send notification to staff in their office + unit director(s)
+    Route::post('/notifications/office-broadcast', [NotificationController::class, 'officeBroadcast'])
+        ->middleware('checkrole:head')
+        ->name('notifications.office_broadcast');
         
     // Training Records
     Route::resource('training_records', TrainingRecordController::class);
@@ -97,14 +107,32 @@ Route::middleware('auth')->group(function () {
     Route::post('/training_records/{id}/status', [TrainingRecordController::class, 'updateStatus'])
         ->name('training_records.update_status');
         
+    // Training Assignments
+    Route::middleware('checkrole:unit_director,unit director')->group(function () {
+        Route::get('/training_assignments', [TrainingAssignmentController::class, 'index'])
+            ->name('training_assignments.index');
+        Route::get('/training_assignments/create', [TrainingAssignmentController::class, 'create'])
+            ->name('training_assignments.create');
+        Route::post('/training_assignments', [TrainingAssignmentController::class, 'store'])
+            ->name('training_assignments.store');
+    });
+    
+    Route::middleware('checkrole:staff')->group(function () {
+        Route::get('/my_assigned_trainings', [TrainingAssignmentController::class, 'myAssignments'])
+            ->name('training_assignments.my_assignments');
+    });
+        
     // Training Proofs
-    Route::post('/training_records/{id}/upload-proof', [TrainingProofController::class, 'upload'])
+    Route::post('/training_records/{training_record}/upload-proof', [TrainingProofController::class, 'upload'])
         ->name('training_proofs.upload');
         
 // Test route removed
         
     Route::get('/training_proofs/{id}/download', [TrainingProofController::class, 'download'])
         ->name('training_proofs.download');
+        
+    Route::get('/training_proofs/{id}/view', [TrainingProofController::class, 'view'])
+        ->name('training_proofs.view');
         
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])

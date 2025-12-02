@@ -3,281 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Staff Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            display: flex;
-            background: white;
-            background-attachment: fixed;
-        }
-        
-        @media (min-width: 992px) {
-            body.toggled .sidebar { width: 80px; }
-            body.toggled .main-content { margin-left: 80px; }
-            .sidebar .nav-link { transition: all 0.2s; white-space: nowrap; overflow: hidden; }
-            body.toggled .sidebar .nav-link { text-align: center; padding: 12px 0; }
-            body.toggled .sidebar .nav-link i { margin-right: 0; }
-            body.toggled .sidebar .nav-link span { display: none; }
-            body.toggled .sidebar h3 { display: none; }
-        }
-        
-        .main-content {
-            flex-grow: 1;
-            padding: 2rem;
-            margin-left: 250px; 
-            transition: margin-left 0.3s ease-in-out;
-        }
-        
-        .sidebar {
-            width: 250px;
-            background-color: #1a237e;
-            color: white;
-            height: 100vh;
-            position: fixed;
-            padding-top: 2rem;
-            transition: width 0.3s ease-in-out;
-        }
-        
-        .sidebar .nav-link {
-            color: white;
-            padding: 12px 20px;
-            border-radius: 5px;
-            margin: 5px 15px;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 0.75rem;
-        }
-        
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            background-color: #3f51b5;
-        }
-        
-        .content-box { 
-            background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(10px);
-            border-radius: 20px; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1); 
-            padding: 2rem; 
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .content-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-        }
-        
-        /* Transparent sidebar toggle like admin */
-        .sidebar .btn-toggle {
-            background-color: transparent;
-            border: none;
-            color: #ffffff;
-            padding: 6px 10px;
-            cursor: pointer;
-        }
-        
-        .sidebar .btn-toggle:focus { box-shadow: none; }
-        .sidebar .btn-toggle:hover { background-color: transparent; }
-        
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-            padding: 2rem 1.5rem;
-            text-align: center;
-            border: none;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
-        }
-        
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-        }
-        
-        .card h3 {
-            margin: 0 0 1rem;
-            color: var(--card-color);
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .card p {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--card-color);
-            margin: 0;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .stats-cards .card:nth-child(1) { 
-            --card-color: #10b981;
-            --card-color-light: #6ee7b7;
-        }
-        
-        .stats-cards .card:nth-child(2) { 
-            --card-color: #f59e0b;
-            --card-color-light: #fbbf24;
-        }
-        
-        .stats-cards .card:nth-child(3) { 
-            --card-color: #31d0e6;
-            --card-color-light: #16c6e6;
-        }
-        
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .action-card {
-            background: #1a237e;
-            color: white;
-            border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-        
-        .action-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .action-card a {
-            color: white;
-            text-decoration: none;
-            display: block;
-        }
-        
-        .action-card i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 1rem;
-                margin-left: 0 !important;
-            }
-            
-            .stats-cards {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .card {
-                padding: 1.5rem 1rem;
-            }
-            
-            .card p {
-                font-size: 2rem;
-            }
-            
-            .content-box {
-                padding: 1.5rem;
-                border-radius: 16px;
-            }
-            
-            .header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .header p {
-                font-size: 0.9rem;
-            }
-            
-            .quick-actions {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .main-content {
-                padding: 0.5rem;
-            }
-            
-            .card {
-                padding: 1rem;
-            }
-            
-            .content-box {
-                padding: 1rem;
-            }
-            
-            .header h1 {
-                font-size: 1.25rem;
-            }
-            
-            .table-responsive {
-                font-size: 0.85rem;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-                gap: 0.25rem;
-            }
-        }
-        
-        /* Checkbox-controlled sidebar toggle (mirror admin_dashboard behavior) */
-        #sidebar-toggle-checkbox:checked ~ .sidebar { width: 80px; padding-top: 1rem; }
-        #sidebar-toggle-checkbox:checked ~ .sidebar .nav-link span,
-        #sidebar-toggle-checkbox:checked ~ .sidebar h3,
-        #sidebar-toggle-checkbox:checked ~ .sidebar .logo-text { display: none; }
-        #sidebar-toggle-checkbox:checked ~ .main-content { margin-left: 80px; }
-        #sidebar-toggle-checkbox:checked ~ .sidebar .nav-link { text-align: center; padding: 12px 0; }
-        #sidebar-toggle-checkbox:checked ~ .sidebar .d-flex.justify-content-between { padding-left: 0.25rem !important; padding-right: 0.25rem !important; margin-bottom: 1rem !important; }
-        
-        /* Keep existing JS-driven toggle (body.toggled) compatible with checkbox approach */
-        @media (min-width: 992px) {
-            #sidebar-toggle-checkbox:checked ~ .sidebar .nav-link { justify-content: center; }
-        }
-        
-        /* Logo in sidebar */
-        .sidebar-logo { height: 30px; width: auto; margin-right: 8px; }
-        .sidebar .d-flex h5 { font-weight: 700; margin-right: 0 !important; }
-        
-        /* Disable sidebar/main transitions so expand/collapse is instant (match other dashboards) */
-        .sidebar,
-        .main-content,
-        .sidebar .nav-link,
-        .sidebar-logo,
-        .logo-text {
-            transition: none !important;
-            -webkit-transition: none !important;
-        }
-        
-        @media (min-width: 992px) {
-            body.toggled .sidebar { transition: none !important; }
-            body.toggled .main-content { transition: none !important; }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/dashboard/staff.css') }}">
 </head>
 <body id="body">
 <input type="checkbox" id="sidebar-toggle-checkbox" style="display: none;">
@@ -297,14 +27,28 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->get('view') === 'training-records' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=training-records">
-                    <i class="fas fa-book-open me-2"></i> <span>Training Records</span>
+                <a class="nav-link {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'active' : '' }}" href="#trainingSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'true' : 'false' }}" aria-controls="trainingSubmenu">
+                    <i class="fas fa-book-open me-2"></i> <span>Training</span>
                 </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
-                    <i class="fas fa-user-circle me-2"></i> <span>Profile</span>
-                </a>
+                <div class="collapse {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'show' : '' }}" id="trainingSubmenu">
+                    <ul class="nav flex-column ms-4">
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->get('view') === 'training-records' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=training-records">
+                                <i class="fas fa-list me-2"></i> <span>My Records</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->get('view') === 'assigned-trainings' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=assigned-trainings">
+                                <i class="fas fa-tasks me-2"></i> <span>Assigned Trainings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->get('view') === 'uploaded-files' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=uploaded-files">
+                                <i class="fas fa-file-upload me-2"></i> <span>Uploaded Files</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </li>
             <li class="nav-item mt-auto">
                 <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -484,7 +228,7 @@
                                 <th scope="col">Start Date</th>
                                 <th scope="col">End Date</th>
                                 <th scope="col">Venue</th>
-                                <th scope="col">Nature</th>
+                                <th scope="col">Nature of Training</th>
                                 <th scope="col">Scope</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
@@ -498,7 +242,7 @@
                                     <td>{{ $row->start_date }}</td>
                                     <td>{{ $row->end_date }}</td>
                                     <td>{{ $row->venue ?? '' }}</td>
-                                    <td>{{ $row->nature ?? '' }}</td>
+                                    <td>{{ $row->nature_of_training ?? '' }}</td>
                                     <td>{{ $row->scope ?? '' }}</td>
                                     <td>
                                         <span class="badge {{ $row->status === 'completed' ? 'bg-success' : 'bg-warning' }}">
@@ -514,13 +258,13 @@
                                                 data-start-date="{{ $row->start_date }}"
                                                 data-end-date="{{ $row->end_date }}"
                                                 data-venue="{{ $row->venue ?? '' }}"
-                                                data-nature="{{ $row->nature ?? '' }}"
+                                                data-nature="{{ $row->nature_of_training ?? '' }}"
                                                 data-scope="{{ $row->scope ?? '' }}">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
-                                            <a href="#" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $row->id }})">
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" data-training-id="{{ $row->id }}">
                                                 <i class="fas fa-trash"></i> Delete
-                                            </a>
+                                            </button>
                                             @if ($row->status === 'completed' && empty($row->proof_uploaded))
                                                 <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadProofModal" data-training-id="{{ $row->id }}"> 
                                                     <i class="fas fa-upload"></i> Upload Proof
@@ -535,6 +279,121 @@
                 @else
                     <div class="alert alert-info mt-4" role="alert">
                         You have not completed any trainings yet.
+                    </div>
+                @endif
+            </div>
+        @elseif (request()->get('view') === 'assigned-trainings')
+            <div class="content-box">
+                <h2>My Assigned Trainings</h2>
+                <p class="text-muted">Trainings assigned to you by your Unit Director.</p>
+                
+                @php
+                    // Get assigned trainings for the current user
+                    $assignedTrainings = \App\Models\TrainingAssignment::with(['training', 'assignedBy'])
+                        ->where('staff_id', Auth::user()->user_id)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+                @endphp
+                
+                @if($assignedTrainings->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Training</th>
+                                    <th>Assigned By</th>
+                                    <th>Assigned Date</th>
+                                    <th>Deadline</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($assignedTrainings as $assignment)
+                                    <tr>
+                                        <td>{{ $assignment->training->title }}</td>
+                                        <td>{{ $assignment->assignedBy->full_name ?? 'N/A' }}</td>
+                                        <td>{{ $assignment->assigned_date->format('M d, Y') }}</td>
+                                        <td>{{ $assignment->deadline->format('M d, Y') }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                @if($assignment->status == 'completed') bg-success
+                                                @elseif($assignment->status == 'pending') bg-warning
+                                                @else bg-danger
+                                                @endif">
+                                                {{ ucfirst($assignment->status) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-5">
+                        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                        <h5>No Assigned Trainings</h5>
+                        <p class="text-muted">You don't have any trainings assigned to you right now.</p>
+                    </div>
+                @endif
+            </div>
+        @elseif (request()->get('view') === 'uploaded-files')
+            <div class="content-box">
+                <h2>My Uploaded Files</h2>
+                <p class="text-muted">Files you have uploaded as proof of completed trainings.</p>
+                
+                @php
+                    // Get uploaded files for the current user
+                    $uploadedFiles = \App\Models\TrainingProof::with(['trainingRecord'])
+                        ->where('user_id', Auth::user()->user_id)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+                @endphp
+                
+                @if($uploadedFiles->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Training</th>
+                                    <th>File Name</th>
+                                    <th>Upload Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($uploadedFiles as $file)
+                                    <tr>
+                                        <td>{{ $file->trainingRecord->title }}</td>
+                                        <td>{{ basename($file->file_path) }}</td>
+                                        <td>{{ $file->created_at->format('M d, Y') }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                @if($file->status == 'approved') bg-success
+                                                @elseif($file->status == 'pending') bg-warning
+                                                @else bg-danger
+                                                @endif">
+                                                {{ ucfirst($file->status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('training_proofs.view', $file->id) }}" class="btn btn-sm btn-primary" target="_blank">
+                                                <i class="fas fa-eye me-1"></i> View
+                                            </a>
+                                            <a href="{{ route('training_proofs.view', $file->id) }}?download=1" class="btn btn-sm btn-secondary">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-5">
+                        <i class="fas fa-file-upload fa-3x text-muted mb-3"></i>
+                        <h5>No Uploaded Files</h5>
+                        <p class="text-muted">You haven't uploaded any files as proof of completed trainings yet.</p>
                     </div>
                 @endif
             </div>
@@ -670,8 +529,10 @@
                                 if (data.errors) {
                                     msg = 'Validation failed:<br>';
                                     for (var field in data.errors) {
-                                        msg += field + ': ' + data.errors[field].join(', ') + '<br>';
+                                        msg += '<strong>' + field + '</strong>: ' + data.errors[field].join(', ') + '<br>';
                                     }
+                                } else if (data.rawText) {
+                                    msg += ' (raw response: ' + data.rawText + ')';
                                 } else if (data.raw) {
                                     msg += ' (raw:' + JSON.stringify(data.raw) + ')';
                                 }
@@ -686,17 +547,120 @@
                         });
                 });
             }
-
+            
             // Training records modal loader
             const trainingRecordsModal = document.getElementById('trainingRecordsModal');
             if (trainingRecordsModal) {
                 trainingRecordsModal.addEventListener('show.bs.modal', function () {
                     const container = document.getElementById('trainingRecordsContent');
                     container.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
-                    // In Laravel, we would need to create an API endpoint for this
-                    container.innerHTML = '<div class="alert alert-info">Training records loading is not implemented yet.</div>';
+                    
+                    // Fetch training records via AJAX
+                    fetch('{{ route('training_records.index') }}', {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'text/html'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text();
+                        } else {
+                            throw new Error('Failed to load training records');
+                        }
+                    })
+                    .then(html => {
+                        container.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Error loading training records:', error);
+                        container.innerHTML = '<div class="alert alert-danger">Failed to load training records. Please try again.</div>';
+                    });
                 });
             }
+            
+            // Handle delete confirmation modal
+            var deleteModal = document.getElementById('deleteConfirmationModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget; // Button that triggered the modal
+                    var trainingId = button.getAttribute('data-training-id');
+                    var modal = this;
+                    modal.querySelector('#deleteTrainingId').value = trainingId;
+                });
+
+                document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                    var trainingId = document.getElementById('deleteTrainingId').value;
+                    
+                    // Show loading state on delete button
+                    var deleteBtn = this;
+                    var originalText = deleteBtn.innerHTML;
+                    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                    deleteBtn.disabled = true;
+                    
+                    // Debugging: log the training ID and CSRF token
+                    console.log('Deleting training record with ID:', trainingId);
+                    console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                                    
+                    // Make AJAX request to delete the training record
+                    fetch('/training_records/' + trainingId, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        console.log('Delete response status:', response.status);
+                        console.log('Delete response ok:', response.ok);
+                                        
+                        if (response.ok) {
+                            // Close modal and reload page
+                            var modal = bootstrap.Modal.getInstance(deleteModal);
+                            modal.hide();
+                            // Show success message
+                            alert('Training record deleted successfully!');
+                            window.location.reload();
+                        } else {
+                            return response.json().then(data => {
+                                console.log('Delete error data:', data);
+                                throw new Error(data.message || 'Delete failed with status: ' + response.status);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to delete training record: ' + error.message);
+                    })
+                    .finally(() => {
+                        // Reset delete button state
+                        deleteBtn.innerHTML = originalText;
+                        deleteBtn.disabled = false;
+                    });
+                });
+            }
+            
+            // Handle delete buttons in dynamically loaded content
+            document.addEventListener('click', function(event) {
+                if (event.target.matches('[data-bs-target="#deleteConfirmationModal"]')) {
+                    var button = event.target;
+                    var trainingId = button.getAttribute('data-training-id');
+                    
+                    // If we can't get the training ID from the button itself, try the closest button
+                    if (!trainingId && button.tagName !== 'BUTTON') {
+                        var parentButton = button.closest('button');
+                        if (parentButton) {
+                            trainingId = parentButton.getAttribute('data-training-id');
+                        }
+                    }
+                    
+                    // Set the training ID in the modal
+                    if (trainingId && deleteModal) {
+                        deleteModal.querySelector('#deleteTrainingId').value = trainingId;
+                    }
+                }
+            });
 
             // Setup for edit training form
             var editForm = document.getElementById('editTrainingForm');
@@ -788,8 +752,10 @@
                                 if (data.errors) {
                                     msg = 'Validation failed:<br>';
                                     for (var field in data.errors) {
-                                        msg += field + ': ' + data.errors[field].join(', ') + '<br>';
+                                        msg += '<strong>' + field + '</strong>: ' + data.errors[field].join(', ') + '<br>';
                                     }
+                                } else if (data.rawText) {
+                                    msg += ' (raw response: ' + data.rawText + ')';
                                 } else if (data.raw) {
                                     msg += ' (raw:' + JSON.stringify(data.raw) + ')';
                                 }
@@ -871,8 +837,10 @@
                                 if (data.errors) {
                                     msg = 'Validation failed:<br>';
                                     for (var field in data.errors) {
-                                        msg += field + ': ' + data.errors[field].join(', ') + '<br>';
+                                        msg += '<strong>' + field + '</strong>: ' + data.errors[field].join(', ') + '<br>';
                                     }
+                                } else if (data.rawText) {
+                                    msg += ' (raw response: ' + data.rawText + ')';
                                 } else if (data.raw) {
                                     msg += ' (raw:' + JSON.stringify(data.raw) + ')';
                                 }
@@ -887,237 +855,41 @@
                         });
                 });
             }
+            
+            // Setup for upload proof modal to populate training ID
+            var uploadProofModal = document.getElementById('uploadProofModal');
+            if (uploadProofModal) {
+                uploadProofModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget; // Button that triggered the modal
+                    var trainingId = button.getAttribute('data-training-id');
+                    var modal = this;
+                    // Set the training ID in the hidden input field
+                    modal.querySelector('input[name="training_id"]').value = trainingId;
+                });
+            }
         });
 
-        function confirmDelete(trainingId) {
-            if (confirm('Are you sure you want to delete this training record?')) {
-                // In a real implementation, you would make an AJAX call to delete the record
-                alert('Delete functionality would be implemented here. Training ID: ' + trainingId);
-            }
-        }
+        // Delete functionality now handled by modal
     </script>
 
-    <!-- Training Records Modal -->
-    <div class="modal fade" id="trainingRecordsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-book-reader me-2"></i>Your Training Records</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="trainingRecordsContent">
-                    <div class="text-center py-4">
-                        <div class="spinner-border" role="status"></div>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <small class="text-muted">Need more space? <a href="{{ route('staff.dashboard') }}?view=training-records">Open the full page</a></small>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    @include('staff.partials.modals')
 
-    <!-- Notifications Modal -->
-    <div class="modal fade" id="notificationsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-bell me-2"></i>Notifications</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="notificationsContent">
-                    <div class="text-center py-4">
-                        <div class="spinner-border" role="status"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile Modal -->
-    <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Profile</h5>
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Delete</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Name:</strong> {{ $user->full_name ?? $user->email ?? '' }}</p>
-                    <p><strong>Email:</strong> {{ $user->email ?? '' }}</p>
-                    <p><strong>Role:</strong> {{ $user->role ?? '' }}</p>
-                    <p class="text-muted">Profile editing functionality would be implemented here.</p>
+                    <p>Are you sure you want to delete this training record? This action cannot be undone.</p>
+                    <input type="hidden" id="deleteTrainingId" value="">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- STATIC: Add Training Modal -->
-    <div class="modal fade" id="addTrainingModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Training</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="addTrainingForm">
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Training Title</label>
-                            <input type="text" name="title" class="form-control" required />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea name="description" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Start Date</label>
-                                <input type="date" name="start_date" class="form-control" required />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">End Date</label>
-                                <input type="date" name="end_date" class="form-control" required />
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Venue</label>
-                            <input type="text" name="venue" class="form-control" />
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nature</label>
-                                <select name="nature" class="form-control">
-                                    <option value="">Select Nature</option>
-                                    <option value="Internal">Internal</option>
-                                    <option value="External">External</option>
-                                    <option value="Online">Online</option>
-                                    <option value="Workshop">Workshop</option>
-                                    <option value="Seminar">Seminar</option>
-                                    <option value="Conference">Conference</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Scope</label>
-                                <select name="scope" class="form-control">
-                                    <option value="">Select Scope</option>
-                                    <option value="Local">Local</option>
-                                    <option value="Regional">Regional</option>
-                                    <option value="National">National</option>
-                                    <option value="International">International</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="addTrainingFeedback"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- STATIC: Edit Training Modal -->
-    <div class="modal fade" id="editTrainingModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Training</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="editTrainingForm">
-                    <div class="modal-body">
-                        <input type="hidden" name="id" />
-                        <div class="mb-3">
-                            <label class="form-label">Training Title</label>
-                            <input type="text" name="title" class="form-control" required />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea name="description" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Start Date</label>
-                                <input type="date" name="start_date" class="form-control" required />
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">End Date</label>
-                                <input type="date" name="end_date" class="form-control" required />
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Venue</label>
-                            <input type="text" name="venue" class="form-control" />
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Nature</label>
-                                <select name="nature" class="form-control">
-                                    <option value="">Select Nature</option>
-                                    <option value="Internal">Internal</option>
-                                    <option value="External">External</option>
-                                    <option value="Online">Online</option>
-                                    <option value="Workshop">Workshop</option>
-                                    <option value="Seminar">Seminar</option>
-                                    <option value="Conference">Conference</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Scope</label>
-                                <select name="scope" class="form-control">
-                                    <option value="">Select Scope</option>
-                                    <option value="Local">Local</option>
-                                    <option value="Regional">Regional</option>
-                                    <option value="National">National</option>
-                                    <option value="International">International</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="editTrainingFeedback"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- STATIC: Upload Proof Modal -->
-    <div class="modal fade" id="uploadProofModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Upload Proof of Completion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="uploadProofForm">
-                    <div class="modal-body">
-                        <input type="hidden" name="training_id" />
-                        <div class="mb-3">
-                            <label class="form-label">Select file (photo or certificate)</label>
-                            <input type="file" name="proof" class="form-control" accept="image/*,.pdf" required />
-                        </div>
-                        <div id="uploadProofFeedback"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Upload</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -1125,5 +897,9 @@
     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
         @csrf
     </form>
+    
+    @include('staff.partials.profile_notification_modals')
+    @include('staff.partials.modal_scripts')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

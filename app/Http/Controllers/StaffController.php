@@ -67,7 +67,7 @@ class StaffController extends Controller
         
         // Ongoing trainings (for overview list)
         $ongoing_rows = DB::table('training_records')
-            ->select('id', 'title', 'start_date', 'end_date', 'status', 'nature', 'scope')
+            ->select('id', 'title', 'start_date', 'end_date', 'status', 'nature_of_training', 'scope')
             ->where('user_id', $staff_user_id)
             ->where('status', 'ongoing')
             ->orderBy('start_date', 'ASC')
@@ -76,7 +76,7 @@ class StaffController extends Controller
         
         // Upcoming trainings (for overview list) - future only
         $upcoming_rows = DB::table('training_records')
-            ->select('id', 'title', 'start_date', 'end_date', 'status', 'nature', 'scope')
+            ->select('id', 'title', 'start_date', 'end_date', 'status', 'nature_of_training', 'scope')
             ->where('user_id', $staff_user_id)
             ->where('status', 'upcoming')
             ->orderBy('start_date', 'ASC')
@@ -85,7 +85,7 @@ class StaffController extends Controller
         
         // Recent activities (last 10)
         $activity_rows = DB::table('training_records')
-            ->select('id', 'title', 'status', 'created_at', 'start_date', 'end_date', 'nature', 'scope')
+            ->select('id', 'title', 'status', 'created_at', 'start_date', 'end_date', 'nature_of_training', 'scope')
             ->where('user_id', $staff_user_id)
             ->orderBy('created_at', 'DESC')
             ->limit(10)

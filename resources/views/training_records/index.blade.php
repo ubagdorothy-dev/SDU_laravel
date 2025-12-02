@@ -64,6 +64,7 @@
                                 <tr>
                                     <th>Title</th>
                                     <th>Description</th>
+                                    <th>Nature of Training</th>
                                     <th>Start Date</th>
                                     <th>End Date</th>
                                     <th>Status</th>
@@ -75,6 +76,7 @@
                                 <tr>
                                     <td>{{ $record->title }}</td>
                                     <td>{{ Str::limit($record->description, 50) }}</td>
+                                    <td>{{ $record->nature_of_training }}</td>
                                     <td>{{ $record->start_date }}</td>
                                     <td>{{ $record->end_date }}</td>
                                     <td>
@@ -90,11 +92,8 @@
                                     <td>
                                         <a href="{{ route('training_records.show', $record->id) }}" class="btn btn-info btn-sm">View</a>
                                         <a href="{{ route('training_records.edit', $record->id) }}" class="btn btn-primary btn-sm">Edit</a>
-                                        <form method="POST" action="{{ route('training_records.destroy', $record->id) }}" style="display: inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?')">Delete</button>
-                                        </form>
+                                        <!-- Delete button that triggers modal -->
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" data-training-id="{{ $record->id }}">Delete</button>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -117,4 +116,67 @@
 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
     @csrf
 </form>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this training record? This action cannot be undone.</p>
+                <input type="hidden" id="deleteTrainingId" value="">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Handle delete confirmation modal
+    document.addEventListener('DOMContentLoaded', function() {
+        var deleteModal = document.getElementById('deleteConfirmationModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; // Button that triggered the modal
+                var trainingId = button.getAttribute('data-training-id');
+                var modal = this;
+                modal.querySelector('#deleteTrainingId').value = trainingId;
+            });
+
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                var trainingId = document.getElementById('deleteTrainingId').value;
+                
+                // Make AJAX request to delete the training record
+                fetch('/training_records/' + trainingId, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Close modal and reload page
+                        var modal = bootstrap.Modal.getInstance(deleteModal);
+                        modal.hide();
+                        window.location.reload();
+                    } else {
+                        throw new Error('Delete failed');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to delete training record. Please try again.');
+                });
+            });
+        }
+    });
+</script>
 @endsection

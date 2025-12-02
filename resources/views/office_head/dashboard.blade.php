@@ -66,6 +66,8 @@
             /* Hide header logo text when collapsed and tighten logo spacing */
             body.toggled .sidebar .logo-text { display: none; }
             body.toggled .sidebar h3 { display: none; }
+            /* Hide the header title (e.g. "SDU OFFICE HEAD") when sidebar is collapsed */
+            body.toggled .sidebar h5 { display: none; }
             body.toggled .sidebar .sidebar-logo { margin-right: 0; }
         }
         .header h1 { 
@@ -218,8 +220,24 @@
         <div class="header mb-4">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                 <div>
-                    <h1 class="fw-bold mb-2" style="color: #1e293b;">Welcome {{ $user->full_name ?? 'Office Head' }}! </h1>
-                    <p class="mb-0" style="color: #6b7280;">Here's what's happening in your office today.</p>
+                    <h1 class="fw-bold mb-2" style="color: #1e293b;">Welcome, {{ $user->full_name ?? 'Office Head' }}! </h1>
+                    <p class="mb-1" style="color: #6b7280; font-size: 0.95rem; margin-bottom: .25rem;">
+                        @if(optional($user->office)->name)
+                            {{ $user->office->name }}
+                            @if(optional($user->office)->code)
+                                ({{ $user->office->code }})
+                            @endif
+                        @elseif(!empty($user->office_code))
+                            ({{ $user->office_code }})
+                        @else
+                            Assigned Office
+                        @endif
+                    </p>
+                </div>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#officeNotificationModal">
+                        <i class="fas fa-paper-plane me-2"></i>Send Notification
+                    </button>
                 </div>
             </div>
         </div>
@@ -323,6 +341,50 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Office Notification Modal -->
+        <div class="modal fade" id="officeNotificationModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-paper-plane me-2"></i>Send Notification to Office</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="officeNotificationForm">
+                        <div class="modal-body">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="notifSubject" class="form-label">Subject (optional)</label>
+                                <input type="text" class="form-control" id="notifSubject" name="subject" maxlength="255">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Audience</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="audience" id="audienceOffice" value="office_staff" checked>
+                                        <label class="form-check-label" for="audienceOffice">Staff of Assigned Office</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="audience" id="audienceDirector" value="unit_director">
+                                        <label class="form-check-label" for="audienceDirector">Unit Director</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="notifMessage" class="form-label">Message</label>
+                                <textarea class="form-control" id="notifMessage" name="message" rows="4" required maxlength="1000"></textarea>
+                            </div>
+                            <div id="notifAlert" style="display:none;"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Send</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Training Status Chart
@@ -352,6 +414,59 @@
             }
         });
     });
+
+// Office notification form submit
+    (function(){
+        const form = document.getElementById('officeNotificationForm');
+        const alertEl = document.getElementById('notifAlert');
+
+        if (!form) return;
+
+            form.addEventListener('submit', function(e){
+            e.preventDefault();
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+
+            const subject = document.getElementById('notifSubject').value;
+            const message = document.getElementById('notifMessage').value;
+            const audience = form.querySelector('input[name="audience"]:checked')?.value || 'office_staff';
+
+            fetch("{{ route('notifications.office_broadcast') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ subject: subject, message: message, audience: audience })
+            }).then(res => res.json())
+            .then(data => {
+                submitBtn.disabled = false;
+                if (data.success) {
+                    alertEl.className = 'alert alert-success';
+                    alertEl.innerText = data.message || 'Notification sent.';
+                    alertEl.style.display = 'block';
+                    // Close modal after short delay
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('officeNotificationModal'));
+                        if (modal) modal.hide();
+                        alertEl.style.display = 'none';
+                        form.reset();
+                    }, 900);
+                } else {
+                    alertEl.className = 'alert alert-danger';
+                    alertEl.innerText = data.message || 'Failed to send notification.';
+                    alertEl.style.display = 'block';
+                }
+            }).catch(err => {
+                submitBtn.disabled = false;
+                alertEl.className = 'alert alert-danger';
+                alertEl.innerText = err?.message || 'An error occurred.';
+                alertEl.style.display = 'block';
+            });
+        });
+    })();
+    
     </script>
 </body>
 </html>

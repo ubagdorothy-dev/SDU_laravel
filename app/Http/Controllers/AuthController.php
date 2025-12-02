@@ -40,7 +40,7 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             // 4. ADD 'exists:offices,code' rule for database validation
-            'office_code' => 'required|string|max:10|exists:offices,code', 
+            'office_code' => 'required|string|max:10|exists:offices,code',
         ], [
             // Custom message for the office code if needed
             'office_code.required' => 'Please select an office/center.',

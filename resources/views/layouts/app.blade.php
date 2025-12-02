@@ -21,6 +21,7 @@
     <style>
         body {
             font-size: .875rem;
+            background-color: #f8f9fa;
         }
         
         .sidebar {
@@ -31,6 +32,7 @@
             z-index: 100;
             padding: 48px 0 0;
             box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background-color: #f8f9fa;
         }
         
         .sidebar-sticky {
@@ -45,15 +47,24 @@
         .sidebar .nav-link {
             font-weight: 500;
             color: #333;
+            padding: .75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0.75rem;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: #e9ecef;
+            color: #007bff;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: #007bff;
+            color: white;
         }
         
         .sidebar .nav-link .feather {
             margin-right: 4px;
             color: #999;
-        }
-        
-        .sidebar .nav-link.active {
-            color: #007bff;
         }
         
         .sidebar .nav-link:hover .feather,
@@ -64,10 +75,13 @@
         .sidebar-heading {
             font-size: .75rem;
             text-transform: uppercase;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            color: #6c757d;
         }
         
         [role="main"] {
-            padding-top: 133px;
+            padding-top: 60px;
         }
         
         .navbar-brand {
@@ -114,6 +128,15 @@
         .stats-cards .card-text {
             font-weight: 700;
             color: #495057;
+        }
+        
+        .border-bottom {
+            border-bottom: 1px solid #dee2e6 !important;
+        }
+        
+        .h2 {
+            font-weight: 600;
+            color: #212529;
         }
     </style>
     

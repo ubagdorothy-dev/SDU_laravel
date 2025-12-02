@@ -24,7 +24,7 @@ class TrainingRecordController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         
@@ -32,6 +32,12 @@ class TrainingRecordController extends Controller
         $trainingRecords = TrainingRecord::where('user_id', $user->user_id)
             ->orderBy('created_at', 'desc')
             ->get();
+        
+        // Check if request is AJAX
+        if ($request->ajax() || $request->wantsJson()) {
+            // Return only the training records table content for modal
+            return view('training_records.partials.records_table', compact('user', 'trainingRecords'));
+        }
         
         return view('training_records.index', compact('user', 'trainingRecords'));
     }
@@ -63,9 +69,10 @@ class TrainingRecordController extends Controller
                 'description' => 'nullable|string',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after_or_equal:start_date',
-                'venue' => 'nullable|string|max:255',
-                'nature' => 'nullable|string|max:100',
-                'scope' => 'nullable|string|max:100',
+                'venue' => 'required|string|max:255',
+                'nature_of_training' => 'nullable|string|max:100',
+                'nature_of_training_other' => 'nullable|string|max:255',
+                'scope' => 'required|string|max:100',
             ]);
             
             // Automatically determine status based on dates
@@ -85,7 +92,14 @@ class TrainingRecordController extends Controller
             $trainingRecord->start_date = $request->start_date;
             $trainingRecord->end_date = $request->end_date;
             $trainingRecord->venue = $request->venue;
-            $trainingRecord->nature = $request->nature;
+            
+            // Handle nature of training
+            if ($request->nature_of_training === 'Other' && $request->nature_of_training_other) {
+                $trainingRecord->nature_of_training = $request->nature_of_training_other;
+            } else {
+                $trainingRecord->nature_of_training = $request->nature_of_training;
+            }
+            
             $trainingRecord->scope = $request->scope;
             $trainingRecord->status = $status;
             $trainingRecord->office_code = $user->office_code;
@@ -174,9 +188,10 @@ class TrainingRecordController extends Controller
                 'description' => 'nullable|string',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date|after_or_equal:start_date',
-                'venue' => 'nullable|string|max:255',
-                'nature' => 'nullable|string|max:100',
-                'scope' => 'nullable|string|max:100',
+                'venue' => 'required|string|max:255',
+                'nature_of_training' => 'nullable|string|max:100',
+                'nature_of_training_other' => 'nullable|string|max:255',
+                'scope' => 'required|string|max:100',
             ]);
             
             // Automatically determine status based on dates
@@ -194,7 +209,14 @@ class TrainingRecordController extends Controller
             $trainingRecord->start_date = $request->start_date;
             $trainingRecord->end_date = $request->end_date;
             $trainingRecord->venue = $request->venue;
-            $trainingRecord->nature = $request->nature;
+            
+            // Handle nature of training
+            if ($request->nature_of_training === 'Other' && $request->nature_of_training_other) {
+                $trainingRecord->nature_of_training = $request->nature_of_training_other;
+            } else {
+                $trainingRecord->nature_of_training = $request->nature_of_training;
+            }
+            
             $trainingRecord->scope = $request->scope;
             $trainingRecord->status = $status;
             $trainingRecord->save();
@@ -244,12 +266,32 @@ class TrainingRecordController extends Controller
      */
     public function destroy($training_record)
     {
-        $user = Auth::user();
-        $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
-        
-        $trainingRecord->delete();
-        
-        return redirect()->route('training_records.index')->with('success', 'Training record deleted successfully.');
+        try {
+            $user = Auth::user();
+            $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+            
+            $trainingRecord->delete();
+            
+            // Check if request is AJAX
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Training record deleted successfully.'
+                ]);
+            }
+            
+            return redirect()->route('training_records.index')->with('success', 'Training record deleted successfully.');
+        } catch (\Exception $e) {
+            // Check if request is AJAX
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to delete training record: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            throw $e;
+        }
     }
     
     /**

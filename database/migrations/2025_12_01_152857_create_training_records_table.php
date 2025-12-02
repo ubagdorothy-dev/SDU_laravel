@@ -23,7 +23,8 @@ return new class extends Migration
                 $table->string('venue');
                 $table->boolean('proof_uploaded')->default(false);
                 $table->string('office_code');
-                $table->string('nature');
+                $table->string('nature_of_training')->nullable();
+                $table->string('nature_of_training_other')->nullable();
                 $table->string('scope');
                 $table->timestamps();
                 

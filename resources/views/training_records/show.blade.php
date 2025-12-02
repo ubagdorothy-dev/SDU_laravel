@@ -62,7 +62,7 @@
                         <div class="col-md-6">
                             <p><strong>Description:</strong> {{ $trainingRecord->description ?? 'N/A' }}</p>
                             <p><strong>Venue:</strong> {{ $trainingRecord->venue ?? 'N/A' }}</p>
-                            <p><strong>Nature:</strong> {{ $trainingRecord->nature ?? 'N/A' }}</p>
+                            <p><strong>Nature of Training:</strong> {{ $trainingRecord->nature_of_training ?? 'N/A' }}</p>
                             <p><strong>Scope:</strong> {{ $trainingRecord->scope ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6">
