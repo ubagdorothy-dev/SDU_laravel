@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login Form</title>
+</head>
+<body>
+    <h2>Test Login Form</h2>
+    <form method="POST" action="/login">
+        <input type="hidden" name="_token" value="">
+        <div>
+            <label>Email:</label>
+            <input type="email" name="email" value="unit.director@sdu.edu.ph" required>
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" name="password" value="sdo123" required>
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+    </form>
+</body>
+</html>
