@@ -162,6 +162,98 @@ body {
     border-top-right-radius: 0.5rem;
 }
 
+/* Add Training Modal Styles */
+#addTrainingModal .modal-content {
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border: none;
+}
+
+#addTrainingModal .modal-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+    color: white;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+#addTrainingModal .modal-title {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin: 0;
+}
+
+#addTrainingModal .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+#addTrainingModal .modal-body {
+    padding: 1.5rem;
+}
+
+#addTrainingModal .form-label {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+#addTrainingModal .form-control, 
+#addTrainingModal .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    margin-bottom: 1rem;
+}
+
+#addTrainingModal .form-control:focus, 
+#addTrainingModal .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: 0;
+}
+
+#addTrainingModal textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+#addTrainingModal .row {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+}
+
+#addTrainingModal .col-md-6 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+#addTrainingModal .mb-3 {
+    margin-bottom: 1.25rem;
+}
+
+#addTrainingModal .modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+    background-color: #f9fafb;
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+
+#addTrainingModal .btn {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+}
+
+#addTrainingModal .alert {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
 .badge {
     font-size: 0.75em;
 }
@@ -271,13 +363,13 @@ body {
 }
 
 .stats-cards .card:nth-child(2) { 
-    --card-color: #f59e0b;
-    --card-color-light: #fbbf24;
+    --card-color: #31d0e6;
+    --card-color-light: #16c6e6;
 }
 
 .stats-cards .card:nth-child(3) { 
-    --card-color: #31d0e6;
-    --card-color-light: #16c6e6;
+    --card-color: #f59e0b;
+    --card-color-light: #fbbf24;
 }
 
 .quick-actions {

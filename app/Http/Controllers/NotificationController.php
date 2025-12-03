@@ -327,31 +327,52 @@ class NotificationController extends Controller
     public function officeBroadcast(Request $request)
     {
         $user = Auth::user();
+        
+        // Log the incoming request for debugging
+        \Log::info('Office broadcast request', [
+            'user_id' => $user->user_id,
+            'office_code' => $user->office_code,
+            'request_data' => $request->all()
+        ]);
 
         $validated = $request->validate([
             'audience' => 'required|in:unit_director,office_staff',
             'subject' => 'nullable|string|max:255',
             'message' => 'required|string|max:1000'
         ]);
+        
+        \Log::info('Validated data', $validated);
 
         $officeCode = $user->office_code;
 
         $recipients = collect();
+        \Log::info('Checking audience value', ['audience' => $validated['audience'], 'type' => gettype($validated['audience'])]);
 
         if ($validated['audience'] === 'office_staff') {
+            \Log::info('Matched office_staff condition');
             if (!empty($officeCode)) {
                 $recipients = User::where('office_code', $officeCode)->pluck('user_id');
+                \Log::info('Office staff recipients', ['count' => $recipients->count(), 'office_code' => $officeCode]);
             }
         } elseif ($validated['audience'] === 'unit_director') {
+            \Log::info('Matched unit_director condition');
             // Include unit director(s). Support both role variants.
             $recipients = User::whereIn('role', ['unit_director', 'unit director'])->pluck('user_id');
+            \Log::info('Unit director recipients', ['count' => $recipients->count()]);
+        } else {
+            \Log::info('No matching condition', ['audience' => $validated['audience']]);
         }
+        
+        \Log::info('Recipients before filtering', ['count' => $recipients->count()]);
 
         // Remove duplicates and exclude the sender if present
         $recipients = $recipients->unique()->filter(function ($id) use ($user) {
             return $id !== $user->user_id;
         });
+        
+        \Log::info('Recipients after filtering', ['count' => $recipients->count()]);
 
+        $notificationCount = 0;
         foreach ($recipients as $recipientId) {
             Notification::create([
                 'user_id' => $recipientId,
@@ -360,11 +381,23 @@ class NotificationController extends Controller
                 'message' => $validated['message'],
                 'is_read' => 0
             ]);
+            $notificationCount++;
+        }
+        
+        \Log::info('Notifications created', ['count' => $notificationCount]);
+
+        // Provide more descriptive feedback based on audience
+        $audienceDescription = '';
+        if ($validated['audience'] === 'office_staff') {
+            $audienceDescription = 'staff members in your office';
+        } elseif ($validated['audience'] === 'unit_director') {
+            $audienceDescription = 'unit director(s)';
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Notification sent to ' . $recipients->count() . ' users.'
+            'message' => 'Notification sent to ' . $notificationCount . ' ' . $audienceDescription . '.',
+            'audience' => $validated['audience']
         ]);
     }
     

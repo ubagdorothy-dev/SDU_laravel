@@ -1,4 +1,5 @@
 <!-- Office Notification Modal -->
+
 <div class="modal fade" id="officeNotificationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -40,3 +41,4 @@
         </div>
     </div>
 </div>
+

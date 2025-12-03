@@ -110,12 +110,22 @@
                             @if($user->staffDetail)
                             <div class="mb-3">
                                 <label for="profile_job_function" class="form-label fw-bold text-primary">Job Function:</label>
-                                <select class="form-select" id="profile_job_function" name="job_function">
-                                    <option value="">Select Job Function</option>
-                                    <option value="Director/Office Head" {{ old('job_function', $user->staffDetail->job_function ?? '') == 'Director/Office Head' ? 'selected' : '' }}>Director/Office Head</option>
-                                    <option value="Program Officer" {{ old('job_function', $user->staffDetail->job_function ?? '') == 'Program Officer' ? 'selected' : '' }}>Program Officer</option>
-                                    <option value="Admin Officer" {{ old('job_function', $user->staffDetail->job_function ?? '') == 'Admin Officer' ? 'selected' : '' }}>Admin Officer</option>
-                                </select>
+                                @if($user->role === 'head')
+                                    <!-- For Office Heads: Auto-assigned based on office, non-editable -->
+                                    @php
+                                        $autoAssignedJobFunction = 'Director/Office Head - ' . ($office_display ?? 'Unknown Office');
+                                    @endphp
+                                    <input type="text" class="form-control" id="profile_job_function" name="job_function" value="{{ $autoAssignedJobFunction }}" readonly>
+                                    <input type="hidden" name="job_function" value="{{ $autoAssignedJobFunction }}">
+                                    <small class="form-text text-muted">Job function is automatically assigned based on your office and cannot be changed.</small>
+                                @else
+                                    <!-- For Staff: Choose between Program Officer and Admin Officer -->
+                                    <select class="form-select" id="profile_job_function" name="job_function" required>
+                                        <option value="">Select Job Function</option>
+                                        <option value="Program Officer" {{ old('job_function', $user->staffDetail->job_function ?? '') == 'Program Officer' ? 'selected' : '' }}>Program Officer</option>
+                                        <option value="Admin Officer" {{ old('job_function', $user->staffDetail->job_function ?? '') == 'Admin Officer' ? 'selected' : '' }}>Admin Officer</option>
+                                    </select>
+                                @endif
                             </div>
                             
                             <div class="mb-3">

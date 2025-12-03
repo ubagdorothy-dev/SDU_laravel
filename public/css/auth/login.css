@@ -1,0 +1,178 @@
+ @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f0f2f5;
+        background-image: url('/images/BG.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .login-container {
+        display: flex;
+        width: 100%;
+        max-width: 1000px;
+        height: 100vh;
+        max-height: 600px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-left {
+        background-color: #1a237e;
+        color: white;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .login-left .login-logo {
+        width: 200px;
+        height: auto;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .login-left h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-align: center; 
+        line-height: 1.7;
+    }
+
+    .login-right {
+        background-color: white;
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .login-form-box {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .login-form-box h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a237e;
+        border-bottom: 3px solid #1a237e;
+        padding-bottom: 5px;
+        margin-bottom: 25px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    .form-group label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .input-with-icon {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ced4da;
+        background-color: #e9ecef;
+    }
+
+    .input-with-icon svg {
+        margin: 0 10px;
+        color: #6c757d;
+    }
+
+    .input-with-icon input {
+        width: 100%;
+        border: none;
+        padding: 10px;
+        background-color: white;
+        outline: none;
+    }
+
+    .input-with-icon input:focus {
+        outline: 2px solid #1a237e;
+        outline-offset: -2px;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #1a237e;
+        color: white;
+        border: none;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+        margin-top: 10px;
+    }
+
+    .login-btn:hover { background-color: #141b63; }
+
+    .register {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .register a {
+        color: #1a237e;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: Bold;
+    }
+
+    .register a:hover { text-decoration: underline; }
+
+    /* Alert Styles */
+    .alert {
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+    
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+    
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+    
+    .alert-info {
+        color: #0c5460;
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+    }
+    
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    @media (max-width: 768px) {
+        .login-container { flex-direction: column-reverse; height: auto; }
+        .login-left, .login-right { width: 100%; padding: 40px 20px; }
+}

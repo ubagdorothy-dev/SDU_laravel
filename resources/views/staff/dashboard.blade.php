@@ -50,6 +50,11 @@
                     </ul>
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+                    <i class="fas fa-user-circle me-2"></i> <span>Profile</span>
+                </a>
+            </li>
             <li class="nav-item mt-auto">
                 <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <i class="fas fa-sign-out-alt me-2"></i> <span>Logout</span>

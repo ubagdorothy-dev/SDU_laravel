@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\TrainingAssignment;
+use App\Models\TrainingRecord;
+use App\Models\User;
 
 class OfficeHeadController extends Controller
 {
@@ -28,6 +31,8 @@ class OfficeHeadController extends Controller
     public function index()
     {
         $user = Auth::user();
+        // Load the staff detail and office relationships for profile modal
+        $user->load('staffDetail', 'office');
         
         // Get current user's office
         $office = $user->office_code;
@@ -101,22 +106,43 @@ class OfficeHeadController extends Controller
             ->orderBy('created_at', 'DESC')
             ->get();
         
-        // Office staff (for office-directory view)
+        // Office staff (for office-directory view) - Updated to include more details
         $office_staff = collect();
         if ($office) {
             $office_staff = DB::table('users')
                 ->leftJoin('staff_details', 'users.user_id', '=', 'staff_details.user_id')
-                ->select('users.user_id', 'users.full_name', 'users.email', 'staff_details.position', 'staff_details.program', 'staff_details.job_function')
+                ->select(
+                    'users.user_id', 
+                    'users.full_name', 
+                    'users.email', 
+                    'staff_details.position', 
+                    'staff_details.program', 
+                    'staff_details.job_function',
+                    'staff_details.employment_status',
+                    'staff_details.degree_attained'
+                )
                 ->where('users.role', 'staff')
                 ->where('users.office_code', $office)
                 ->orderBy('users.full_name')
                 ->get();
         }
         
+        // Prepare office display information for profile modal
+        $office_display = '';
+        if ($user->office) {
+            $office_display = $user->office->name;
+            if ($user->office->code) {
+                $office_display .= ' (' . $user->office->code . ')';
+            }
+        } elseif (!empty($user->office_code)) {
+            $office_display = $user->office_code;
+        }
+        
         // Pass all data to the view
         return view('office_head.dashboard', compact(
             'user',
             'office',
+            'office_display',
             'head_trainings_completed',
             'head_trainings_upcoming',
             'total_staff_in_office',
@@ -129,5 +155,46 @@ class OfficeHeadController extends Controller
             'training_records',
             'office_staff'
         ));
+    }
+    
+    /**
+     * Get training records for a specific staff member in the office head's office.
+     *
+     * @param  int  $userId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getStaffTrainings($userId)
+    {
+        $user = Auth::user();
+        
+        // Verify that the staff member belongs to the office head's office
+        $staffMember = User::where('user_id', $userId)
+            ->where('office_code', $user->office_code)
+            ->where('role', 'staff')
+            ->first();
+            
+        if (!$staffMember) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Staff member not found or does not belong to your office.'
+            ], 404);
+        }
+        
+        // Get training records for this staff member with proof relationship
+        $trainings = TrainingRecord::with('proof')
+            ->where('user_id', $userId)
+            ->select('id', 'title', 'description', 'start_date', 'end_date', 'venue', 'nature_of_training', 'scope', 'status')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        // Add proof information to each training record
+        $trainings->each(function ($training) {
+            $training->proof_document = $training->proof ? $training->proof->file_path : null;
+        });
+        
+        return response()->json([
+            'success' => true,
+            'trainings' => $trainings
+        ]);
     }
 }

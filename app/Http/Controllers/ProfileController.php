@@ -41,6 +41,10 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
+        // Load office relationship for Office Heads to display office name
+        if ($user->role === 'head') {
+            $user->load('office');
+        }
         $staffDetail = $user->staffDetail;
         $offices = Office::all();
         return view('profile.edit', compact('user', 'staffDetail', 'offices'));
@@ -57,15 +61,22 @@ class ProfileController extends Controller
         $user = Auth::user();
         
         try {
-            $request->validate([
+            // Validate based on user role
+            $rules = [
                 'full_name' => 'required|string|max:100',
                 'email' => 'required|email|unique:users,email,' . $user->user_id . ',user_id',
-                'job_function' => 'nullable|string|max:255',
                 'employment_status' => 'nullable|string|max:50',
                 'degree_attained' => 'nullable|string|max:100',
                 'degree_other' => 'nullable|string|max:255',
                 'program' => 'nullable|string|max:255',
-            ]);
+            ];
+            
+            // For Staff, validate job function selection
+            if ($user->role !== 'head') {
+                $rules['job_function'] = 'required|in:Program Officer,Admin Officer';
+            }
+            
+            $request->validate($rules);
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Check if request is AJAX
             if ($request->ajax() || $request->wantsJson()) {
@@ -87,7 +98,15 @@ class ProfileController extends Controller
             // Update staff details
             $staffDetail = $user->staffDetail;
             if ($staffDetail) {
-                $staffDetail->job_function = $request->job_function;
+                // For Office Heads, auto-assign job function based on office
+                if ($user->role === 'head') {
+                    $autoAssignedJobFunction = 'Director/Office Head - ' . ($user->office ? $user->office->name : 'Unknown Office');
+                    $staffDetail->job_function = $autoAssignedJobFunction;
+                } else {
+                    // For Staff, use the provided job function
+                    $staffDetail->job_function = $request->job_function;
+                }
+                
                 $staffDetail->employment_status = $request->employment_status;
                 $staffDetail->program = $request->program;
                 
@@ -100,9 +119,15 @@ class ProfileController extends Controller
                 
                 $staffDetail->save();
             } else {
+                // For Office Heads, auto-assign job function based on office
+                $jobFunction = $request->job_function;
+                if ($user->role === 'head') {
+                    $jobFunction = 'Director/Office Head - ' . ($user->office ? $user->office->name : 'Unknown Office');
+                }
+                
                 // Create staff details if they don't exist
                 $user->staffDetail()->create([
-                    'job_function' => $request->job_function,
+                    'job_function' => $jobFunction,
                     'employment_status' => $request->employment_status,
                     'program' => $request->program,
                     'degree_attained' => $request->degree_attained === 'Other' ? $request->degree_other : $request->degree_attained,

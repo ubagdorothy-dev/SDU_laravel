@@ -57,6 +57,11 @@ Route::middleware('auth')->group(function () {
         ->middleware('checkrole:head')
         ->name('office_head.dashboard');
     
+    // Office Head: Get staff training records
+    Route::get('/office-head/staff/{userId}/trainings', [OfficeHeadController::class, 'getStaffTrainings'])
+        ->middleware('checkrole:head')
+        ->name('office_head.staff_trainings');
+    
     // Staff Dashboard
     Route::get('/staff/dashboard', [StaffController::class, 'index'])
         ->middleware('checkrole:staff')

@@ -45,6 +45,11 @@
     .alert-danger {
         border-radius: 8px;
     }
+    
+    .readonly-field {
+        background-color: #e9ecef;
+        opacity: 1;
+    }
 </style>
 @endsection
 
@@ -120,12 +125,22 @@
                         <!-- Job Functions -->
                         <div class="mb-3">
                             <label for="job_function" class="form-label">Job Function</label>
-                            <select class="form-select" id="job_function" name="job_function">
-                                <option value="">Select Job Function</option>
-                                <option value="Director/Office Head" {{ old('job_function', $staffDetail->job_function ?? '') == 'Director/Office Head' ? 'selected' : '' }}>Director/Office Head</option>
-                                <option value="Program Officer" {{ old('job_function', $staffDetail->job_function ?? '') == 'Program Officer' ? 'selected' : '' }}>Program Officer</option>
-                                <option value="Admin Officer" {{ old('job_function', $staffDetail->job_function ?? '') == 'Admin Officer' ? 'selected' : '' }}>Admin Officer</option>
-                            </select>
+                            @if($user->role === 'head')
+                                <!-- For Office Heads: Auto-assigned based on office, non-editable -->
+                                @php
+                                    $autoAssignedJobFunction = 'Director/Office Head - ' . ($user->office ? $user->office->name : 'Unknown Office');
+                                @endphp
+                                <input type="text" class="form-control readonly-field" id="job_function" name="job_function" value="{{ $autoAssignedJobFunction }}" readonly>
+                                <input type="hidden" name="job_function" value="{{ $autoAssignedJobFunction }}">
+                                <small class="form-text text-muted">Job function is automatically assigned based on your office and cannot be changed.</small>
+                            @else
+                                <!-- For Staff: Choose between Program Officer and Admin Officer -->
+                                <select class="form-select" id="job_function" name="job_function">
+                                    <option value="">Select Job Function</option>
+                                    <option value="Program Officer" {{ old('job_function', $staffDetail->job_function ?? '') == 'Program Officer' ? 'selected' : '' }}>Program Officer</option>
+                                    <option value="Admin Officer" {{ old('job_function', $staffDetail->job_function ?? '') == 'Admin Officer' ? 'selected' : '' }}>Admin Officer</option>
+                                </select>
+                            @endif
                         </div>
 
                         <!-- Employment Status -->
