@@ -28,9 +28,29 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="notificationsContent">
-                <div class="text-center py-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <button id="markAllReadBtn" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-check-double me-1"></i>Mark All Read
+                        </button>
+                        <button id="deleteAllBtn" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-trash-alt me-1"></i>Delete All
+                        </button>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <label for="notificationFilter" class="me-2">Filter:</label>
+                        <select id="notificationFilter" class="form-select form-select-sm" style="width: auto;">
+                            <option value="all">All Notifications</option>
+                            <option value="unit_director">From Unit Director</option>
+                            <option value="office_head">From Office Head</option>
+                            <option value="system">System Notifications</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-center py-4" id="notificationsLoader">
                     <div class="spinner-border" role="status"></div>
                 </div>
+                <div id="notificationsList"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
@@ -41,10 +61,10 @@
 
 <!-- Profile Modal -->
 <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true" data-office-code="{{ $user->office_code ?? '' }}" data-program="{{ $user->staffDetail->program ?? '' }}">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="fas fa-user-circle me-2"></i>Profile Information</h5>
+                <h5 class="modal-title"><i class="fas fa-user-circle me-2"></i>Edit Profile</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -54,12 +74,12 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="profile_full_name" class="form-label fw-bold text-primary">Name:</label>
+                                <label for="profile_full_name" class="form-label fw-bold text-primary">Full Name *</label>
                                 <input type="text" class="form-control" id="profile_full_name" name="full_name" value="{{ $user->full_name ?? '' }}" required>
                             </div>
                             
                             <div class="mb-3">
-                                <label for="profile_email" class="form-label fw-bold text-primary">Email:</label>
+                                <label for="profile_email" class="form-label fw-bold text-primary">Email Address *</label>
                                 <input type="email" class="form-control" id="profile_email" name="email" value="{{ $user->email ?? '' }}" required>
                             </div>
                             
@@ -143,9 +163,6 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-success" id="saveProfileBtn">
                     <i class="fas fa-save me-1"></i> Save Changes
-                </button>
-                <button type="button" class="btn btn-primary" onclick="window.location.href='{{ route('profile.show') }}'">
-                    <i class="fas fa-edit me-1"></i> Edit Full Profile
                 </button>
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
             </div>

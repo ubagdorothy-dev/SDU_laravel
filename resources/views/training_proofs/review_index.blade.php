@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Training Assignments - SDU Unit Director</title>
+<title>Review Training Proofs - SDU Unit Director</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="{{ asset('css/unitdirector/dashboard.css') }}">
 </head>
 <body id="body">
-
 <input type="checkbox" id="sidebar-toggle-checkbox" style="display: none;">
 
 <!-- Desktop Sidebar -->
@@ -24,9 +23,8 @@
   <ul class="nav flex-column">
     <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
     <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
-    @if(in_array($user->role, ['unit director', 'unit_director']))
       <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
-    @endif
+     
     <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
     <li class="nav-item mt-auto"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
   </ul>
@@ -34,72 +32,70 @@
 
 <div class="main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Training Assignments</h1>
+                <h1 class="h2">Review Training Proofs</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
-                    <a href="{{ route('training_assignments.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus-circle me-1"></i> Assign Training
-                    </a>
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" onclick="location.reload()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
                 </div>
             </div>
             
             @if(session('success'))
-                <div class="alert alert-success">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
             
-            <div class="card">
-                <div class="card-header">
-                    <h5>All Training Assignments</h5>
+            @if($pendingProofs->isEmpty())
+                <div class="text-center py-5">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h4>No Pending Training Proofs</h4>
+                    <p class="text-muted">There are currently no training proofs awaiting review.</p>
                 </div>
-                <div class="card-body">
-                    @if($assignments->count() > 0)
+            @else
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Pending Training Proofs</h5>
+                        <p class="text-muted mb-0">Review and approve/reject training proofs submitted by staff members</p>
+                    </div>
+                    <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped">
+                            <table class="table table-striped table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Training</th>
                                         <th>Staff Member</th>
-                                        <th>Assigned By</th>
-                                        <th>Assigned Date</th>
-                                        <th>Deadline</th>
-                                        <th>Status</th>
+                                        <th>Training Title</th>
+                                        <th>Office</th>
+                                        <th>Submitted On</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($assignments as $assignment)
+                                    @foreach($pendingProofs as $proof)
                                         <tr>
-                                            <td>{{ $assignment->training->title }}</td>
-                                            <td>{{ $assignment->staff->full_name ?? 'N/A' }}</td>
-                                            <td>{{ $assignment->assignedBy->full_name ?? 'N/A' }}</td>
-                                            <td>{{ $assignment->assigned_date->format('M d, Y') }}</td>
-                                            <td>{{ $assignment->deadline->format('M d, Y') }}</td>
+                                            <td>{{ $proof->user->full_name ?? 'N/A' }}</td>
+                                            <td>{{ $proof->trainingRecord->title ?? 'N/A' }}</td>
+                                            <td>{{ $proof->user->office_code ?? 'N/A' }}</td>
+                                            <td>{{ $proof->created_at->format('M d, Y H:i') }}</td>
                                             <td>
-                                                <span class="badge 
-                                                    @if($assignment->status == 'completed') bg-success
-                                                    @elseif($assignment->status == 'pending') bg-warning
-                                                    @else bg-danger
-                                                    @endif">
-                                                    {{ ucfirst($assignment->status) }}
-                                                </span>
+                                                <a href="{{ route('training_proofs.review', $proof->id) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye me-1"></i> Review
+                                                </a>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
-                            <h5>No training assignments found</h5>
-                            <p class="text-muted">Assign trainings to staff members to track their progress.</p>
-                            <a href="{{ route('training_assignments.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus-circle me-1"></i> Assign Training Now
-                            </a>
+                        
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-center mt-4">
+                            {{ $pendingProofs->links() }}
                         </div>
-                    @endif
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
 </div>

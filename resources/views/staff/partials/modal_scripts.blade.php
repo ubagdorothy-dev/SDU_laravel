@@ -40,6 +40,14 @@
             notificationsModal.addEventListener('show.bs.modal', function () {
                 fetchNotifications();
             });
+                
+            // Handle filter change
+            const filterSelect = document.getElementById('notificationFilter');
+            if (filterSelect) {
+                filterSelect.addEventListener('change', function() {
+                    fetchNotifications(this.value);
+                });
+            }
         }
         
         // Update notification badge periodically
@@ -48,31 +56,102 @@
     });
     
     // Fetch notifications and display them in the modal
-    function fetchNotifications() {
-        const contentDiv = document.getElementById('notificationsContent');
-        if (!contentDiv) return;
+    function fetchNotifications(filter = 'all') {
+        const loaderDiv = document.getElementById('notificationsLoader');
+        const listDiv = document.getElementById('notificationsList');
+        
+        if (!loaderDiv || !listDiv) return;
         
         // Show loading spinner
-        contentDiv.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
+        loaderDiv.style.display = 'block';
+        listDiv.innerHTML = '';
         
-        fetch("{{ route('notifications.get') }}", {
+        // Add filter parameter to the request
+        const url = "{{ route('notifications.get') }}" + (filter !== 'all' ? '?filter=' + filter : '');
+        
+        fetch(url, {
             method: 'GET',
             headers: {
-                'Accept': 'text/html',
+                'Accept': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest'
             }
         })
-        .then(response => response.text())
-        .then(html => {
-            contentDiv.innerHTML = html;
+        .then(response => response.json())
+        .then(data => {
+            loaderDiv.style.display = 'none';
+            
+            if (data.success && data.notifications) {
+                renderNotifications(data.notifications);
+            } else {
+                listDiv.innerHTML = '<div class="alert alert-danger">Failed to load notifications. Please try again.</div>';
+            }
             
             // Add event listeners for notification actions
             initializeNotificationActions();
         })
         .catch(error => {
             console.error('Error fetching notifications:', error);
-            contentDiv.innerHTML = '<div class="alert alert-danger">Failed to load notifications. Please try again.</div>';
+            loaderDiv.style.display = 'none';
+            listDiv.innerHTML = '<div class="alert alert-danger">Failed to load notifications. Please try again.</div>';
         });
+    }
+    
+    // Render notifications in the modal
+    function renderNotifications(notifications) {
+        const listDiv = document.getElementById('notificationsList');
+        
+        if (notifications.length === 0) {
+            listDiv.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+                    <h5>No notifications</h5>
+                    <p class="text-muted">You don't have any notifications at the moment.</p>
+                </div>`;
+            return;
+        }
+        
+        let html = '<div class="list-group">';
+        
+        notifications.forEach(notification => {
+            const isUnreadClass = !notification.is_read ? 'list-group-item-warning unread' : '';
+            const unreadIndicator = !notification.is_read ? '<span class="badge bg-warning me-2">NEW</span>' : '';
+            
+            // Get sender information
+            let senderInfo = '';
+            if (notification.sender_name && notification.sender_role) {
+                senderInfo = `<small class="text-muted d-block mb-1">From: ${notification.sender_name} (${notification.sender_role})</small>`;
+            }
+            
+            html += `
+                <div class="list-group-item ${isUnreadClass}" data-notification-id="${notification.id}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${unreadIndicator}${notification.title || 'Notification'}</h6>
+                        <small class="text-muted">${timeAgo(new Date(notification.created_at))}</small>
+                    </div>
+                    ${senderInfo}
+                    <p class="mb-1">${notification.message || ''}</p>
+                </div>`;
+        });
+        
+        html += '</div>';
+        listDiv.innerHTML = html;
+    }
+    
+    // Helper function to format time ago
+    function timeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        let interval = Math.floor(seconds / 31536000);
+        
+        if (interval > 1) return interval + " years ago";
+        interval = Math.floor(seconds / 2592000);
+        if (interval > 1) return interval + " months ago";
+        interval = Math.floor(seconds / 86400);
+        if (interval > 1) return interval + " days ago";
+        interval = Math.floor(seconds / 3600);
+        if (interval > 1) return interval + " hours ago";
+        interval = Math.floor(seconds / 60);
+        if (interval > 1) return interval + " minutes ago";
+        return Math.floor(seconds) + " seconds ago";
     }
     
     // Initialize notification action buttons (mark as read, delete, etc.)

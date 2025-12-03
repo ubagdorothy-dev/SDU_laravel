@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
         
     // Training Records
     Route::resource('training_records', TrainingRecordController::class);
+    Route::get('/training_records/{training_record}/edit-ajax', [TrainingRecordController::class, 'editAjax'])->name('training_records.edit_ajax');
     
     Route::post('/training_records/{id}/status', [TrainingRecordController::class, 'updateStatus'])
         ->name('training_records.update_status');
@@ -133,6 +134,16 @@ Route::middleware('auth')->group(function () {
         
     Route::get('/training_proofs/{id}/view', [TrainingProofController::class, 'view'])
         ->name('training_proofs.view');
+        
+    // Training Proof Review (Unit Director only)
+    Route::middleware('checkrole:unit_director,unit director')->group(function () {
+        Route::get('/training_proofs/review', [TrainingProofController::class, 'reviewIndex'])
+            ->name('training_proofs.review_index');
+        Route::get('/training_proofs/{id}/review', [TrainingProofController::class, 'review'])
+            ->name('training_proofs.review');
+        Route::post('/training_proofs/{id}/process-review', [TrainingProofController::class, 'processReview'])
+            ->name('training_proofs.process_review');
+    });
         
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])

@@ -26,20 +26,8 @@ class TrainingRecordController extends Controller
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
-        
-        // Get training records for the authenticated user
-        $trainingRecords = TrainingRecord::where('user_id', $user->user_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        // Check if request is AJAX
-        if ($request->ajax() || $request->wantsJson()) {
-            // Return only the training records table content for modal
-            return view('training_records.partials.records_table', compact('user', 'trainingRecords'));
-        }
-        
-        return view('training_records.index', compact('user', 'trainingRecords'));
+        // Redirect to staff dashboard with training records view
+        return redirect()->route('staff.dashboard', ['view' => 'training-records']);
     }
 
     /**
@@ -49,8 +37,8 @@ class TrainingRecordController extends Controller
      */
     public function create()
     {
-        $user = Auth::user();
-        return view('training_records.create', compact('user'));
+        // Redirect to staff dashboard with modal trigger
+        return redirect()->route('staff.dashboard', ['view' => 'training-records', 'action' => 'create']);
     }
 
     /**
@@ -164,10 +152,32 @@ class TrainingRecordController extends Controller
      */
     public function edit($training_record)
     {
-        $user = Auth::user();
-        $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
-        
-        return view('training_records.edit', compact('user', 'trainingRecord'));
+        // Redirect to staff dashboard with modal trigger
+        return redirect()->route('staff.dashboard', ['view' => 'training-records', 'action' => 'edit', 'id' => $training_record]);
+    }
+
+    /**
+     * Get training record data for AJAX modal editing.
+     *
+     * @param  int  $training_record
+     * @return \Illuminate\Http\Response
+     */
+    public function editAjax($training_record)
+    {
+        try {
+            $user = Auth::user();
+            $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+            
+            return response()->json([
+                'success' => true,
+                'training_record' => $trainingRecord
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching training record'
+            ], 500);
+        }
     }
 
     /**

@@ -29,18 +29,57 @@ class NotificationController extends Controller
         try {
             $user = Auth::user();
             
-            $notifications = Notification::where('user_id', $user->user_id)
-                ->orderBy('created_at', 'desc')
-                ->get();
+            // Build query with potential filtering
+            $query = Notification::where('user_id', $user->user_id)
+                ->with('sender')
+                ->orderBy('created_at', 'desc');
+            
+            // Apply filter if provided
+            $filter = $request->input('filter', 'all');
+            if ($filter !== 'all') {
+                switch ($filter) {
+                    case 'unit_director':
+                        $query->whereHas('sender', function ($q) {
+                            $q->whereIn('role', ['unit_director', 'unit director']);
+                        });
+                        break;
+                    case 'office_head':
+                        $query->whereHas('sender', function ($q) {
+                            $q->where('role', 'head');
+                        });
+                        break;
+                    case 'system':
+                        $query->where(function ($q) {
+                            $q->whereNull('sender_id')
+                                ->orWhereDoesntHave('sender');
+                        });
+                        break;
+                }
+            }
+            
+            $notifications = $query->get();
             
             // Check if request wants HTML response (for office head dashboard)
             if ($request->wantsJson() === false && $request->headers->get('Accept') && strpos($request->headers->get('Accept'), 'text/html') !== false) {
                 return $this->renderNotificationsHTML($notifications);
             }
             
+            // Add sender information to each notification for JSON response
+            $notificationsWithSender = $notifications->map(function ($notification) {
+                $notificationArray = $notification->toArray();
+                if ($notification->sender) {
+                    $notificationArray['sender_name'] = $notification->sender->full_name ?? 'Unknown Sender';
+                    $notificationArray['sender_role'] = ucfirst($notification->sender->role ?? 'user');
+                } else {
+                    $notificationArray['sender_name'] = 'System';
+                    $notificationArray['sender_role'] = 'System';
+                }
+                return $notificationArray;
+            });
+            
             return response()->json([
                 'success' => true,
-                'notifications' => $notifications
+                'notifications' => $notificationsWithSender
             ]);
         } catch (\Exception $e) {
             \Log::error('Error fetching notifications: ' . $e->getMessage());
@@ -88,11 +127,20 @@ class NotificationController extends Controller
                 // Process message to convert proof references to links
                 $processedMessage = $this->processNotificationMessage($notification->message);
                 
+                // Get sender information
+                $senderInfo = '';
+                if ($notification->sender) {
+                    $senderName = $notification->sender->full_name ?? 'Unknown Sender';
+                    $senderRole = ucfirst($notification->sender->role ?? 'user');
+                    $senderInfo = '<small class="text-muted d-block mb-1">From: ' . e($senderName) . ' (' . e($senderRole) . ')</small>';
+                }
+                
                 $html .= '<div class="list-group-item ' . $isUnreadClass . '" data-notification-id="' . $notification->id . '">
                     <div class="d-flex w-100 justify-content-between">
                         <h6 class="mb-1">' . $unreadIndicator . e($notification->title) . '</h6>
                         <small class="text-muted">' . $notification->created_at->diffForHumans() . '</small>
                     </div>
+                    ' . $senderInfo . '
                     <p class="mb-1">' . $processedMessage . '</p>
                 </div>';
             }
@@ -113,10 +161,20 @@ class NotificationController extends Controller
     {
         try {
             // Convert proof references to clickable links
-            $message = preg_replace_callback('/\[View Proof\]\(proof:(\d+)\)/', function($matches) {
+            $user = Auth::user();
+            $message = preg_replace_callback('/\[View Proof\]\(proof:(\d+)\)/', function($matches) use ($user) {
                 $proofId = $matches[1];
-                return '<a href="' . route('training_proofs.view', $proofId) . '" target="_blank" class="btn btn-sm btn-outline-primary me-2">View Proof</a>' .
-                       '<a href="' . route('training_proofs.view', ['id' => $proofId, 'download' => 1]) . '" class="btn btn-sm btn-outline-secondary">Download</a>';
+                
+                // If user is a unit director, provide link to review page
+                if (in_array($user->role, ['unit_director', 'unit director'])) {
+                    return '<a href="' . route('training_proofs.review', $proofId) . '" class="btn btn-sm btn-outline-primary me-2">Review Proof</a>' .
+                           '<a href="' . route('training_proofs.view', $proofId) . '" target="_blank" class="btn btn-sm btn-outline-secondary me-2">View</a>' .
+                           '<a href="' . route('training_proofs.view', ['id' => $proofId, 'download' => 1]) . '" class="btn btn-sm btn-outline-secondary">Download</a>';
+                } else {
+                    // For other users, provide standard view/download links
+                    return '<a href="' . route('training_proofs.view', $proofId) . '" target="_blank" class="btn btn-sm btn-outline-primary me-2">View Proof</a>' .
+                           '<a href="' . route('training_proofs.view', ['id' => $proofId, 'download' => 1]) . '" class="btn btn-sm btn-outline-secondary">Download</a>';
+                }
             }, e($message));
         } catch (\Exception $e) {
             // If there's an error processing the message, return the original message
@@ -248,6 +306,7 @@ class NotificationController extends Controller
         foreach ($recipients as $recipientId) {
             Notification::create([
                 'user_id' => $recipientId,
+                'sender_id' => $user->user_id,
                 'title' => $validated['subject'] ?? 'Broadcast Message',
                 'message' => $validated['message'],
                 'is_read' => 0
@@ -295,6 +354,7 @@ class NotificationController extends Controller
         foreach ($recipients as $recipientId) {
             Notification::create([
                 'user_id' => $recipientId,
+                'sender_id' => $user->user_id,
                 'title' => $validated['subject'] ?? 'Office Head Message',
                 'message' => $validated['message'],
                 'is_read' => 0

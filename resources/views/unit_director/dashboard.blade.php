@@ -3,188 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Unit Director - Dashboard</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
+<link rel="stylesheet" href="{{ asset('css/unitdirector/dashboard.css') }}">
 
-body { 
-    font-family: 'Montserrat', sans-serif;
-    display: flex; 
-    background-color: #f0f2f5;
-}
-.main-content { flex-grow: 1; padding: 2rem; transition: margin-left 0.3s ease-in-out; }
-.sidebar-lg { transition: width 0.3s ease-in-out; }
-
-@media (min-width: 992px) {
-    .sidebar-lg { 
-        width: 250px; 
-        background-color: #1a237e; 
-        color: white; 
-        height: 100vh; 
-        position: fixed; 
-        padding-top: 2rem; 
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    .sidebar-lg .d-flex.justify-content-between { 
-        padding: 0.75rem 1rem; 
-    }
-    .main-content { margin-left: 250px; }
-}
-
-/* Sidebar collapse toggle */
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg { width: 80px; padding-top: 1rem; }
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .nav-link span,
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .logo-text,
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg h5 { display: none; }
-#sidebar-toggle-checkbox:checked ~ .main-content { margin-left: 80px; }
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .d-flex.justify-content-between { padding-left: 0.25rem !important; padding-right: 0.25rem !important; margin-bottom: 1rem !important; }
-
-/* Disable sidebar/main transitions so expand/collapse is instant (match other dashboards) */
-.sidebar-lg,
-.main-content,
-.sidebar-lg .nav-link,
-.sidebar-logo,
-.logo-text {
-    transition: none !important;
-    -webkit-transition: none !important;
-}
-@media (min-width: 992px) {
-    body.toggled .sidebar-lg { transition: none !important; }
-    body.toggled .main-content { transition: none !important; }
-}
-
-
-/* Consistent sidebar styling */
-.sidebar-lg .d-flex h5 { 
-    font-weight: 700; 
-    margin-right: 0 !important; 
-    font-size: 1rem;
-}
-.sidebar-lg .nav-link { 
-    color: #ffffff !important; 
-    padding: 12px 20px; 
-    border-radius: 5px; 
-    margin: 5px 15px; 
-    transition: background-color 0.2s; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    display: flex;
-    align-items: center;
-}
-.sidebar-lg .nav-link:hover, 
-.sidebar-lg .nav-link.active { 
-    background-color: #3f51b5; 
-    color: #ffffff !important; 
-}
-.sidebar-lg .nav-link i {
-    min-width: 20px;
-    text-align: center;
-    margin-right: 15px;
-}
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .nav-link i {
-    margin-right: 0;
-}
-.sidebar-lg .btn-toggle { background-color: transparent; border: none; color: #ffffff; padding: 6px 10px; cursor: pointer; }
-.sidebar-lg .btn-toggle:focus { box-shadow: none; }
-
-.stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-.card { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); padding: 2rem 1.5rem; text-align: center; border: none; transition: all 0.3s ease; position: relative; overflow: hidden; }
-.card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--card-color), var(--card-color-light)); }
-.card h3 { margin: 0 0 1rem; color: var(--card-color); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-.card p { font-size: 2.5rem; font-weight: 900; margin: 0; color: var(--card-color); }
-.card:nth-child(1) { --card-color: #6366f1; --card-color-light: #a5b4fc; }
-.card:nth-child(2) { --card-color: #10b981; --card-color-light: #6ee7b7; }
-.card:nth-child(3) { --card-color: #f59e0b; --card-color-light: #fbbf24; }
-.card:nth-child(4) { --card-color: #8b5cf6; --card-color-light: #c4b5fd; }
-.card:nth-child(5) { --card-color: #06b6d4; --card-color-light: #67e8f9; }
-
-.content-box { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); padding: 2rem; border: 1px solid rgba(255, 255, 255, 0.2); }
-.content-box h2 { color: #1e293b; border-bottom: 3px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px; font-weight: 700; font-size: 1.5rem; }
-
-
-
-.modal-body .form-label, .modal-body .form-control-plaintext { color: #1e293b !important; }
-.modal-dialog { display: flex; align-items: center; min-height: calc(100vh - 1rem); }
-.sidebar-logo { height: 30px; width: auto; margin-right: 8px; }
-
-@media (max-width: 991.98px) { .main-content { margin-left: 0 !important; } }
-@media (max-width: 768px) { .main-content { padding: 1rem; } .stats-cards { grid-template-columns: 1fr; } }
-/* Chart styling */
-.chart-card { padding: 1rem; }
-.chart-wrapper { overflow: hidden; max-height: 260px; }
-.chart-canvas { width: 100%; height: auto; display: block; }
-@media (min-width: 1200px) { .chart-wrapper { max-height: 320px; } }
-@media (max-width: 767px) { .chart-wrapper { max-height: 200px; } }
-
-/* Progress bar styling */
-.progress { 
-    border-radius: 10px; 
-    background-color: #e9ecef; 
-}
-.progress-bar { 
-    border-radius: 10px; 
-    background-color: #6366f1; 
-}
-
-/* Offcanvas sidebar for mobile */
-.offcanvas {
-    background-color: #1a237e;
-}
-.offcanvas .nav-link {
-    color: #ffffff !important;
-    padding: 12px 20px;
-    border-radius: 5px;
-    margin: 5px 0;
-    transition: background-color 0.2s;
-}
-.offcanvas .nav-link:hover,
-.offcanvas .nav-link.active {
-    background-color: #3f51b5;
-    color: #ffffff !important;
-}
-.offcanvas .nav-link i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-}
-</style>
 </head>
+
 <body id="body">
 <input type="checkbox" id="sidebar-toggle-checkbox" style="display: none;">
-
-<!-- Offcanvas Mobile -->
-<div class="offcanvas offcanvas-start bg-dark" tabindex="-1" id="offcanvasNavbar">
-  <div class="offcanvas-header text-white">
-    <h5 class="offcanvas-title">SDU Menu</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-  </div>
-  <div class="offcanvas-body">
-    <ul class="navbar-nav">
-      <li class="nav-item"><a class="nav-link active" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i>Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i>Directory & Reports</a></li>
-      <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pending_approvals }}</span></a></li>
-      <li class="nav-item"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-    </ul>
-  </div>
-</div>
 
 <!-- Desktop Sidebar -->
 <div class="sidebar-lg d-none d-lg-block">
   <div class="d-flex justify-content-between align-items-center px-3 mb-3">
     <div class="d-flex align-items-center">
-      <img src="{{ asset('images/SDU_Logo.png') }}" class="sidebar-logo" alt="SDU">
+      <img src="{{ asset('SDU_Logo.png') }}" class="sidebar-logo" alt="SDU">
       <h5 class="m-0 text-white">SDU UNIT DIRECTOR</h5>
     </div>
     <label for="sidebar-toggle-checkbox" class="btn btn-toggle" style="color:#fff;border:none;background:transparent"><i class="fas fa-bars"></i></label>
   </div>
   <ul class="nav flex-column">
-    <li class="nav-item"><a class="nav-link active" href="{{ route('admin.dashboard') }}" ><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
-    <li class="nav-item"><a class="nav-link" href="{{ route('directory_reports.index') }}" ><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
-    <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i> <span> Pending Approvals <span class="badge bg-danger">{{ $pending_approvals }}</span></span></a></li>
+    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
+    <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
+     @if(in_array($user->role, ['unit director', 'unit_director']))
+      <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
+      @endif
+    <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
     <li class="nav-item mt-auto"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
   </ul>
 </div>
@@ -564,20 +409,30 @@ function fetchInboxCount() {
 
 // Load inbox list
 function loadInboxList() {
-    fetch('{{ route('notifications.get') }}')
-        .then(response => response.json())
+    fetch('{{ route('notifications.get') }}', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 renderNotifications(data.notifications);
             } else {
                 document.getElementById('notificationsList').innerHTML = 
-                    '<div class="alert alert-danger">Failed to load notifications</div>';
+                    '<div class="alert alert-danger">Failed to load notifications: ' + (data.message || 'Unknown error') + '</div>';
             }
         })
         .catch(error => {
             console.error('Error loading notifications:', error);
             document.getElementById('notificationsList').innerHTML = 
-                '<div class="alert alert-danger">Error loading notifications</div>';
+                '<div class="alert alert-danger">Error loading notifications: ' + error.message + '</div>';
         });
 }
 
@@ -758,6 +613,7 @@ document.getElementById('deleteAllBtn')?.addEventListener('click', function() {
         alert('Error deleting all notifications');
     });
 });
+
 </script>
 </body>
 </html>

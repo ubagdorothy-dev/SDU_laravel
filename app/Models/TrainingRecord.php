@@ -77,4 +77,12 @@ class TrainingRecord extends Model
     {
         return $this->belongsTo(Office::class, 'office_code', 'code');
     }
+    
+    /**
+     * Get the proof associated with the training record.
+     */
+    public function proof()
+    {
+        return $this->hasOne(TrainingProof::class, 'training_id', 'id');
+    }
 }

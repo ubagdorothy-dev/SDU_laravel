@@ -24,23 +24,47 @@ class DirectoryReportsController extends Controller
     /**
      * Display directory and reports.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        
+        // Get filter parameters
+        $officeFilter = $request->get('office', 'all');
+        $roleFilter = $request->get('role', 'all');
+        $periodFilter = $request->get('period', 'all');
         
         // Get all offices
         $offices = Office::all();
         
-        // Get all users with their office information, staff details, and training records
-        $users = User::with(['office', 'staffDetail', 'trainingRecords'])->get();
+        // Build user query with potential filtering
+        $userQuery = User::with(['office', 'staffDetail', 'trainingRecords.proof']);
         
-        // Get training statistics
-        $trainingStats = $this->getTrainingStats();
+        // Apply office filter
+        if ($officeFilter !== 'all') {
+            $userQuery->where('office_code', $officeFilter);
+        }
         
-        // Get office statistics
-        $officeStats = $this->getOfficeStats();
+        // Apply role filter
+        if ($roleFilter !== 'all') {
+            $userQuery->where('role', $roleFilter);
+        }
+        
+        // Apply period filter (based on created_at year)
+        if ($periodFilter !== 'all') {
+            $userQuery->whereYear('created_at', $periodFilter);
+        }
+        
+        // Get filtered users
+        $users = $userQuery->get();
+        
+        // Get training statistics (filtered)
+        $trainingStats = $this->getTrainingStats($officeFilter, $roleFilter, $periodFilter);
+        
+        // Get office statistics (filtered)
+        $officeStats = $this->getOfficeStats($officeFilter, $roleFilter, $periodFilter);
         
         // Get pending approvals count for unit directors
         $pendingApprovalsCount = 0;
@@ -55,13 +79,53 @@ class DirectoryReportsController extends Controller
     
     /**
      * Get training statistics.
+     *
+     * @param string $officeFilter
+     * @param string $roleFilter
+     * @param string $periodFilter
      */
-    private function getTrainingStats()
+    private function getTrainingStats($officeFilter = 'all', $roleFilter = 'all', $periodFilter = 'all')
     {
-        $totalTrainings = TrainingRecord::count();
-        $completedTrainings = TrainingRecord::where('status', 'completed')->count();
-        $upcomingTrainings = TrainingRecord::where('status', 'upcoming')->count();
-        $ongoingTrainings = TrainingRecord::where('status', 'ongoing')->count();
+        // Build training record query with potential filtering
+        $trainingQuery = TrainingRecord::query();
+        $completedQuery = clone $trainingQuery;
+        $upcomingQuery = clone $trainingQuery;
+        $ongoingQuery = clone $trainingQuery;
+        
+        // Apply office filter if not 'all'
+        if ($officeFilter !== 'all') {
+            $trainingQuery->where('office_code', $officeFilter);
+            $completedQuery->where('office_code', $officeFilter);
+            $upcomingQuery->where('office_code', $officeFilter);
+            $ongoingQuery->where('office_code', $officeFilter);
+        }
+        
+        // Apply role filter if not 'all' (need to join with users table)
+        if ($roleFilter !== 'all') {
+            $userIds = User::where('role', $roleFilter);
+            if ($officeFilter !== 'all') {
+                $userIds->where('office_code', $officeFilter);
+            }
+            $userIds = $userIds->pluck('user_id');
+            
+            $trainingQuery->whereIn('user_id', $userIds);
+            $completedQuery->whereIn('user_id', $userIds);
+            $upcomingQuery->whereIn('user_id', $userIds);
+            $ongoingQuery->whereIn('user_id', $userIds);
+        }
+        
+        // Apply period filter if not 'all'
+        if ($periodFilter !== 'all') {
+            $trainingQuery->whereYear('created_at', $periodFilter);
+            $completedQuery->whereYear('created_at', $periodFilter);
+            $upcomingQuery->whereYear('created_at', $periodFilter);
+            $ongoingQuery->whereYear('created_at', $periodFilter);
+        }
+        
+        $totalTrainings = $trainingQuery->count();
+        $completedTrainings = $completedQuery->where('status', 'completed')->count();
+        $upcomingTrainings = $upcomingQuery->where('status', 'upcoming')->count();
+        $ongoingTrainings = $ongoingQuery->where('status', 'ongoing')->count();
         
         return [
             'total' => $totalTrainings,
@@ -73,23 +137,61 @@ class DirectoryReportsController extends Controller
     
     /**
      * Get office statistics.
+     *
+     * @param string $officeFilter
+     * @param string $roleFilter
+     * @param string $periodFilter
      */
-    private function getOfficeStats()
+    private function getOfficeStats($officeFilter = 'all', $roleFilter = 'all', $periodFilter = 'all')
     {
-        $offices = Office::all();
+        // Get offices (filtered if needed)
+        $officesQuery = Office::query();
+        if ($officeFilter !== 'all') {
+            $officesQuery->where('code', $officeFilter);
+        }
+        $offices = $officesQuery->get();
+        
         $officeStats = [];
         
         foreach ($offices as $office) {
-            $staffCount = User::where('office_code', $office->code)
-                ->whereIn('role', ['staff', 'head'])
-                ->count();
+            // Build staff query with potential filtering
+            $staffQuery = User::where('office_code', $office->code)
+                ->whereIn('role', ['staff', 'head']);
                 
-            $trainingCount = TrainingRecord::where('office_code', $office->code)
-                ->count();
+            // Apply role filter if not 'all'
+            if ($roleFilter !== 'all') {
+                $staffQuery->where('role', $roleFilter);
+            }
+            
+            // Apply period filter if not 'all'
+            if ($periodFilter !== 'all') {
+                $staffQuery->whereYear('created_at', $periodFilter);
+            }
+            
+            $staffCount = $staffQuery->count();
                 
-            $completedTrainingCount = TrainingRecord::where('office_code', $office->code)
-                ->where('status', 'completed')
-                ->count();
+            // Build training query with potential filtering
+            $trainingQuery = TrainingRecord::where('office_code', $office->code);
+            $completedTrainingQuery = clone $trainingQuery;
+                
+            // Apply role filter if not 'all' (need to join with users table)
+            if ($roleFilter !== 'all') {
+                $userIds = User::where('role', $roleFilter)
+                    ->where('office_code', $office->code)
+                    ->pluck('user_id');
+                
+                $trainingQuery->whereIn('user_id', $userIds);
+                $completedTrainingQuery->whereIn('user_id', $userIds);
+            }
+            
+            // Apply period filter if not 'all'
+            if ($periodFilter !== 'all') {
+                $trainingQuery->whereYear('created_at', $periodFilter);
+                $completedTrainingQuery->whereYear('created_at', $periodFilter);
+            }
+                
+            $trainingCount = $trainingQuery->count();
+            $completedTrainingCount = $completedTrainingQuery->where('status', 'completed')->count();
                 
             $officeStats[] = [
                 'office' => $office,

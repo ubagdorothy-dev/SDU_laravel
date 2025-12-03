@@ -7,7 +7,7 @@
     <title>Staff Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dashboard/staff.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/staff/dashboard.css') }}">
 </head>
 <body id="body">
 <input type="checkbox" id="sidebar-toggle-checkbox" style="display: none;">
@@ -105,11 +105,6 @@
                     <i class="fas fa-user"></i>
                     <h4>View Profile</h4>
                     <p>Manage your information</p>
-                </div>
-                <div class="action-card" data-bs-toggle="modal" data-bs-target="#trainingRecordsModal" style="cursor:pointer;">
-                    <i class="fas fa-book-open"></i>
-                    <h4>Training Records</h4>
-                    <p>Review your records instantly</p>
                 </div>
             </div>
             
@@ -466,6 +461,55 @@
                 });
             }
 
+            // Handle URL parameters to auto-open modals
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+            const trainingId = urlParams.get('id');
+            const view = urlParams.get('view');
+            
+            if (action === 'create') {
+                // Auto-open add training modal
+                const addModal = new bootstrap.Modal(document.getElementById('addTrainingModal'));
+                addModal.show();
+            } else if (action === 'edit' && trainingId) {
+                // Auto-open edit training modal with training data
+                fetch(`/training_records/${trainingId}/edit-ajax`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const editModalElement = document.getElementById('editTrainingModal');
+                            const form = document.getElementById('editTrainingForm');
+                            
+                            // Populate form fields
+                            form.elements['id'].value = data.training_record.id;
+                            form.elements['title'].value = data.training_record.title;
+                            if (form.elements['description']) {
+                                form.elements['description'].value = data.training_record.description || '';
+                            }
+                            if (form.elements['start_date']) {
+                                form.elements['start_date'].value = data.training_record.start_date || '';
+                            }
+                            if (form.elements['end_date']) {
+                                form.elements['end_date'].value = data.training_record.end_date || '';
+                            }
+                            if (form.elements['venue']) {
+                                form.elements['venue'].value = data.training_record.venue || '';
+                            }
+                            if (form.elements['nature_of_training']) {
+                                form.elements['nature_of_training'].value = data.training_record.nature_of_training || '';
+                            }
+                            if (form.elements['scope']) {
+                                form.elements['scope'].value = data.training_record.scope || '';
+                            }
+                            
+                            // Show the modal
+                            const editModal = new bootstrap.Modal(editModalElement);
+                            editModal.show();
+                        }
+                    })
+                    .catch(error => console.error('Error fetching training record:', error));
+            }
+
             // Setup for add training form
             var addForm = document.getElementById('addTrainingForm');
             if (addForm) {
@@ -545,38 +589,6 @@
                             console.error('Fetch error on create:', err);
                             fb.innerHTML = '<div class="alert alert-danger">Request failed: ' + (err && err.message ? err.message : 'network error') + '</div>';
                         });
-                });
-            }
-            
-            // Training records modal loader
-            const trainingRecordsModal = document.getElementById('trainingRecordsModal');
-            if (trainingRecordsModal) {
-                trainingRecordsModal.addEventListener('show.bs.modal', function () {
-                    const container = document.getElementById('trainingRecordsContent');
-                    container.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
-                    
-                    // Fetch training records via AJAX
-                    fetch('{{ route('training_records.index') }}', {
-                        method: 'GET',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'text/html'
-                        }
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.text();
-                        } else {
-                            throw new Error('Failed to load training records');
-                        }
-                    })
-                    .then(html => {
-                        container.innerHTML = html;
-                    })
-                    .catch(error => {
-                        console.error('Error loading training records:', error);
-                        container.innerHTML = '<div class="alert alert-danger">Failed to load training records. Please try again.</div>';
-                    });
                 });
             }
             

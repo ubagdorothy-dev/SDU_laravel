@@ -158,6 +158,40 @@ class TrainingProofController extends Controller
             $notification->is_read = false;
             $notification->save();
         }
+        
+        // Notify unit directors
+        $this->notifyUnitDirectors($trainingRecord, $staffUser, $trainingProof);
+    }
+    
+    /**
+     * Notify unit directors when a training proof is uploaded.
+     *
+     * @param  TrainingRecord  $trainingRecord
+     * @param  User  $staffUser
+     * @param  TrainingProof  $trainingProof
+     * @return void
+     */
+    private function notifyUnitDirectors($trainingRecord, $staffUser, $trainingProof)
+    {
+        // Find all unit directors
+        $unitDirectors = User::whereIn('role', ['unit_director', 'unit director'])
+            ->get();
+            
+        foreach ($unitDirectors as $director) {
+            $notification = new Notification();
+            $notification->user_id = $director->user_id;
+            $notification->title = 'New Training Proof Uploaded';
+            
+            // Include a reference to the training proof in the message
+            if ($trainingProof) {
+                $notification->message = "Staff member {$staffUser->full_name} has uploaded proof for training: {$trainingRecord->title}. Please review. [View Proof](proof:{$trainingProof->id})";
+            } else {
+                $notification->message = "Staff member {$staffUser->full_name} has uploaded proof for training: {$trainingRecord->title}. Please review.";
+            }
+            
+            $notification->is_read = false;
+            $notification->save();
+        }
     }
     
     /**
@@ -174,11 +208,18 @@ class TrainingProofController extends Controller
         // Find the training proof
         $trainingProofQuery = TrainingProof::where('id', $proof_id);
         
-        // If user is not the owner, check if they are an office head for the same office
+        // If user is not the owner, check permissions
         if ($user->role !== 'staff') {
-            $trainingProofQuery->whereHas('trainingRecord', function($query) use ($user) {
-                $query->where('office_code', $user->office_code);
-            });
+            // Office heads can view proofs from their office
+            // Unit directors can view all proofs
+            if (in_array($user->role, ['unit_director', 'unit director'])) {
+                // Unit directors can view all proofs - no additional filtering needed
+            } else {
+                // Office heads can only view proofs from their office
+                $trainingProofQuery->whereHas('trainingRecord', function($query) use ($user) {
+                    $query->where('office_code', $user->office_code);
+                });
+            }
         } else {
             // For staff users, ensure they own the proof
             $trainingProofQuery->where('user_id', $user->user_id);
@@ -209,5 +250,157 @@ class TrainingProofController extends Controller
     public function download($proof_id)
     {
         return $this->view($proof_id, request());
+    }
+    
+    /**
+     * Show pending training proofs for unit director review.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function reviewIndex(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Only unit directors can access this
+        if (!in_array($user->role, ['unit_director', 'unit director'])) {
+            abort(403, 'Unauthorized');
+        }
+        
+        // Get pending training proofs with related data
+        $query = TrainingProof::with(['trainingRecord', 'user'])
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc');
+            
+        // Get paginated results
+        $pendingProofs = $query->paginate(10);
+        
+        // Get pending approvals count for unit directors
+        $pendingApprovalsCount = 0;
+        if (in_array($user->role, ['unit director', 'unit_director'])) {
+            $pendingApprovalsCount = User::where('is_approved', 0)
+                ->whereIn('role', ['staff', 'head'])
+                ->count();
+        }
+        
+        return view('training_proofs.review_index', compact('pendingProofs', 'user', 'pendingApprovalsCount'));
+    }
+    
+    /**
+     * Review a specific training proof.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $proof_id
+     * @return \Illuminate\Http\Response
+     */
+    public function review(Request $request, $proof_id)
+    {
+        $user = Auth::user();
+        
+        // Only unit directors can access this
+        if (!in_array($user->role, ['unit_director', 'unit director'])) {
+            abort(403, 'Unauthorized');
+        }
+        
+        // Find the training proof with related data
+        $trainingProof = TrainingProof::with(['trainingRecord', 'user'])
+            ->where('id', $proof_id)
+            ->where('status', 'pending')
+            ->firstOrFail();
+            
+        return view('training_proofs.review', compact('trainingProof'));
+    }
+    
+    /**
+     * Approve or reject a training proof.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $proof_id
+     * @return \Illuminate\Http\Response
+     */
+    public function processReview(Request $request, $proof_id)
+    {
+        try {
+            $user = Auth::user();
+            
+            // Only unit directors can access this
+            if (!in_array($user->role, ['unit_director', 'unit director'])) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Unauthorized access'
+                    ], 403);
+                }
+                abort(403, 'Unauthorized');
+            }
+        
+        // Validate request
+        try {
+            $request->validate([
+                'action' => 'required|in:approve,reject',
+                'remarks' => 'nullable|string|max:500'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+            throw $e;
+        }
+        
+        // Find the training proof
+        $trainingProof = TrainingProof::where('id', $proof_id)
+            ->where('status', 'pending')
+            ->firstOrFail();
+            
+        // Update the proof status
+        $trainingProof->status = $request->action === 'approve' ? 'approved' : 'rejected';
+        $trainingProof->reviewed_by = $user->user_id;
+        $trainingProof->reviewed_at = now();
+        $trainingProof->remarks = $request->remarks;
+        $trainingProof->save();
+        
+        // Update training record status if proof is approved
+        $trainingRecord = $trainingProof->trainingRecord;
+        if ($request->action === 'approve' && $trainingRecord) {
+            $trainingRecord->status = 'completed';
+            $trainingRecord->save();
+        }
+        
+        // Notify the staff member
+        $staffUser = $trainingProof->user;
+        
+        $notification = new Notification();
+        $notification->user_id = $staffUser->user_id;
+        $notification->title = $request->action === 'approve' ? 'Training Proof Approved' : 'Training Proof Rejected';
+        $notification->message = $request->action === 'approve' 
+            ? "Your proof for training '{$trainingRecord->title}' has been approved by the Unit Director. The training status has been updated to completed." 
+            : "Your proof for training '{$trainingRecord->title}' has been rejected by the Unit Director. Remarks: " . ($request->remarks ?: 'None provided');
+        $notification->is_read = false;
+        $notification->save();
+        
+        // Return success response
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Training proof {$request->action}d successfully.",
+                'status' => $request->action === 'approve' ? 'approved' : 'rejected'
+            ]);
+        }
+        
+        return redirect()->route('training_proofs.review_index')
+            ->with('success', "Training proof {$request->action}d successfully.");
+        } catch (\Exception $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'An error occurred while processing the review'
+                ], 500);
+            }
+            throw $e;
+        }
     }
 }

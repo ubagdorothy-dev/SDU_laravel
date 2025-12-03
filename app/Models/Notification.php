@@ -30,6 +30,7 @@ class Notification extends Model
      */
     protected $fillable = [
         'user_id',
+        'sender_id',
         'title',
         'message',
         'is_read',
@@ -58,5 +59,13 @@ class Notification extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
+
+    /**
+     * Get the sender of the notification.
+     */
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id', 'user_id');
     }
 }

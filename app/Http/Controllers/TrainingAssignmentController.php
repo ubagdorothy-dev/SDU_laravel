@@ -29,7 +29,12 @@ class TrainingAssignmentController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
             
-        return view('training_assignments.index', compact('assignments'));
+        // Get pending approvals count for sidebar
+        $pendingApprovalsCount = User::where('is_approved', 0)
+            ->whereIn('role', ['staff', 'head'])
+            ->count();
+            
+        return view('training_assignments.index', compact('assignments', 'user', 'pendingApprovalsCount'));
     }
     
     /**
@@ -52,7 +57,15 @@ class TrainingAssignmentController extends Controller
         // Get all staff members
         $staff = User::where('role', 'staff')->get();
         
-        return view('training_assignments.create', compact('trainings', 'staff'));
+        // Get pending approvals count for unit directors
+        $pendingApprovalsCount = 0;
+        if (in_array($user->role, ['unit director', 'unit_director'])) {
+            $pendingApprovalsCount = User::where('is_approved', 0)
+                ->whereIn('role', ['staff', 'head'])
+                ->count();
+        }
+        
+        return view('training_assignments.create', compact('trainings', 'staff', 'user', 'pendingApprovalsCount'));
     }
     
     /**
@@ -99,9 +112,10 @@ class TrainingAssignmentController extends Controller
     /**
      * Display a listing of assigned trainings for staff members.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function myAssignments()
+    public function myAssignments(Request $request)
     {
         $user = Auth::user();
         
@@ -115,6 +129,14 @@ class TrainingAssignmentController extends Controller
             ->where('staff_id', $user->user_id)
             ->orderBy('created_at', 'desc')
             ->get();
+            
+        // Return JSON for AJAX requests (modal loading)
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'assignments' => $assignments
+            ]);
+        }
             
         return view('training_assignments.my_assignments', compact('assignments'));
     }

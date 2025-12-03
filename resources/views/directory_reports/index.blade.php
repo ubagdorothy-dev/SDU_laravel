@@ -7,204 +7,11 @@
 <title>Staff Directory & Training Reports</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
-
-body { 
-    font-family: 'Montserrat', sans-serif;
-    display: flex; 
-    background-color: #f0f2f5;
-}
-
-.main-content { 
-    flex-grow: 1; 
-    padding: 2rem; 
-    transition: margin-left 0.3s ease-in-out; 
-}
-
-.sidebar-lg { 
-    transition: width 0.3s ease-in-out; 
-}
-
-@media (min-width: 992px) {
-    .sidebar-lg { 
-        width: 250px; 
-        background-color: #1a237e; 
-        color: white; 
-        height: 100vh; 
-        position: fixed; 
-        padding-top: 2rem; 
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    .sidebar-lg .d-flex.justify-content-between { 
-        padding: 0.75rem 1rem; 
-    }
-    .main-content { margin-left: 250px; }
-}
-
-/* Sidebar collapse toggle */
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg { 
-    width: 80px; 
-    padding-top: 1rem; 
-}
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .nav-link span,
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .logo-text,
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg h5 { 
-    display: none; 
-}
-#sidebar-toggle-checkbox:checked ~ .main-content { 
-    margin-left: 80px; 
-}
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .nav-link { 
-    text-align: center; 
-    padding: 12px 0; 
-}
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .d-flex.justify-content-between { 
-    padding-left: 0.25rem !important; 
-    padding-right: 0.25rem !important; 
-    margin-bottom: 1rem !important; 
-}
-
-/* Consistent sidebar styling */
-.sidebar-lg .d-flex h5 { 
-    font-weight: 700; 
-    margin-right: 0 !important; 
-    font-size: 1rem;
-}
-.sidebar-lg .nav-link { 
-    color: #ffffff !important; 
-    padding: 12px 20px; 
-    border-radius: 5px; 
-    margin: 5px 15px; 
-    transition: background-color 0.2s; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    display: flex;
-    align-items: center;
-}
-.sidebar-lg .nav-link:hover, 
-.sidebar-lg .nav-link.active { 
-    background-color: #3f51b5; 
-    color: #ffffff !important; 
-}
-.sidebar-lg .nav-link i {
-    min-width: 20px;
-    text-align: center;
-    margin-right: 15px;
-}
-#sidebar-toggle-checkbox:checked ~ .sidebar-lg .nav-link i {
-    margin-right: 0;
-}
-
-.sidebar-lg .btn-toggle { 
-    background-color: transparent; 
-    border: none; 
-    color: #ffffff; 
-    padding: 6px 10px; 
-    cursor: pointer; 
-}
-.sidebar-lg .btn-toggle:focus { 
-    box-shadow: none; 
-}
-
-.sidebar-logo { 
-    height: 30px; 
-    width: auto; 
-    margin-right: 8px; 
-}
-
-/* Offcanvas sidebar for mobile */
-.offcanvas {
-    background-color: #1a237e;
-}
-.offcanvas .nav-link {
-    color: #ffffff !important;
-    padding: 12px 20px;
-    border-radius: 5px;
-    margin: 5px 0;
-    transition: background-color 0.2s;
-}
-.offcanvas .nav-link:hover,
-.offcanvas .nav-link.active {
-    background-color: #3f51b5;
-    color: #ffffff !important;
-}
-.offcanvas .nav-link i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-}
-
-/* Responsive adjustments */
-@media (max-width: 991.98px) { 
-    .main-content { 
-        margin-left: 0 !important; 
-        padding: 1rem;
-    } 
-}
-
-.content-box{background:rgba(255,255,255,.98);border-radius:12px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,.08);border:1px solid rgba(0,0,0,.03)}
-.content-box h2{font-weight:800;color:#2b3742;margin-bottom:1rem}
-.table thead th{background:#f1f5f9;color:#374151;font-weight:700}
-.table tbody td{vertical-align:middle}
-.badge-complete{background:#16a34a;color:#fff}
-.badge-ongoing{background:#2563eb;color:#fff}
-
-.modal-body .form-label, .modal-body .form-control-plaintext { color: #1e293b !important; }
-.modal-dialog { display: flex; align-items: center; min-height: calc(100vh - 1rem); }
-
-/* Master-detail table styles (lightweight) */
-.master-table{ width:100%; border-collapse:collapse; min-width:720px; }
-.master-table thead th{ text-align:left; font-size:0.85rem; padding:12px 10px; color:#6b7280; border-bottom:1px solid #eef2f7; font-weight:700; }
-.master-table td{ padding:12px 10px; vertical-align:middle; border-bottom:1px solid #f1f5f9; font-size:0.95rem; }
-.col-toggle{ width:44px; text-align:center; }
-.toggle-indicator{ display:inline-block; width:18px; height:18px; transition:transform 160ms ease; font-size:12px; }
-.toggle-indicator.open{ transform:rotate(90deg); }
-.detail-row{ background:#fbfdff; }
-.detail-cell{ padding:10px 12px; }
-.detail-table{ width:100%; border-collapse:collapse; margin-top:6px; }
-.detail-table th{ font-size:0.8rem; padding:8px 10px; text-align:left; color:#6b7280; border-bottom:1px solid #eef2f7; font-weight:700; }
-.detail-table td{ padding:8px 10px; border-bottom:1px dashed #f1f5f9; font-size:0.9rem; }
-.badge{ display:inline-block; padding:4px 8px; font-size:0.78rem; border-radius:999px; color:#fff; font-weight:700; }
-.badge.completed{ background:#10b981; }
-.badge.ongoing{ background:#1f6feb; }
-.badge.cancelled{ background:#ef4444; }
-
-@media (max-width: 768px) {
-    .main-content { padding: 1rem; }
-    .content-box { padding: 1.5rem; }
-    .d-flex.flex-wrap { flex-direction: column; }
-    .me-2 { margin-bottom: 1rem; }
-}
-</style>
+<link rel="stylesheet" href="{{ asset('css/unitdirector/directoryreports.css') }}">
 </head>
 <body>
     
-<input type="checkbox" id="sidebar-toggle-checkbox" style="display:none;">
-
-<!-- Offcanvas Mobile -->
-<div class="offcanvas offcanvas-start bg-dark" tabindex="-1" id="offcanvasNavbar">
-  <div class="offcanvas-header text-white">
-    <h5 class="offcanvas-title">SDU Menu</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas"></button>
-  </div>
-  <div class="offcanvas-body">
-    <ul class="navbar-nav">
-      <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i>Dashboard</a></li>
-      <li class="nav-item"><a class="nav-link active" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i>Directory & Reports</a></li>
-      @if(in_array($user->role, ['unit director', 'unit_director']))
-      <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
-      @endif
-      <li class="nav-item">
-        <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="fas fa-sign-out-alt me-2"></i>Logout
-        </a>
-      </li>
-    </ul>
-  </div>
-</div>
+<input type="checkbox" id="sidebar-toggle-checkbox" style="display: none;">
 
 <!-- Desktop Sidebar -->
 <div class="sidebar-lg d-none d-lg-block">
@@ -216,23 +23,17 @@ body {
     <label for="sidebar-toggle-checkbox" class="btn btn-toggle" style="color:#fff;border:none;background:transparent"><i class="fas fa-bars"></i></label>
   </div>
   <ul class="nav flex-column">
-    <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}" ><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
-    <li class="nav-item"><a class="nav-link active" href="{{ route('directory_reports.index') }}" ><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
+    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
+    <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
     @if(in_array($user->role, ['unit director', 'unit_director']))
-    <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i> <span> Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></span></a></li>
+      <li class="nav-item"><a class="nav-link {{ request()->routeIs('pending_approvals.index') ? 'active' : '' }}" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
     @endif
-    <li class="nav-item mt-auto">
-        <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="fas fa-sign-out-alt me-2"></i><span> Logout</span>
-        </a>
-    </li>
+    <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
+    <li class="nav-item mt-auto"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
   </ul>
 </div>
-
 <!-- Main -->
 <div class="main-content">
-  <button class="btn btn-primary d-lg-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"><i class="fas fa-bars"></i> Menu</button>
-
   <div class="content-box">
     <h2>Staff Directory & Training Reports</h2>
 
@@ -286,38 +87,22 @@ body {
     </div>
 
     <!-- Stats Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Total Trainings</h5>
-                    <p class="card-text display-4">{{ $trainingStats['total'] }}</p>
-                </div>
-            </div>
+    <div class="stats-cards">
+        <div class="card">
+            <h3>Total Trainings</h3>
+            <p>{{ $trainingStats['total'] }}</p>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Completed</h5>
-                    <p class="card-text display-4">{{ $trainingStats['completed'] }}</p>
-                </div>
-            </div>
+        <div class="card">
+            <h3>Completed</h3>
+            <p>{{ $trainingStats['completed'] }}</p>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Upcoming</h5>
-                    <p class="card-text display-4">{{ $trainingStats['upcoming'] }}</p>
-                </div>
-            </div>
+        <div class="card">
+            <h3>Upcoming</h3>
+            <p>{{ $trainingStats['upcoming'] }}</p>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Ongoing</h5>
-                    <p class="card-text display-4">{{ $trainingStats['ongoing'] }}</p>
-                </div>
-            </div>
+        <div class="card">
+            <h3>Ongoing</h3>
+            <p>{{ $trainingStats['ongoing'] }}</p>
         </div>
     </div>
 
@@ -422,17 +207,17 @@ body {
 
 <!-- Trainings Modal -->
 <div class="modal fade" id="trainingsModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" style="background-color: #1a237e; color: white;">
         <h5 class="modal-title">Staff Trainings</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <h4 id="trainingsModalTitle">Training Records</h4>
+        <h4 id="trainingsModalTitle" style="color: #1a237e;">Training Records</h4>
         <div class="table-responsive">
           <table class="table table-bordered">
-            <thead class="table-dark">
+            <thead style="background-color: #1a237e; color: white;">
               <tr>
                 <th>Training Title</th>
                 <th>Description</th>
@@ -441,7 +226,7 @@ body {
                 <th>Nature</th>
                 <th>Scope</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Proof</th>
               </tr>
             </thead>
             <tbody id="trainingsModalBody">
@@ -456,6 +241,34 @@ body {
     </div>
   </div>
 </div>
+
+<!-- Proof Preview Modal -->
+<div class="modal fade" id="proofPreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #1a237e; color: white;">
+        <h5 class="modal-title">Proof Preview</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center p-0" id="proofPreviewContent">
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 500px;">
+          <div>
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading proof...</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="#" id="downloadProofLink" class="btn btn-primary" download>Download</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -493,14 +306,34 @@ document.getElementById('printBtn').addEventListener('click', function(){
 });
 
 // Filtering logic (client-side simple)
-document.getElementById('applyFilters').addEventListener('click', function(){
-  const office = encodeURIComponent(document.getElementById('filter-office').value || 'all');
-  const role = encodeURIComponent(document.getElementById('filter-role').value || 'all');
-  const period = encodeURIComponent(document.getElementById('filter-period').value || 'all');
-  // Redirect to same page with query parameters so results come from SQL
-  const qs = `?office=${office}&role=${role}&period=${period}`;
-  window.location.href = window.location.pathname + qs;
-});
+const applyFiltersBtn = document.getElementById('applyFilters');
+if (applyFiltersBtn) {
+  applyFiltersBtn.addEventListener('click', function(){
+    try {
+      const officeFilter = document.getElementById('filter-office');
+      const roleFilter = document.getElementById('filter-role');
+      const periodFilter = document.getElementById('filter-period');
+      
+      if (!officeFilter || !roleFilter || !periodFilter) {
+        console.error('Filter elements not found');
+        return;
+      }
+      
+      const office = encodeURIComponent(officeFilter.value || 'all');
+      const role = encodeURIComponent(roleFilter.value || 'all');
+      const period = encodeURIComponent(periodFilter.value || 'all');
+      
+      // Redirect to same page with query parameters so results come from SQL
+      const qs = `?office=${office}&role=${role}&period=${period}`;
+      window.location.href = window.location.pathname + qs;
+    } catch (error) {
+      console.error('Error applying filters:', error);
+      alert('Error applying filters. Please try again.');
+    }
+  });
+} else {
+  console.warn('Apply filters button not found');
+}
 
 document.addEventListener('DOMContentLoaded', function(){
     // Synchronize the hidden checkbox with the body.toggled class.
@@ -574,8 +407,11 @@ const staffList = [];
             end_date: "{{ $training->end_date }}",
             venue: "{{ $training->venue }}",
             status: "{{ $training->status }}",
-            nature: "{{ $training->nature }}",
-            scope: "{{ $training->scope }}"
+            nature: "{{ $training->nature_of_training }}",
+            scope: "{{ $training->scope }}",
+            proof_document: "{{ $training->proof ? addslashes($training->proof->file_path) : '' }}",
+            proof_id: {{ $training->proof ? $training->proof->id : 'null' }},
+            proof_status: "{{ $training->proof ? $training->proof->status : '' }}"
         },
         @endforeach
     ];
@@ -615,13 +451,10 @@ function showTrainingsFor(userId, userName) {
         arr.forEach(t => {
             const tr = document.createElement('tr');
             const statusHtml = renderStatusBadgeClient(t.status || '');
-            const actions = t.training_id ? 
-                `<button class="btn btn-sm btn-outline-primary" onclick="onViewTraining(${t.training_id}, this)">View</button> 
-                 <button class="btn btn-sm btn-outline-secondary" onclick="onUploadProof(${t.training_id}, this)">Upload Proof</button>` + 
-                (( (t.status||'').toLowerCase() !== 'completed') ? 
-                    ` <button class="btn btn-sm btn-success" onclick="onMarkCompleted(${t.training_id}, this)">Mark Completed</button>` : 
-                    '') : 
-                '<span class="text-muted">No actions</span>';
+            // Add proof preview if available
+            const proofPreview = t.proof_document ? 
+                `<button class="btn btn-sm btn-info" onclick="previewProof('/storage/${t.proof_document}', ${t.proof_id}, '${t.proof_status}')">Preview</button>` : 
+                '<span class="text-muted">No proof</span>';
             const dates = (t.start_date || t.end_date) ? 
                 `${t.start_date ? formatDateClient(t.start_date) : ''}${t.start_date && t.end_date ? ' - ' : ''}${t.end_date ? formatDateClient(t.end_date) : ''}` : 
                 '-';
@@ -635,7 +468,7 @@ function showTrainingsFor(userId, userName) {
                 <td>${escapeHtml(nature)}</td>
                 <td>${escapeHtml(scope)}</td>
                 <td>${statusHtml}</td>
-                <td>${actions}</td>
+                <td>${proofPreview}</td>
             `;
             body.appendChild(tr);
         });
@@ -753,6 +586,203 @@ function onMarkCompleted(trainingId, btn) {
         btn.disabled = false; 
     });
 }
+// Preview proof in modal with approval functionality
+function previewProof(filePath, proofId, proofStatus) {
+    // Decode the file path in case it's URL encoded
+    const decodedPath = decodeURIComponent(filePath);
+    
+    const modal = document.getElementById('proofPreviewModal');
+    const content = document.getElementById('proofPreviewContent');
+    const downloadLink = document.getElementById('downloadProofLink');
+    
+    // Set download link
+    downloadLink.href = decodedPath;
+    
+    // Show loading state
+    content.innerHTML = `
+        <div class="d-flex justify-content-center align-items-center" style="min-height: 500px;">
+            <div>
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading proof...</p>
+            </div>
+        </div>
+    `;
+    
+    // Show modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    
+    // Load content based on file type
+    const fileExtension = decodedPath.split('.').pop().toLowerCase();
+    
+    // Add a fallback mechanism for file loading errors
+    setTimeout(() => {
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+            // Image file
+            const img = document.createElement('img');
+            img.src = decodedPath;
+            img.className = 'img-fluid';
+            img.style.cssText = 'max-height: 80vh; max-width: 100%; object-fit: contain;';
+            img.alt = 'Proof Document';
+            
+            // Handle image load error
+            img.onerror = function() {
+                content.innerHTML = `
+                    <div class="d-flex justify-content-center align-items-center" style="min-height: 500px;">
+                        <div>
+                            <i class="fas fa-exclamation-triangle fa-5x mb-3 text-warning"></i>
+                            <h5>File Not Found</h5>
+                            <p class="text-muted">The requested file could not be found or accessed.</p>
+                            <p class="small text-muted">Path: ${decodedPath}</p>
+                            <a href="${decodedPath}" class="btn btn-primary" download>Try Direct Download</a>
+                        </div>
+                    </div>
+                `;
+            };
+            
+            // Handle successful image load
+            img.onload = function() {
+                displayProofContent(decodedPath, proofId, proofStatus);
+            };
+            
+            // Initially show the image (will trigger onload or onerror)
+            content.innerHTML = `
+                <div class="d-flex justify-content-center align-items-center" style="min-height: 500px;">
+                    <img src="${decodedPath}" class="img-fluid" style="max-height: 80vh; max-width: 100%; object-fit: contain;" alt="Proof Document">
+                </div>
+            `;
+        } else if (fileExtension === 'pdf') {
+            // PDF file
+            displayProofContent(decodedPath, proofId, proofStatus);
+        } else {
+            // Other file types - provide download link
+            displayProofContent(decodedPath, proofId, proofStatus);
+        }
+    }, 500); // Small delay to show loading state
+}
+
+// Display proof content with approval functionality
+function displayProofContent(filePath, proofId, proofStatus) {
+    const content = document.getElementById('proofPreviewContent');
+    const fileExtension = filePath.split('.').pop().toLowerCase();
+    
+    // Check if proof is already approved/rejected
+    let approvalSection = '';
+    if (proofStatus === 'pending') {
+        approvalSection = `
+            <div class="approval-section mt-3 p-3 border-top">
+                <h5>Review & Approval</h5>
+                <div class="mb-3">
+                    <label for="remarks" class="form-label">Remarks (Optional)</label>
+                    <textarea class="form-control" id="remarks" rows="2" placeholder="Add any remarks..."></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" onclick="processReview(${proofId}, 'approve')">
+                        <i class="fas fa-check-circle me-1"></i> Approve
+                    </button>
+                    <button class="btn btn-danger" onclick="processReview(${proofId}, 'reject')">
+                        <i class="fas fa-times-circle me-1"></i> Reject
+                    </button>
+                </div>
+            </div>
+        `;
+    } else if (proofStatus === 'approved') {
+        approvalSection = `
+            <div class="alert alert-success mt-3">
+                <i class="fas fa-check-circle me-1"></i> This proof has been <strong>approved</strong>.
+            </div>
+        `;
+    } else if (proofStatus === 'rejected') {
+        approvalSection = `
+            <div class="alert alert-danger mt-3">
+                <i class="fas fa-times-circle me-1"></i> This proof has been <strong>rejected</strong>.
+            </div>
+        `;
+    }
+    
+    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+        // Image file
+        content.innerHTML = `
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 500px;">
+                <img src="${filePath}" class="img-fluid" style="max-height: 60vh; max-width: 100%; object-fit: contain;" alt="Proof Document">
+            </div>
+            ${approvalSection}
+        `;
+    } else if (fileExtension === 'pdf') {
+        // PDF file
+        content.innerHTML = `
+            <div style="height: 60vh;">
+                <iframe src="${filePath}" class="w-100 h-100" frameborder="0"></iframe>
+            </div>
+            ${approvalSection}
+        `;
+    } else {
+        // Other file types
+        content.innerHTML = `
+            <div class="d-flex justify-content-center align-items-center" style="min-height: 500px;">
+                <div>
+                    <i class="fas fa-file fa-5x mb-3 text-muted"></i>
+                    <h5>File Preview Not Available</h5>
+                    <p class="text-muted">This file type cannot be previewed directly.</p>
+                    <a href="${filePath}" class="btn btn-primary" download>Download File</a>
+                </div>
+            </div>
+            ${approvalSection}
+        `;
+    }
+}
+
+// Process review (approve/reject)
+function processReview(proofId, action) {
+    const remarks = document.getElementById('remarks') ? document.getElementById('remarks').value : '';
+    
+    // Confirm action
+    const actionText = action === 'approve' ? 'approve' : 'reject';
+    if (!confirm(`Are you sure you want to ${actionText} this training proof?`)) {
+        return;
+    }
+    
+    // Send request to server
+    fetch(`/training_proofs/${proofId}/process-review`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            action: action,
+            remarks: remarks
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert(`Training proof ${actionText}d successfully.`);
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('proofPreviewModal'));
+            if (modal) modal.hide();
+            // Reload page to reflect changes
+            location.reload();
+        } else {
+            alert('Error processing review: ' + (data.message || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error processing review. Please try again.');
+    });
+}
+
+
+
 </script>
 </body>
 </html>
