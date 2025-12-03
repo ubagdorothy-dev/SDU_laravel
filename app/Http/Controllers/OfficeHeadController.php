@@ -101,7 +101,7 @@ class OfficeHeadController extends Controller
         
         // Training records (for training-records view)
         $training_records = DB::table('training_records')
-            ->select('id', 'title', 'description', 'start_date', 'end_date', 'venue', 'nature_of_training as nature', 'scope', 'status')
+            ->select('id', 'title', 'description', 'start_date', 'end_date', 'venue', 'nature_of_training as nature', 'scope', 'status', 'proof_uploaded')
             ->where('user_id', $user->user_id)
             ->orderBy('created_at', 'DESC')
             ->get();

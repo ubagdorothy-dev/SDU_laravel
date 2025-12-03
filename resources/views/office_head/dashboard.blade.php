@@ -100,10 +100,10 @@
         
         @if (!request()->has('view') || request()->get('view') === 'overview')
             <div class="stats-cards">
-                <div class="card"><h3>Trainings Completed</h3><p>{{ $head_trainings_completed }}</p></div>
-                <div class="card"><h3>Upcoming Trainings</h3><p>{{ $head_trainings_upcoming }}</p></div>
                 <div class="card"><h3>Staff in Office</h3><p>{{ $total_staff_in_office }}</p></div>
-                <div class="card"><h3>Completed in Office</h3><p>{{ $completed_trainings_in_office }}</p></div>
+                <div class="card"><h3>Trainings Completed</h3><p>{{ $completed_trainings_in_office }}</p></div>
+                <div class="card"><h3>Trainings Upcoming</h3><p>{{ $training_pending }}</p></div>
+                <div class="card"><h3>Trainings Ongoing</h3><p>{{ $training_overdue }}</p></div>
             </div>
 
             <div class="row g-3 mb-4">
@@ -117,31 +117,37 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="content-box">
-                        <h2>Upcoming Trainings</h2>
+                        <h2>Staff in Office</h2>
                         <div class="table-responsive">
-                            @if(count($result_head_upcoming_list) > 0)
+                            @if($office_staff->count() > 0)
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Title</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Nature</th>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Job Function</th>
+                                            <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($result_head_upcoming_list as $training)
+                                        @foreach($office_staff as $staff)
                                             <tr>
-                                                <td>{{ $training['title'] }}</td>
-                                                <td>{{ $training['start_date'] }}</td>
-                                                <td>{{ $training['end_date'] }}</td>
-                                                <td>{{ $training['nature'] }}</td>
+                                                <td>{{ $staff->full_name }}</td>
+                                                <td>{{ $staff->position ?? 'N/A' }}</td>
+                                                <td>{{ $staff->job_function ?? 'N/A' }}</td>
+                                                <td>
+                                                    <button class="btn btn-info btn-sm btn-view-trainings" 
+                                                        data-user-id="{{ $staff->user_id }}" 
+                                                        data-user-name="{{ $staff->full_name }}">
+                                                        <i class="fas fa-graduation-cap"></i> View Trainings
+                                                    </button>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
                             @else
-                                <p class="text-muted">No upcoming trainings.</p>
+                                <p class="text-muted">No staff members in your office.</p>
                             @endif
                         </div>
                     </div>
@@ -167,20 +173,20 @@
                                     <tbody>
                                         @foreach($result_head_activities as $activity)
                                             <tr>
-                                                <td>{{ $activity['title'] }}</td>
+                                                <td>{{ $activity->title }}</td>
                                                 <td>
                                                     <span class="badge 
-                                                        @if($activity['status'] == 'completed') bg-success
-                                                        @elseif($activity['status'] == 'upcoming') bg-warning
-                                                        @elseif($activity['status'] == 'ongoing') bg-info
+                                                        @if($activity->status == 'completed') bg-success
+                                                        @elseif($activity->status == 'upcoming') bg-warning
+                                                        @elseif($activity->status == 'ongoing') bg-info
                                                         @else bg-secondary
                                                         @endif">
-                                                        {{ ucfirst($activity['status']) }}
+                                                        {{ ucfirst($activity->status) }}
                                                     </span>
                                                 </td>
-                                                <td>{{ $activity['start_date'] }}</td>
-                                                <td>{{ $activity['end_date'] }}</td>
-                                                <td>{{ date('M j, Y', strtotime($activity['created_at'])) }}</td>
+                                                <td>{{ $activity->start_date }}</td>
+                                                <td>{{ $activity->end_date }}</td>
+                                                <td>{{ date('M j, Y', strtotime($activity->created_at)) }}</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -213,6 +219,7 @@
                                 <th scope="col">Nature of Training</th>
                                 <th scope="col">Scope</th>
                                 <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -226,9 +233,37 @@
                                     <td>{{ $record->nature ?? '' }}</td>
                                     <td>{{ $record->scope ?? '' }}</td>
                                     <td>
-                                        <span class="badge {{ $record->status === 'completed' ? 'bg-success' : 'bg-warning' }}">
+                                        <span class="badge 
+                                            @if($record->status == 'completed') bg-success
+                                            @elseif($record->status == 'upcoming') bg-warning text-dark
+                                            @elseif($record->status == 'ongoing') bg-primary
+                                            @else bg-secondary
+                                            @endif">
                                             {{ ucfirst($record->status) }}
                                         </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTrainingModal"
+                                                data-training-id="{{ $record->id }}"
+                                                data-title="{{ $record->title }}"
+                                                data-description="{{ $record->description }}"
+                                                data-start-date="{{ $record->start_date }}"
+                                                data-end-date="{{ $record->end_date }}"
+                                                data-venue="{{ $record->venue ?? '' }}"
+                                                data-nature="{{ $record->nature ?? '' }}"
+                                                data-scope="{{ $record->scope ?? '' }}">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" data-training-id="{{ $record->id }}">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                            @if ($record->status === 'completed' && empty($record->proof_uploaded))
+                                                <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadProofModal" data-training-id="{{ $record->id }}"> 
+                                                    <i class="fas fa-upload"></i> Upload Proof
+                                                </button>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -275,8 +310,9 @@
                                         <td>
                                             <span class="badge 
                                                 @if($assignment->status == 'completed') bg-success
-                                                @elseif($assignment->status == 'pending') bg-warning
-                                                @else bg-danger
+                                                @elseif($assignment->status == 'pending') bg-warning text-dark
+                                                @elseif($assignment->status == 'overdue') bg-primary
+                                                @else bg-secondary
                                                 @endif">
                                                 {{ ucfirst($assignment->status) }}
                                             </span>
@@ -489,20 +525,28 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Training Status Chart
+        // Training Status Chart (Bar Chart)
         const statusCtx = document.getElementById('trainingStatusChart').getContext('2d');
         new Chart(statusCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
                 labels: ['Completed', 'Pending', 'Ongoing'],
                 datasets: [{
+                    label: 'Training Status Distribution',
                     data: [{{ $training_completed }}, {{ $training_pending }}, {{ $training_overdue }}],
                     backgroundColor: [
                         '#28a745',
                         '#ffc107',
                         '#17a2b8'
                     ],
-                    borderWidth: 1
+                    borderColor: [
+                        '#1e7e34',
+                        '#e0a800',
+                        '#117a8b'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    borderSkipped: false,
                 }]
             },
             options: {
@@ -510,7 +554,30 @@
                 maintainAspectRatio: true,
                 plugins: {
                     legend: {
-                        position: 'bottom',
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
                     }
                 }
             }
@@ -848,8 +915,211 @@
         });
     }
     
-    // Handle delete confirmation
+    // Handle edit training modal
     document.addEventListener('DOMContentLoaded', function() {
+        // Populate edit training modal with data
+        const editTrainingModal = document.getElementById('editTrainingModal');
+        if (editTrainingModal) {
+            editTrainingModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                
+                // Extract info from data-* attributes
+                const trainingId = button.getAttribute('data-training-id');
+                const title = button.getAttribute('data-title');
+                const description = button.getAttribute('data-description');
+                const startDate = button.getAttribute('data-start-date');
+                const endDate = button.getAttribute('data-end-date');
+                const venue = button.getAttribute('data-venue');
+                const nature = button.getAttribute('data-nature');
+                const scope = button.getAttribute('data-scope');
+                
+                // Update the modal's content
+                const modal = this;
+                modal.querySelector('input[name="id"]').value = trainingId;
+                modal.querySelector('input[name="title"]').value = title;
+                modal.querySelector('textarea[name="description"]').value = description;
+                modal.querySelector('input[name="start_date"]').value = startDate;
+                modal.querySelector('input[name="end_date"]').value = endDate;
+                modal.querySelector('input[name="venue"]').value = venue;
+                
+                // Set nature of training select
+                const natureSelect = modal.querySelector('select[name="nature_of_training"]');
+                if (natureSelect) {
+                    natureSelect.value = nature;
+                }
+                
+                // Set scope select
+                const scopeSelect = modal.querySelector('select[name="scope"]');
+                if (scopeSelect) {
+                    scopeSelect.value = scope;
+                }
+            });
+        }
+        
+        // Handle edit training form submission
+        const editTrainingForm = document.getElementById('editTrainingForm');
+        if (editTrainingForm) {
+            editTrainingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                const feedbackDiv = document.getElementById('editTrainingFeedback');
+                
+                // Show loading state
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Updating...';
+                submitBtn.disabled = true;
+                feedbackDiv.innerHTML = '';
+                
+                // Get form data
+                const formData = new FormData(this);
+                const trainingId = formData.get('id');
+                
+                // Submit form via AJAX
+                fetch('/training_records/' + trainingId, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-HTTP-Method-Override': 'PUT' // Laravel convention for PUT requests
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        feedbackDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+                        
+                        // Close modal after delay
+                        setTimeout(() => {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('editTrainingModal'));
+                            if (modal) modal.hide();
+                            
+                            // Reload page to show updated training record
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        // Show error message
+                        let errorMsg = data.message || 'Error updating training record.';
+                        if (data.errors) {
+                            errorMsg += '<br><ul class="mb-0">';
+                            for (const field in data.errors) {
+                                errorMsg += '<li>' + data.errors[field][0] + '</li>';
+                            }
+                            errorMsg += '</ul>';
+                        }
+                        feedbackDiv.innerHTML = '<div class="alert alert-danger">' + errorMsg + '</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    feedbackDiv.innerHTML = '<div class="alert alert-danger">An error occurred while updating the training record.</div>';
+                })
+                .finally(() => {
+                    // Restore button state
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+        
+        // Handle upload proof modal
+        const uploadProofModal = document.getElementById('uploadProofModal');
+        if (uploadProofModal) {
+            uploadProofModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const trainingId = button.getAttribute('data-training-id');
+                
+                // Update the modal's content
+                const modal = this;
+                modal.querySelector('input[name="training_id"]').value = trainingId;
+            });
+        }
+        
+        // Handle upload proof form submission
+        const uploadProofForm = document.getElementById('uploadProofForm');
+        if (uploadProofForm) {
+            uploadProofForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                const feedbackDiv = document.getElementById('uploadProofFeedback');
+                
+                // Show loading state
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...';
+                submitBtn.disabled = true;
+                feedbackDiv.innerHTML = '';
+                
+                // Get form data
+                const formData = new FormData(this);
+                
+                // Get training ID from the hidden input field
+                const trainingId = this.querySelector('input[name="training_id"]').value;
+                
+                // Add CSRF token to form data
+                formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+                
+                // Rename 'proof' to 'proof_file' to match the controller expectation
+                if (formData.has('proof')) {
+                    const proofFile = formData.get('proof');
+                    formData.delete('proof');
+                    formData.append('proof_file', proofFile);
+                }
+                
+                // Submit form via AJAX
+                fetch('{{ route('training_proofs.upload', ['training_record' => '_ID_']) }}'.replace('_ID_', trainingId), {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        feedbackDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+                        
+                        // Reset form
+                        uploadProofForm.reset();
+                        
+                        // Close modal after delay
+                        setTimeout(() => {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('uploadProofModal'));
+                            if (modal) modal.hide();
+                            
+                            // Reload page to show updated training record
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        // Show error message
+                        let errorMsg = data.message || 'Error uploading proof.';
+                        if (data.errors) {
+                            errorMsg += '<br><ul class="mb-0">';
+                            for (const field in data.errors) {
+                                errorMsg += '<li>' + data.errors[field][0] + '</li>';
+                            }
+                            errorMsg += '</ul>';
+                        }
+                        feedbackDiv.innerHTML = '<div class="alert alert-danger">' + errorMsg + '</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    feedbackDiv.innerHTML = '<div class="alert alert-danger">An error occurred while uploading the proof.</div>';
+                })
+                .finally(() => {
+                    // Restore button state
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+        }
+    
+    // Handle delete confirmation
         // Set up delete button event listeners
         const deleteButtons = document.querySelectorAll('[data-bs-target="#deleteConfirmationModal"]');
         deleteButtons.forEach(button => {
@@ -863,7 +1133,7 @@
         document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
             const trainingId = document.getElementById('deleteTrainingId').value;
             
-            fetch('/training-records/' + trainingId, {
+            fetch('/training_records/' + trainingId, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

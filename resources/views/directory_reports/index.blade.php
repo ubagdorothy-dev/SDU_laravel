@@ -433,10 +433,10 @@ function formatDateClient(dStr) {
 
 function renderStatusBadgeClient(status) {
     const s = (status || '').toLowerCase();
-    if (s === 'completed') return '<span class="badge completed">Completed</span>';
-    if (s === 'ongoing') return '<span class="badge ongoing">Ongoing</span>';
-    if (s === 'cancelled') return '<span class="badge cancelled">Cancelled</span>';
-    return '<span class="badge ongoing">' + escapeHtml(status || 'Unknown') + '</span>';
+    if (s === 'completed') return '<span class="badge bg-success">Completed</span>';
+    if (s === 'upcoming') return '<span class="badge bg-warning text-dark">Upcoming</span>';
+    if (s === 'ongoing') return '<span class="badge bg-primary">Ongoing</span>';
+    return '<span class="badge bg-secondary">' + escapeHtml(status || 'Unknown') + '</span>';
 }
 
 // showTrainingsFor: populate modal from trainingsByUser and show
@@ -570,7 +570,7 @@ function onMarkCompleted(trainingId, btn) {
             const row = btn.closest('tr');
             if (row) {
                 const statusCell = row.querySelector('td:nth-child(7)');
-                if (statusCell) statusCell.innerHTML = '<span class="badge completed">Completed</span>';
+                if (statusCell) statusCell.innerHTML = '<span class="badge bg-success">Completed</span>';
                 // remove the complete button
                 const compBtn = row.querySelector('.btn-success'); 
                 if (compBtn) compBtn.remove();

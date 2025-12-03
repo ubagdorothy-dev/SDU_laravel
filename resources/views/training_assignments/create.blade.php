@@ -50,7 +50,7 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                         <div>
                             <h2 class="mb-2 fw-bold text-primary"><i class="fas fa-user-friends me-3"></i>Assign Training</h2>
-                            <p class="text-muted mb-0">Assign training programs to staff members</p>
+                            <p class="text-muted mb-0">Assign training programs to staff members and office heads</p>
                         </div>
                         <div class="bg-primary bg-opacity-10 px-4 py-3 rounded-pill d-flex align-items-center">
                             <i class="fas fa-user-friends me-2 text-primary"></i>
@@ -85,7 +85,7 @@
                         
                         <div class="form-group-spacing">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <label class="control-label mb-0">Select Staff Members</label>
+                                <label class="control-label mb-0">Select Staff Members and Office Heads</label>
                                 <div class="d-flex gap-2">
                                     <div class="input-group input-group-sm" style="width: auto;">
                                         <span class="input-group-text bg-light border-end-0"><i class="fas fa-search"></i></span>

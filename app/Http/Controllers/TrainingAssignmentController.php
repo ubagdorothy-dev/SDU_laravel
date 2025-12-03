@@ -55,8 +55,8 @@ class TrainingAssignmentController extends Controller
         // Get all training records that can be assigned
         $trainings = TrainingRecord::all();
         
-        // Get all staff members with office information
-        $staff = User::where('role', 'staff')
+        // Get all staff members and office heads with office information
+        $staff = User::whereIn('role', ['staff', 'head'])
             ->with('office')
             ->get()
             ->groupBy('office_code');
@@ -157,12 +157,12 @@ class TrainingAssignmentController extends Controller
     {
         $user = Auth::user();
         
-        // Only staff can view their assigned trainings
-        if ($user->role !== 'staff') {
+        // Both staff and office heads can view their assigned trainings
+        if (!in_array($user->role, ['staff', 'head'])) {
             abort(403, 'Unauthorized access');
         }
         
-        // Get training assignments for the current staff member
+        // Get training assignments for the current user (staff or office head)
         $assignments = TrainingAssignment::with(['training', 'assignedBy'])
             ->where('staff_id', $user->user_id)
             ->orderBy('created_at', 'desc')

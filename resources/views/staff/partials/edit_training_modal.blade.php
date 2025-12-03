@@ -35,7 +35,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Nature of Training</label>
-                            <select name="nature_of_training" class="form-control">
+                            <select name="nature_of_training" class="form-control" id="edit_nature_of_training">
                                 <option value="">Select Nature of Training</option>
                                 <option value="Leadership training">Leadership training</option>
                                 <option value="Technical skills training">Technical skills training</option>

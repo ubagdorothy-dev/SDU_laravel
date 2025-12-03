@@ -1,28 +1,28 @@
-    :root {
-        --primary-color: #2563eb;
-        --primary-hover: #1d4ed8;
-        --secondary-color: #64748b;
-        --success-color: #10b981;
-        --warning-color: #f59e0b;
-        --danger-color: #ef4444;
-        --light-bg: #f8fafc;
-        --border-color: #e2e8f0;
-        --text-primary: #1e293b;
-        --text-secondary: #64748b;
-        --text-muted: #94a3b8;
-        --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --card-shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --border-radius: 0.5rem;
-        --transition-speed: 0.2s;
-        --spacing-1: 0.25rem;
-        --spacing-2: 0.5rem;
-        --spacing-3: 0.75rem;
-        --spacing-4: 1rem;
-        --spacing-5: 1.25rem;
-        --spacing-6: 1.5rem;
-        --spacing-8: 2rem;
-    }
-    
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary-color: #64748b;
+
+    --border-radius: 0.65rem;
+    --border-color: #dce3eb;
+
+    --text-primary: #1e293b;
+    --text-muted: #6b7280;
+
+    --light-bg: #f8fafc;
+
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    --card-shadow-hover: 0 4px 14px rgba(0, 0, 0, 0.08);
+
+    --transition-speed: 0.2s;
+
+    /* Tighter spacing scale */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+}
 
 
  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap');
@@ -117,249 +117,205 @@ body {
 .sidebar-lg .btn-toggle { background-color: transparent; border: none; color: #ffffff; padding: 6px 10px; cursor: pointer; }
 .sidebar-lg .btn-toggle:focus { box-shadow: none; }
 
-    /* Card styles */
-    .modern-card {
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--card-shadow);
-        transition: all var(--transition-speed) ease;
-        margin-bottom: var(--spacing-6);
-        border: 1px solid var(--border-color);
-    }
-    
-    .modern-card:hover {
-        box-shadow: var(--card-shadow-hover);
-    }
-    
-    .card-header {
-        padding: var(--spacing-5) var(--spacing-6);
-        border-bottom: 1px solid var(--border-color);
-        background-color: white;
-        border-radius: var(--border-radius) var(--border-radius) 0 0;
-    }
-    
-    /* Header styles */
-    .header-gradient {
-        background-color: white;
-        color: var(--text-primary);
-        border-bottom: 1px solid var(--border-color);
-        padding: 1.5rem 1.75rem;
-    }
-    
-    .text-primary {
-        color: var(--primary-color) !important;
-    }
-    
-    .fs-5 {
-        font-size: 1.25rem !important;
-    }
-    
-    /* Form styles */
-    .form-group-spacing {
-        margin-bottom: var(--spacing-6);
-    }
-    
-    .control-label {
-        display: block;
-        font-weight: 600;
-        margin-bottom: var(--spacing-2);
-        color: var(--text-primary);
-        font-size: 1rem;
-    }
-    
-    .form-control, .form-select {
-        display: block;
-        width: 100%;
-        padding: 0.5rem 0.75rem;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        color: var(--text-primary);
-        background-color: white;
-        background-clip: padding-box;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        color: var(--text-primary);
-        background-color: white;
-        border-color: var(--primary-color);
-        outline: 0;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-    
-    .input-group {
-        display: flex;
-        align-items: stretch;
-        width: 100%;
-    }
-    
-    .input-group .form-control {
-        position: relative;
-        flex: 1 1 auto;
-        width: 1%;
-        min-width: 0;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-    }
-    
-    .input-group .btn {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-    
-    /* Button styles */
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: var(--border-radius);
-        font-weight: 500;
-        transition: all var(--transition-speed) ease;
-        cursor: pointer;
-        border: 1px solid transparent;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-    }
-    
-    .btn-primary {
-        background-color: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-    }
-    
-    .btn-primary:hover {
-        background-color: var(--primary-hover);
-        border-color: var(--primary-hover);
-    }
-    
-    .btn-outline-primary {
-        color: var(--primary-color);
-        background-color: transparent;
-        border-color: var(--primary-color);
-    }
-    
-    .btn-outline-primary:hover {
-        background-color: var(--primary-color);
-        color: white;
-        border-color: var(--primary-color);
-    }
-    
-    .btn-outline-secondary {
-        color: var(--secondary-color);
-        background-color: transparent;
-        border-color: var(--border-color);
-    }
-    
-    .btn-outline-secondary:hover {
-        background-color: var(--secondary-color);
-        color: white;
-        border-color: var(--secondary-color);
-    }
-    
-    /* Staff list styles */
-    .staff-list-container {
-        max-height: 400px;
-        overflow-y: auto;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        padding: var(--spacing-4);
-        background-color: var(--light-bg);
-    }
-    
-    .section-header {
-        position: sticky;
-        top: 0;
-        background: white;
-        z-index: 10;
-        padding: var(--spacing-3) 0;
-        margin-bottom: var(--spacing-4);
-        border-bottom: 1px solid var(--border-color);
-    }
-    
-    .staff-checkbox-card {
-        display: block;
-        width: 100%;
-        padding: var(--spacing-4);
-        margin-bottom: var(--spacing-3);
-        background-color: white;
-        border: 1px solid var(--border-color);
-        border-radius: var(--border-radius);
-        transition: all var(--transition-speed) ease;
-        cursor: pointer;
-    }
-    
-    .staff-checkbox-card:hover {
-        border-color: var(--primary-color);
-        background-color: #f0f9ff;
-    }
-    
-    .staff-checkbox-card.selected {
-        border-color: var(--primary-color);
-        background-color: #eff6ff;
-    }
-    
-    .staff-checkbox {
-        position: absolute;
-        opacity: 0;
-        pointer-events: none;
-    }
-    
-    /* Custom training input */
-    .custom-training-input {
-        display: none;
-        margin-top: var(--spacing-4);
-    }
-    
-    /* Utility classes */
-    .text-muted {
-        color: var(--text-muted);
-    }
-    
-    .fw-medium {
-        font-weight: 500;
-    }
-    
-    .d-flex {
-        display: flex;
-    }
-    
-    .align-items-center {
-        align-items: center;
-    }
-    
-    .gap-2 {
-        gap: var(--spacing-2);
-    }
-    
-    .gap-3 {
-        gap: var(--spacing-3);
-    }
-    
-    .mb-3 {
-        margin-bottom: var(--spacing-3);
-    }
-    
-    .mb-4 {
-        margin-bottom: var(--spacing-4);
-    }
-    
-    .mt-2 {
-        margin-top: var(--spacing-2);
-    }
-    
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .card-header {
-            padding: var(--spacing-4);
-        }
-        
-        .form-group-spacing {
-            margin-bottom: var(--spacing-5);
-        }
-        
-        .staff-checkbox-card {
-            padding: var(--spacing-3);
-        }
-    }
+
+/* ========= Card Styles ========= */
+.modern-card {
+    background: white;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    transition: all var(--transition-speed);
+    margin-bottom: var(--space-4);
+}
+
+.modern-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-1px);
+}
+
+/* Card Header */
+.card-header,
+.header-gradient {
+    background: #f7f9fc;
+    padding: var(--space-4) var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-gradient .fs-5,
+.card-header .fs-5 {
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+}
+
+/* ========= Form Styles ========= */
+.control-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+    font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    transition: all 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    background: #fff;
+}
+
+/* Input Group */
+.input-group {
+    display: flex;
+}
+
+.input-group .form-control {
+    border-right: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* ========= Buttons ========= */
+.btn {
+    padding: 0.5rem 1.1rem;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all var(--transition-speed);
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* ========= Staff List ========= */
+.staff-list-container {
+    max-height: 380px;
+    overflow-y: auto;
+    background: var(--light-bg);
+    padding: var(--space-3);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.section-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* Staff Card */
+.staff-checkbox-card {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: var(--space-3);
+    border: 1px solid var(--border-color);
+    transition: all var(--transition-speed);
+    margin-bottom: var(--space-3);
+}
+
+.staff-checkbox-card:hover {
+    background: #f0f7ff;
+    border-color: var(--primary-color);
+}
+
+.staff-checkbox-card.selected {
+    background: #e8f0ff;
+    border-color: var(--primary-color);
+}
+
+.staff-checkbox {
+    display: none;
+}
+
+/* Custom training input */
+.custom-training-input {
+    display: none;
+    margin-top: var(--space-3);
+}
+
+/* ========= Utility Classes ========= */
+.text-muted {
+    color: var(--text-muted);
+}
+
+.fw-medium {
+    font-weight: 500;
+}
+
+.d-flex {
+    display: flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.gap-2 {
+    gap: var(--space-2);
+}
+
+.gap-3 {
+    gap: var(--space-3);
+}
+
+.mb-3 {
+    margin-bottom: var(--space-3);
+}
+
+.mb-4 {
+    margin-bottom: var(--space-4);
+}
+
+.mt-2 {
+    margin-top: var(--space-2);
+}
+
+/* Badge Styles */
+.bg-primary {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+.bg-secondary {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+

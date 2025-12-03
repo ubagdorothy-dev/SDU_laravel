@@ -6,7 +6,7 @@
                 <h5 class="modal-title">Upload Proof of Completion</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="uploadProofForm">
+            <form id="uploadProofForm" enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" name="training_id" />
                     <div class="mb-3">

@@ -62,9 +62,6 @@
                                 <i class="fas fa-list-check me-2 text-primary"></i>
                                 <span class="fw-bold text-primary fs-5">{{ $assignments->count() }} Total</span>
                             </div>
-                            <a href="{{ route('training_assignments.create') }}" class="btn btn-primary px-4 py-3 fw-bold">
-                                <i class="fas fa-plus-circle me-2"></i> New Assignment
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -134,7 +131,8 @@
                                                 <span class="badge status-badge rounded-pill 
                                                     @if($assignment->status == 'completed') bg-success
                                                     @elseif($assignment->status == 'pending') bg-warning text-dark
-                                                    @else bg-danger
+                                                    @elseif($assignment->status == 'overdue') bg-primary
+                                                    @else bg-secondary
                                                     @endif">
                                                     {{ ucfirst($assignment->status) }}
                                                 </span>

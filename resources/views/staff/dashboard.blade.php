@@ -245,7 +245,12 @@
                                     <td>{{ $row->nature_of_training ?? '' }}</td>
                                     <td>{{ $row->scope ?? '' }}</td>
                                     <td>
-                                        <span class="badge {{ $row->status === 'completed' ? 'bg-success' : 'bg-warning' }}">
+                                        <span class="badge 
+                                            @if($row->status == 'completed') bg-success
+                                            @elseif($row->status == 'upcoming') bg-warning text-dark
+                                            @elseif($row->status == 'ongoing') bg-primary
+                                            @else bg-secondary
+                                            @endif">
                                             {{ ucfirst($row->status) }}
                                         </span>
                                     </td>
@@ -317,8 +322,9 @@
                                         <td>
                                             <span class="badge 
                                                 @if($assignment->status == 'completed') bg-success
-                                                @elseif($assignment->status == 'pending') bg-warning
-                                                @else bg-danger
+                                                @elseif($assignment->status == 'pending') bg-warning text-dark
+                                                @elseif($assignment->status == 'overdue') bg-primary
+                                                @else bg-secondary
                                                 @endif">
                                                 {{ ucfirst($assignment->status) }}
                                             </span>
@@ -370,8 +376,9 @@
                                         <td>
                                             <span class="badge 
                                                 @if($file->status == 'approved') bg-success
-                                                @elseif($file->status == 'pending') bg-warning
-                                                @else bg-danger
+                                                @elseif($file->status == 'pending') bg-warning text-dark
+                                                @elseif($file->status == 'rejected') bg-primary
+                                                @else bg-secondary
                                                 @endif">
                                                 {{ ucfirst($file->status) }}
                                             </span>
