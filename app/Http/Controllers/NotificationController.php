@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\Office;
 
 class NotificationController extends Controller
 {
@@ -364,6 +365,63 @@ class NotificationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Notification sent to ' . $recipients->count() . ' users.'
+        ]);
+    }
+    
+    /**
+     * Send notification to staff of specific offices.
+     * Accessible by Unit Directors.
+     */
+    public function officeStaffBroadcast(Request $request)
+    {
+        $user = Auth::user();
+        
+        $validated = $request->validate([
+            'offices' => 'required|array',
+            'offices.*' => 'string',
+            'subject' => 'nullable|string|max:255',
+            'message' => 'required|string|max:1000'
+        ]);
+        
+        $officeCodes = $validated['offices'];
+        
+        // Get staff members from specified offices
+        $recipients = User::where('role', 'staff')
+            ->whereIn('office_code', $officeCodes)
+            ->pluck('user_id');
+        
+        // Remove duplicates and exclude the sender if present
+        $recipients = $recipients->unique()->filter(function ($id) use ($user) {
+            return $id !== $user->user_id;
+        });
+        
+        foreach ($recipients as $recipientId) {
+            Notification::create([
+                'user_id' => $recipientId,
+                'sender_id' => $user->user_id,
+                'title' => $validated['subject'] ?? 'Unit Director Message',
+                'message' => $validated['message'],
+                'is_read' => 0
+            ]);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification sent to ' . $recipients->count() . ' staff members.'
+        ]);
+    }
+    
+    /**
+     * Get all offices for notification broadcasting.
+     * Accessible by Unit Directors.
+     */
+    public function getOffices()
+    {
+        $offices = Office::all();
+        
+        return response()->json([
+            'success' => true,
+            'offices' => $offices
         ]);
     }
 }

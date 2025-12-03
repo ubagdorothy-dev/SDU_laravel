@@ -171,7 +171,7 @@
                                 <td>{{ $user->full_name }}</td>
                                 <td>{{ ucfirst($user->role) }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td>{{ $user->office ? $user->office->name : 'N/A' }}</td>
+                                <td>{{ $user->office ? $user->office->code : 'N/A' }}</td>
                                 <td>{{ $user->staffDetail ? $user->staffDetail->position : 'N/A' }}</td>
                                 <td>{{ $user->staffDetail ? $user->staffDetail->program : 'N/A' }}</td>
                                 <td>{{ $user->staffDetail ? $user->staffDetail->job_function : 'N/A' }}</td>

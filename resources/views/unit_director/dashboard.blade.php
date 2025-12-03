@@ -42,7 +42,7 @@
     <div class="header mb-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
-                <h1 class="fw-bold mb-2" style="color: #1e293b;">Welcome {{ $user->full_name ?? 'SDU Director' }}! </h1>
+                <h1 class="fw-bold mb-2" style="color: #1e293b;">Welcome, {{ $user->full_name ?? 'SDU Director' }}! </h1>
                 <p class="mb-0" style="color: #6b7280;">Here's what's happening with your organization today.</p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
@@ -50,9 +50,19 @@
                     <i class="fas fa-bell me-2"></i> Inbox
                     <span id="inboxCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;">0</span>
                 </button>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#broadcastModal">
-                    <i class="fas fa-bullhorn me-2"></i> Send Notification
-                </button>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bullhorn me-2"></i> Send Notification
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#broadcastModal">
+                            <i class="fas fa-users me-2"></i> Broadcast to All
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#officeStaffBroadcastModal">
+                            <i class="fas fa-building me-2"></i> To Specific Offices
+                        </a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -61,7 +71,6 @@
         <div class="card"><h3>Total Staff</h3><p>{{ $total_staff }}</p></div>
         <div class="card"><h3>Total Heads</h3><p>{{ $total_heads }}</p></div>
         <div class="card"><h3>Trainings Completed</h3><p>{{ $training_completion_percentage }}%</p></div>
-        <div class="card"><h3>Upcoming Trainings</h3><p>{{ $upcoming_trainings }}</p></div>
         <div class="card"><h3>Active Offices</h3><p>{{ $active_offices }}</p></div>
     </div>
 
@@ -266,6 +275,44 @@
     </div>
 </div>
 
+<!-- Office Staff Broadcast Modal -->
+<div class="modal fade" id="officeStaffBroadcastModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="officeStaffBroadcastForm">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-building me-2"></i>Send Notification to Office Staff</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Offices</label>
+                        <div id="officesContainer" class="border rounded p-3 bg-light">
+                            <div class="text-center py-3">
+                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                <span class="ms-2">Loading offices...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject (optional)</label>
+                        <input type="text" class="form-control" name="subject" placeholder="Optional subject line">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" name="message" rows="5" placeholder="Share updates, reminders, or announcements" required></textarea>
+                    </div>
+                    <div id="officeStaffBroadcastFeedback" class="mt-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Send to Selected Offices</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
@@ -384,6 +431,54 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchInboxCount();
     var inboxModal = document.getElementById('inboxModal');
     if (inboxModal) inboxModal.addEventListener('show.bs.modal', loadInboxList);
+    
+    // Handle broadcast form submission
+    document.getElementById('broadcastForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const feedback = document.getElementById('broadcastFeedback');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        // Disable submit button
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+        
+        // Clear previous feedback
+        feedback.innerHTML = '';
+        
+        fetch('{{ route('notifications.broadcast') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify(Object.fromEntries(new FormData(form)))
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                feedback.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                form.reset();
+                
+                // Close modal after 2 seconds
+                setTimeout(() => {
+                    bootstrap.Modal.getInstance(document.getElementById('broadcastModal')).hide();
+                }, 2000);
+            } else {
+                feedback.innerHTML = `<div class="alert alert-danger">Error: ${data.message || 'Failed to send notification'}</div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error sending notification:', error);
+            feedback.innerHTML = '<div class="alert alert-danger">Error sending notification. Please try again.</div>';
+        })
+        .finally(() => {
+            // Re-enable submit button
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Send';
+        });
+    });
 });
 
 // Fetch inbox count
@@ -466,12 +561,21 @@ function renderNotifications(notifications) {
             minute: '2-digit' 
         });
         
+        // Get sender information
+        let senderInfo = '';
+        if (notification.sender_name && notification.sender_role) {
+            senderInfo = `<small class="text-muted d-block mb-1">From: ${notification.sender_name} (${notification.sender_role})</small>`;
+        } else if (notification.sender_name) {
+            senderInfo = `<small class="text-muted d-block mb-1">From: ${notification.sender_name}</small>`;
+        }
+        
         html += `
-            <div class="list-group-item ${isReadClass} mb-2">
+            <div class="list-group-item ${isReadClass} mb-2" data-notification-id="${notification.id}">
                 <div class="d-flex w-100 justify-content-between">
                     <h6 class="mb-1">${notification.title || 'Notification'}</h6>
                     <small>${formattedDate}</small>
                 </div>
+                ${senderInfo}
                 <p class="mb-1">${notification.message}</p>
                 <div class="d-flex justify-content-end gap-2 mt-2">
                     ${!notification.is_read ? 
@@ -611,6 +715,106 @@ document.getElementById('deleteAllBtn')?.addEventListener('click', function() {
     .catch(error => {
         console.error('Error deleting all notifications:', error);
         alert('Error deleting all notifications');
+    });
+});
+
+// Load offices when office staff broadcast modal is shown
+var officeStaffBroadcastModal = document.getElementById('officeStaffBroadcastModal');
+if (officeStaffBroadcastModal) {
+    officeStaffBroadcastModal.addEventListener('show.bs.modal', function () {
+        loadOfficesForBroadcast();
+    });
+}
+
+// Load offices for broadcast
+function loadOfficesForBroadcast() {
+    const container = document.getElementById('officesContainer');
+    
+    fetch('{{ route('notifications.offices') }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.offices.length > 0) {
+                let html = '<div class="row">';
+                data.offices.forEach(office => {
+                    html += `
+                        <div class="col-md-6 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="offices[]" value="${office.code}" id="office_${office.code}">
+                                <label class="form-check-label" for="office_${office.code}">
+                                    ${office.name} (${office.code})
+                                </label>
+                            </div>
+                        </div>`;
+                });
+                html += '</div>';
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div class="text-center text-muted">No offices found</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading offices:', error);
+            container.innerHTML = '<div class="alert alert-danger">Error loading offices. Please try again.</div>';
+        });
+}
+
+// Handle office staff broadcast form submission
+document.getElementById('officeStaffBroadcastForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const feedback = document.getElementById('officeStaffBroadcastFeedback');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Get selected offices
+    const selectedOffices = Array.from(form.querySelectorAll('input[name="offices[]"]:checked'))
+        .map(checkbox => checkbox.value);
+    
+    if (selectedOffices.length === 0) {
+        feedback.innerHTML = '<div class="alert alert-warning">Please select at least one office.</div>';
+        return;
+    }
+    
+    // Get form data
+    const formData = new FormData(form);
+    
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+    
+    // Clear previous feedback
+    feedback.innerHTML = '';
+    
+    fetch('{{ route('notifications.office_staff_broadcast') }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            feedback.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+            form.reset();
+            
+            // Close modal after 2 seconds
+            setTimeout(() => {
+                bootstrap.Modal.getInstance(officeStaffBroadcastModal).hide();
+            }, 2000);
+        } else {
+            feedback.innerHTML = `<div class="alert alert-danger">Error: ${data.message || 'Failed to send notification'}</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error sending notification:', error);
+        feedback.innerHTML = '<div class="alert alert-danger">Error sending notification. Please try again.</div>';
+    })
+    .finally(() => {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Send to Selected Offices';
     });
 });
 

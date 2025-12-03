@@ -101,6 +101,16 @@ Route::middleware('auth')->group(function () {
         ->middleware('checkrole:head')
         ->name('notifications.office_broadcast');
         
+    // Unit Director: send notification to staff in specific offices
+    Route::post('/notifications/office-staff-broadcast', [NotificationController::class, 'officeStaffBroadcast'])
+        ->middleware('checkrole:unit_director,unit director')
+        ->name('notifications.office_staff_broadcast');
+        
+    // Unit Director: get all offices for notification broadcasting
+    Route::get('/notifications/offices', [NotificationController::class, 'getOffices'])
+        ->middleware('checkrole:unit_director,unit director')
+        ->name('notifications.offices');
+        
     // Training Records
     Route::resource('training_records', TrainingRecordController::class);
     Route::get('/training_records/{training_record}/edit-ajax', [TrainingRecordController::class, 'editAjax'])->name('training_records.edit_ajax');

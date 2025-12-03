@@ -7,6 +7,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="{{ asset('css/unitdirector/dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/Training/index.css') }}">
 </head>
 <body id="body">
 
@@ -43,41 +44,96 @@
             </div>
             
             @if(session('success'))
-                <div class="alert alert-success">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
             
-            <div class="card">
-                <div class="card-header">
-                    <h5>All Training Assignments</h5>
+            <div class="modern-card">
+                <div class="card-header header-gradient">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h2 class="mb-2 fw-bold text-primary"><i class="fas fa-tasks me-3"></i>Training Assignments</h2>
+                            <p class="text-muted mb-0">Manage and track assigned training programs</p>
+                        </div>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <div class="bg-primary bg-opacity-10 px-4 py-3 rounded-pill d-flex align-items-center">
+                                <i class="fas fa-list-check me-2 text-primary"></i>
+                                <span class="fw-bold text-primary fs-5">{{ $assignments->count() }} Total</span>
+                            </div>
+                            <a href="{{ route('training_assignments.create') }}" class="btn btn-primary px-4 py-3 fw-bold">
+                                <i class="fas fa-plus-circle me-2"></i> New Assignment
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
+                <div class="p-0">
                     @if($assignments->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table table-striped">
+                        <div class="table-container">
+                            <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th>Training</th>
-                                        <th>Staff Member</th>
-                                        <th>Assigned By</th>
-                                        <th>Assigned Date</th>
-                                        <th>Deadline</th>
-                                        <th>Status</th>
+                                        <th width="25%">Training Program</th>
+                                        <th width="20%">Staff Member</th>
+                                        <th width="15%">Assigned By</th>
+                                        <th width="15%">Assigned On</th>
+                                        <th width="15%">Deadline</th>
+                                        <th width="10%">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($assignments as $assignment)
                                         <tr>
-                                            <td>{{ $assignment->training->title }}</td>
-                                            <td>{{ $assignment->staff->full_name ?? 'N/A' }}</td>
-                                            <td>{{ $assignment->assignedBy->full_name ?? 'N/A' }}</td>
-                                            <td>{{ $assignment->assigned_date->format('M d, Y') }}</td>
-                                            <td>{{ $assignment->deadline->format('M d, Y') }}</td>
                                             <td>
-                                                <span class="badge 
+                                                <div class="fw-medium data-highlight">{{ $assignment->training->title }}</div>
+                                                @if($assignment->training->description)
+                                                    <small class="text-muted d-block mt-1">{{ Str::limit($assignment->training->description, 50) }}</small>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="fw-medium text-dark">{{ $assignment->staff->full_name ?? 'N/A' }}</div>
+                                                @if($assignment->staff->office_code)
+                                                    <small class="text-muted d-block mt-1"><i class="fas fa-building me-1"></i>{{ $assignment->staff->office_code }}</small>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <div class="text-dark">{{ $assignment->assignedBy->full_name ?? 'N/A' }}</div>
+                                                <small class="text-muted d-block mt-1">
+                                                    <i class="fas fa-user me-1"></i>{{ ucfirst($assignment->assignedBy->role ?? 'N/A') }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="text-dark">{{ $assignment->assigned_date->format('M d, Y') }}</div>
+                                                <small class="text-muted d-block mt-1">
+                                                    <i class="fas fa-calendar me-1"></i>{{ $assignment->assigned_date->diffForHumans() }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="text-dark">{{ $assignment->deadline->format('M d, Y') }}</div>
+                                                @php
+                                                    $daysUntilDeadline = now()->startOfDay()->diffInDays($assignment->deadline->startOfDay(), false);
+                                                    $isUrgent = $daysUntilDeadline <= 3 && $daysUntilDeadline >= 0;
+                                                    $isOverdue = $daysUntilDeadline < 0;
+                                                @endphp
+                                                @if($isOverdue)
+                                                    <small class="text-danger d-block mt-1">
+                                                        <i class="fas fa-exclamation-circle me-1"></i>{{ abs($daysUntilDeadline) }} days overdue
+                                                    </small>
+                                                @elseif($isUrgent)
+                                                    <small class="text-warning d-block mt-1">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>{{ $daysUntilDeadline }} days left
+                                                    </small>
+                                                @else
+                                                    <small class="text-muted d-block mt-1">
+                                                        <i class="fas fa-hourglass-half me-1"></i>{{ $daysUntilDeadline }} days left
+                                                    </small>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <span class="badge status-badge rounded-pill 
                                                     @if($assignment->status == 'completed') bg-success
-                                                    @elseif($assignment->status == 'pending') bg-warning
+                                                    @elseif($assignment->status == 'pending') bg-warning text-dark
                                                     @else bg-danger
                                                     @endif">
                                                     {{ ucfirst($assignment->status) }}
@@ -89,12 +145,14 @@
                             </table>
                         </div>
                     @else
-                        <div class="text-center py-5">
-                            <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
-                            <h5>No training assignments found</h5>
-                            <p class="text-muted">Assign trainings to staff members to track their progress.</p>
-                            <a href="{{ route('training_assignments.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus-circle me-1"></i> Assign Training Now
+                        <div class="empty-state">
+                            <div class="empty-state-icon mb-4">
+                                <i class="fas fa-tasks fa-3x"></i>
+                            </div>
+                            <h5 class="mb-3">No Training Assignments Found</h5>
+                            <p class="text-muted mb-4">Get started by assigning training programs to staff members. Create your first assignment to begin tracking progress.</p>
+                            <a href="{{ route('training_assignments.create') }}" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-plus-circle me-2"></i> Create First Assignment
                             </a>
                         </div>
                     @endif
