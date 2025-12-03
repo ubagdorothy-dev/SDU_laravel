@@ -20,6 +20,7 @@ body {
     .sidebar-lg { 
         width: 250px; 
         background-color: #1a237e; 
+        transition: background-color 0.2s;
         color: white; 
         height: 100vh; 
         position: fixed; 
@@ -65,9 +66,9 @@ body {
 }
 .sidebar-lg .nav-link { 
     color: #ffffff !important; 
-    padding: 12px 20px; 
-    border-radius: 5px; 
-    margin: 5px 15px; 
+    padding: 10px 12px; 
+    border-radius: 6px; 
+    margin: 4px 12px; 
     transition: background-color 0.2s; 
     white-space: nowrap; 
     overflow: hidden; 
@@ -78,14 +79,22 @@ body {
 .sidebar-lg .nav-link.active { 
     background-color: #3f51b5; 
     color: #ffffff !important; 
+    width: calc(100% - 24px);
 }
 .sidebar-lg .nav-link i {
     min-width: 20px;
     text-align: center;
     margin-right: 15px;
 }
+
 #sidebar-toggle-checkbox:checked ~ .sidebar-lg .nav-link i {
     margin-right: 0;
+}
+
+#sidebar-toggle-checkbox:checked ~ .sidebar-lg .nav-link {
+    padding: 10px 30px 20px 12px; 
+    margin: 5px auto;
+    width: 25px;
 }
 
 .sidebar-lg .btn-toggle { 
