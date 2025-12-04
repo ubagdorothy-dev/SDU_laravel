@@ -641,12 +641,20 @@
                         console.log('Delete response ok:', response.ok);
                                         
                         if (response.ok) {
-                            // Close modal and reload page
+                            // Close delete confirmation modal
                             var modal = bootstrap.Modal.getInstance(deleteModal);
-                            modal.hide();
-                            // Show success message
-                            alert('Training record deleted successfully!');
-                            window.location.reload();
+                            if (modal) {
+                                modal.hide();
+                            }
+                            // Show success message in modal
+                            var successModal = new bootstrap.Modal(document.getElementById('successMessageModal'));
+                            document.getElementById('successMessageText').textContent = 'Training record deleted successfully!';
+                            successModal.show();
+                            
+                            // Reload page after a short delay
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
                         } else {
                             return response.json().then(data => {
                                 console.log('Delete error data:', data);
@@ -656,7 +664,15 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Failed to delete training record: ' + error.message);
+                        // Close delete confirmation modal
+                        var modal = bootstrap.Modal.getInstance(deleteModal);
+                        if (modal) {
+                            modal.hide();
+                        }
+                        // Show error message in modal
+                        var successModal = new bootstrap.Modal(document.getElementById('successMessageModal'));
+                        document.getElementById('successMessageText').textContent = 'Failed to delete training record: ' + error.message;
+                        successModal.show();
                     })
                     .finally(() => {
                         // Reset delete button state
@@ -924,10 +940,26 @@
     </form>
     
     @include('staff.partials.profile_notification_modals')
-    
-    @include('staff.partials.profile_notification_modals')
-    
+
     @include('staff.partials.modal_scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Success Message Modal -->
+    <div class="modal fade" id="successMessageModal" tabindex="-1" aria-labelledby="successMessageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successMessageModalLabel">Success</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="successMessageText"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

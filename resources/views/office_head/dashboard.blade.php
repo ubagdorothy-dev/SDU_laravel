@@ -700,6 +700,24 @@
         </div>
     </div>
     
+    <!-- Success Message Modal -->
+    <div class="modal fade" id="successMessageModal" tabindex="-1" aria-labelledby="successMessageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successMessageModalLabel">Success</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="successMessageText"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
     
     <!-- Trainings Modal -->
@@ -1073,25 +1091,73 @@
         document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
             const trainingId = document.getElementById('deleteTrainingId').value;
             
+            // Show loading state on delete button
+            const deleteBtn = this;
+            const originalText = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+            deleteBtn.disabled = true;
+            
+            // Debugging: log the training ID and CSRF token
+            console.log('Deleting training record with ID:', trainingId);
+            console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+            
             fetch('/training_records/' + trainingId, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json'
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Reload the page to reflect changes
-                    location.reload();
+            .then(response => {
+                console.log('Delete response status:', response.status);
+                console.log('Delete response ok:', response.ok);
+                
+                if (response.ok) {
+                    // Close delete confirmation modal
+                    const deleteModal = document.getElementById('deleteConfirmationModal');
+                    const modal = bootstrap.Modal.getInstance(deleteModal);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    // Show success message in modal
+                    const successModal = new bootstrap.Modal(document.getElementById('successMessageModal'));
+                    document.getElementById('successMessageText').textContent = 'Training record deleted successfully!';
+                    successModal.show();
+                    
+                    // Reload page after a short delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 } else {
-                    alert('Failed to delete training record: ' + (data.message || 'Unknown error'));
+                    return response.json().then(data => {
+                        console.log('Delete error data:', data);
+                        throw new Error(data.message || 'Delete failed with status: ' + response.status);
+                    }).catch(e => {
+                        // If we can't parse JSON, use the status text
+                        if (e instanceof SyntaxError) {
+                            throw new Error('Delete failed with status: ' + response.status + ' - ' + response.statusText);
+                        }
+                        throw e;
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while deleting the training record.');
+                // Close delete confirmation modal
+                const deleteModal = document.getElementById('deleteConfirmationModal');
+                const modal = bootstrap.Modal.getInstance(deleteModal);
+                if (modal) {
+                    modal.hide();
+                }
+                // Show error message in modal
+                const successModal = new bootstrap.Modal(document.getElementById('successMessageModal'));
+                document.getElementById('successMessageText').textContent = 'Failed to delete training record: ' + error.message;
+                successModal.show();
+            })
+            .finally(() => {
+                // Reset delete button state
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
             });
         });
         

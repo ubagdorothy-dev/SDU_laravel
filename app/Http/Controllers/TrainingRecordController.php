@@ -139,7 +139,21 @@ class TrainingRecordController extends Controller
     public function show($training_record)
     {
         $user = Auth::user();
-        $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+        
+        // For office heads, allow viewing of their own training records and training records from staff in their office
+        if ($user->role === 'head') {
+            // Find training record that either belongs to the office head themselves or to a staff member in their office
+            $trainingRecord = TrainingRecord::where(function($query) use ($user) {
+                $query->where('user_id', $user->user_id) // Office head's own training records
+                      ->orWhereHas('user', function($subQuery) use ($user) {
+                          $subQuery->where('office_code', $user->office_code)
+                                   ->where('role', 'staff');
+                      });
+            })->findOrFail($training_record);
+        } else {
+            // For regular users (staff), only allow viewing of their own training records
+            $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+        }
         
         return view('training_records.show', compact('user', 'trainingRecord'));
     }
@@ -166,7 +180,21 @@ class TrainingRecordController extends Controller
     {
         try {
             $user = Auth::user();
-            $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+            
+            // For office heads, allow editing of their own training records and training records from staff in their office
+            if ($user->role === 'head') {
+                // Find training record that either belongs to the office head themselves or to a staff member in their office
+                $trainingRecord = TrainingRecord::where(function($query) use ($user) {
+                    $query->where('user_id', $user->user_id) // Office head's own training records
+                          ->orWhereHas('user', function($subQuery) use ($user) {
+                              $subQuery->where('office_code', $user->office_code)
+                                       ->where('role', 'staff');
+                          });
+                })->findOrFail($training_record);
+            } else {
+                // For regular users (staff), only allow editing of their own training records
+                $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+            }
             
             return response()->json([
                 'success' => true,
@@ -191,7 +219,21 @@ class TrainingRecordController extends Controller
     {
         try {
             $user = Auth::user();
-            $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+            
+            // For office heads, allow updating of their own training records and training records from staff in their office
+            if ($user->role === 'head') {
+                // Find training record that either belongs to the office head themselves or to a staff member in their office
+                $trainingRecord = TrainingRecord::where(function($query) use ($user) {
+                    $query->where('user_id', $user->user_id) // Office head's own training records
+                          ->orWhereHas('user', function($subQuery) use ($user) {
+                              $subQuery->where('office_code', $user->office_code)
+                                       ->where('role', 'staff');
+                          });
+                })->findOrFail($training_record);
+            } else {
+                // For regular users (staff), only allow updating of their own training records
+                $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+            }
             
             $request->validate([
                 'title' => 'required|string|max:255',
@@ -278,7 +320,21 @@ class TrainingRecordController extends Controller
     {
         try {
             $user = Auth::user();
-            $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+            
+            // For office heads, allow deletion of their own training records and training records from staff in their office
+            if ($user->role === 'head') {
+                // Find training record that either belongs to the office head themselves or to a staff member in their office
+                $trainingRecord = TrainingRecord::where(function($query) use ($user) {
+                    $query->where('user_id', $user->user_id) // Office head's own training records
+                          ->orWhereHas('user', function($subQuery) use ($user) {
+                              $subQuery->where('office_code', $user->office_code)
+                                       ->where('role', 'staff');
+                          });
+                })->findOrFail($training_record);
+            } else {
+                // For regular users (staff), only allow deletion of their own training records
+                $trainingRecord = TrainingRecord::where('user_id', $user->user_id)->findOrFail($training_record);
+            }
             
             $trainingRecord->delete();
             

@@ -277,7 +277,7 @@
 
 <!-- Inbox Modal -->
 <div class="modal fade" id="inboxModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="fas fa-inbox me-2"></i>Notifications Inbox</h5>
@@ -313,7 +313,7 @@
 
 <!-- Broadcast Modal -->
 <div class="modal fade" id="broadcastModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <form id="broadcastForm">
                 <div class="modal-header">
@@ -352,7 +352,7 @@
 
 <!-- Office Staff Broadcast Modal -->
 <div class="modal fade" id="officeStaffBroadcastModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <form id="officeStaffBroadcastForm">
                 <div class="modal-header">

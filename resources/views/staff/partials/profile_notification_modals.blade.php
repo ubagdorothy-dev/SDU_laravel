@@ -1,6 +1,6 @@
 <!-- Training Records Modal -->
 <div class="modal fade" id="trainingRecordsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title"><i class="fas fa-book-reader me-2"></i>Your Training Records</h5>
@@ -21,7 +21,7 @@
 
 <!-- Notifications Modal -->
 <div class="modal fade" id="notificationsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title"><i class="fas fa-bell me-2"></i>Notifications</h5>
@@ -69,7 +69,7 @@
 
 <!-- Profile Modal -->
 <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true" data-office-code="{{ $user->office_code ?? ($user->office->code ?? '') }}" data-program="{{ $user->staffDetail->program ?? '' }}" data-role="{{ $user->role ?? '' }}">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">
@@ -85,7 +85,7 @@
             <style>
                 #profileModal .modal-content {
                     border-radius: 12px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                    box-shadow: 0 10px 30px rgba(2, 0, 0, 0.15);
                     border: none;
                 }
                 
