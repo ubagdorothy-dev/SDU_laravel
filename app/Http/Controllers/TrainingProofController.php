@@ -9,6 +9,7 @@ use App\Models\TrainingRecord;
 use App\Models\TrainingProof;
 use App\Models\User;
 use App\Models\Notification;
+use App\Models\Office;
 
 class TrainingProofController extends Controller
 {
@@ -267,13 +268,24 @@ class TrainingProofController extends Controller
             abort(403, 'Unauthorized');
         }
         
+        // Get all offices for the filter dropdown
+        $offices = Office::orderBy('name')->get();
+        
         // Get pending training proofs with related data
         $query = TrainingProof::with(['trainingRecord', 'user'])
             ->where('status', 'pending')
             ->orderBy('created_at', 'desc');
             
+        // Apply office filter if selected
+        $selectedOffice = $request->input('office');
+        if ($selectedOffice) {
+            $query->whereHas('user', function ($q) use ($selectedOffice) {
+                $q->where('office_code', $selectedOffice);
+            });
+        }
+            
         // Get paginated results
-        $pendingProofs = $query->paginate(10);
+        $pendingProofs = $query->paginate(10)->appends(['office' => $selectedOffice]);
         
         // Get pending approvals count for unit directors
         $pendingApprovalsCount = 0;
@@ -283,7 +295,7 @@ class TrainingProofController extends Controller
                 ->count();
         }
         
-        return view('training_proofs.review_index', compact('pendingProofs', 'user', 'pendingApprovalsCount'));
+        return view('training_proofs.review_index', compact('pendingProofs', 'user', 'pendingApprovalsCount', 'offices', 'selectedOffice'));
     }
     
     /**

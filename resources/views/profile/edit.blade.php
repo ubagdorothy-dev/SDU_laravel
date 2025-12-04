@@ -92,6 +92,13 @@
                 <h1 class="h2">Edit Profile</h1>
             </div>
 
+            @if(session('error'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            
             @if($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <ul class="mb-0">
@@ -103,14 +110,21 @@
                 </div>
             @endif
 
-            <div class="profile-card">
-                <div class="card-header">
-                    <h5 class="mb-0">Edit Personal Information</h5>
+            @if(in_array(auth()->user()->role, ['unit_director', 'unit director']))
+                <div class="alert alert-info">
+                    <h4 class="alert-heading">Profile Management</h4>
+                    <p>As a Unit Director, your profile information is managed by the system administrator. Contact your administrator if you need to update any information.</p>
+                    <a href="{{ route('profile.show') }}" class="btn btn-primary">Back to Profile</a>
                 </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ route('profile.update') }}" id="profile-form">
-                        @csrf
-                        @method('PUT')
+            @else
+                <div class="profile-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Edit Personal Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('profile.update') }}" id="profile-form">
+                            @csrf
+                            @method('PUT')
                         
                         <div class="mb-3">
                             <label for="full_name" class="form-label">Full Name *</label>
@@ -197,6 +211,7 @@
                     </form>
                 </div>
             </div>
+            @endif
         </main>
     </div>
 </div>

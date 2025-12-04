@@ -280,6 +280,19 @@
             saveProfileBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 
+                // Check if user is a unit director
+                const profileModal = document.getElementById('profileModal');
+                if (profileModal) {
+                    const roleElements = profileModal.querySelectorAll('[data-role]');
+                    if (roleElements.length > 0) {
+                        const role = roleElements[0].dataset.role;
+                        if (role === 'unit_director' || role === 'unit director') {
+                            alert('As a Unit Director, your profile information is managed by the system administrator.');
+                            return;
+                        }
+                    }
+                }
+                
                 // Show loading state
                 const originalText = saveProfileBtn.innerHTML;
                 saveProfileBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';

@@ -48,8 +48,8 @@
     <div class="header mb-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
-                <h1 class="fw-bold mb-2" style="color: #1e293b;">Welcome, {{ $user->full_name ?? 'SDU Director' }}! </h1>
-                <p class="mb-0" style="color: #6b7280;">Here's what's happening with your organization today.</p>
+                <h1 class="fw-bold mb-3" style="color: #1e293b; font-size: 2.2rem;">Welcome, {{ $user->full_name ?? 'Unit Director' }}!</h1>
+                <p class="mb-0" style="color: #6b7280; font-size: 1.2rem;">Here's what's happening with your organization today.</p>
             </div>
             <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-primary position-relative" data-bs-toggle="modal" data-bs-target="#inboxModal">
@@ -75,18 +75,30 @@
     
     <!-- Stats Cards -->
     <div class="stats-cards">
-        <div class="card"><h3>Total Staff</h3><p>{{ $total_staff }}</p></div>
-        <div class="card"><h3>Total Heads</h3><p>{{ $total_heads }}</p></div>
-        <div class="card"><h3>Trainings Completed</h3><p>{{ $training_completion_percentage }}%</p></div>
-        <div class="card"><h3>Active Offices</h3><p>{{ $active_offices }}</p></div>
+        <div class="card">
+            <h3>Total Staff</h3>
+            <p>{{ $total_staff }}</p>
+        </div>
+        <div class="card">
+            <h3>Total Heads</h3>
+            <p>{{ $total_heads }}</p>
+        </div>
+        <div class="card">
+            <h3>Trainings Completed</h3>
+            <p>{{ $training_completion_percentage }}%</p>
+        </div>
+        <div class="card">
+            <h3>Active Offices</h3>
+            <p>{{ $active_offices }}</p>
+        </div>
     </div>
     
     <!-- Quick Action Tiles -->
     <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card quick-action-card" onclick="window.location.href='{{ route('pending_approvals.index') }}'" style="cursor: pointer;">
+            <div class="card quick-action-card content-box-enhanced" onclick="window.location.href='{{ route('pending_approvals.index') }}'" style="cursor: pointer;">
                 <div class="card-body text-center">
-                    <div class="quick-action-icon bg-primary text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <div class="quick-action-icon bg-primary text-white rounded-circle mx-auto mb-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-user-check fa-2x"></i>
                     </div>
                     <h5 class="card-title">Pending Requests</h5>
@@ -96,9 +108,9 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card quick-action-card" onclick="window.location.href='{{ route('training_proofs.review_index') }}'" style="cursor: pointer;">
+            <div class="card quick-action-card content-box-enhanced" onclick="window.location.href='{{ route('training_proofs.review_index') }}'" style="cursor: pointer;">
                 <div class="card-body text-center">
-                    <div class="quick-action-icon bg-warning text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <div class="quick-action-icon bg-warning text-white rounded-circle mx-auto mb-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-file-alt fa-2x"></i>
                     </div>
                     <h5 class="card-title">Pending Reports</h5>
@@ -108,9 +120,9 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card quick-action-card" onclick="window.location.href='{{ route('training_assignments.index') }}'" style="cursor: pointer;">
+            <div class="card quick-action-card content-box-enhanced" onclick="window.location.href='{{ route('training_assignments.index') }}'" style="cursor: pointer;">
                 <div class="card-body text-center">
-                    <div class="quick-action-icon bg-info text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <div class="quick-action-icon bg-info text-white rounded-circle mx-auto mb-3" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-tasks fa-2x"></i>
                     </div>
                     <h5 class="card-title">Pending Trainings</h5>
@@ -124,11 +136,11 @@
     <!-- Top Performers Card -->
     <div class="row g-3 mb-4">
         <div class="col-12">
-            <div class="content-box">
+            <div class="content-box-enhanced">
                 <h2>Top Performers</h2>
-                <p class="text-muted">Staff with the most completed trainings</p>
+                <p class="subtitle">Staff with the most completed trainings</p>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover table-enhanced">
                         <thead>
                             <tr>
                                 <th>Rank</th>
@@ -153,8 +165,8 @@
                                     <td>{{ $performer->full_name }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <span class="me-2">{{ $performer->completed_count }}</span>
-                                            <div class="progress flex-grow-1" style="height: 8px; max-width: 100px;">
+                                            <span class="me-2 fw-bold">{{ $performer->completed_count }}</span>
+                                            <div class="progress flex-grow-1" style="height: 12px; max-width: 120px;">
                                                 <div class="progress-bar" role="progressbar" style="width: {{ min(100, ($performer->completed_count / max(1, $top_performers->first()->completed_count)) * 100) }}%" aria-valuenow="{{ $performer->completed_count }}" aria-valuemin="0" aria-valuemax="{{ $top_performers->first()->completed_count ?? 1 }}"></div>
                                             </div>
                                         </div>
@@ -175,34 +187,36 @@
     <!-- Recent Training Completions -->
     <div class="row g-3 mb-4">
         <div class="col-12">
-            <div class="content-box">
+            <div class="content-box-enhanced">
                 <h2>Recent Training Completions</h2>
-                <p class="text-muted">Latest training completions by staff members</p>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Staff Name</th>
-                                <th>Training Title</th>
-                                <th>Completion Date</th>
-                                <th>Office</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recentTrainings">
-                            @forelse($recent_trainings as $training)
+                <p class="subtitle">Latest training completions by staff members</p>
+                <div class="scrollable-section">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-enhanced recent-completions-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $training->full_name }}</td>
-                                    <td>{{ $training->title }}</td>
-                                    <td>{{ $training->completion_date }}</td>
-                                    <td>{{ $training->office_code }}</td>
+                                    <th>Staff Name</th>
+                                    <th>Training Title</th>
+                                    <th>Completion Date</th>
+                                    <th>Office</th>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">No recent training completions</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="recentTrainings">
+                                @forelse($recent_trainings as $training)
+                                    <tr>
+                                        <td>{{ $training->full_name }}</td>
+                                        <td>{{ $training->title }}</td>
+                                        <td>{{ $training->completion_date }}</td>
+                                        <td>{{ $training->office_code }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">No recent training completions</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -211,44 +225,46 @@
     <!-- Office-wise Training Statistics -->
     <div class="row g-3 mb-4">
         <div class="col-12">
-            <div class="content-box">
+            <div class="content-box-enhanced">
                 <h2>Office-wise Training Statistics</h2>
-                <p class="text-muted">Training completion rates by office</p>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Office</th>
-                                <th>Total Staff</th>
-                                <th>Completed Trainings</th>
-                                <th>Completion Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody id="officeStats">
-                            @forelse($office_stats as $office)
-                                @php
-                                    $completionRate = $office['total_staff'] > 0 ? round(($office['completed_trainings'] / $office['total_staff']) * 100) : 0;
-                                @endphp
+                <p class="subtitle">Training completion rates by office</p>
+                <div class="scrollable-section">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-enhanced office-stats-table">
+                            <thead>
                                 <tr>
-                                    <td>{{ $office['office_name'] }}</td>
-                                    <td>{{ $office['total_staff'] }}</td>
-                                    <td>{{ $office['completed_trainings'] }}</td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="progress flex-grow-1 me-2" style="height: 10px;">
-                                                <div class="progress-bar" role="progressbar" style="width: {{ $completionRate }}%" aria-valuenow="{{ $completionRate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <th>Office</th>
+                                    <th>Total Staff</th>
+                                    <th>Completed Trainings</th>
+                                    <th>Completion Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="officeStats">
+                                @forelse($office_stats as $office)
+                                    @php
+                                        $completionRate = $office['total_staff'] > 0 ? round(($office['completed_trainings'] / $office['total_staff']) * 100) : 0;
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $office['office_name'] }}</td>
+                                        <td>{{ $office['total_staff'] }}</td>
+                                        <td>{{ $office['completed_trainings'] }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 12px;">
+                                                    <div class="progress-bar" role="progressbar" style="width: {{ $completionRate }}%" aria-valuenow="{{ $completionRate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <span class="fw-bold">{{ $completionRate }}%</span>
                                             </div>
-                                            <span>{{ $completionRate }}%</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">No office statistics available</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">No office statistics available</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -373,67 +389,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    
-    // --- Area Chart (Total Attendance) ---
-    const areaCtx = document.getElementById('areaChart').getContext('2d');
-    const areaGradient = areaCtx.createLinearGradient(0, 0, 0, 220);
-    areaGradient.addColorStop(0, 'rgba(99,102,241,0.16)');
-    areaGradient.addColorStop(1, 'rgba(99,102,241,0.02)');
-
-    new Chart(areaCtx, {
-        type: 'line',
-        data: {
-            labels: @json($attendance_labels),
-            datasets: [{
-                label: 'Completed trainings',
-                data: @json($attendance_data),
-                borderColor: '#1e3a8a',
-                backgroundColor: areaGradient,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: '#1e3a8a',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { stepSize: 1 } } },
-            plugins: { legend: { display: false } }
-        }
-    });
-
-    // --- Horizontal Bar Chart (Training completion trends) ---
-    const hbarCtx = document.getElementById('horizontalBarChart').getContext('2d');
-    new Chart(hbarCtx, {
-        type: 'bar',
-        data: {
-            indexAxis: 'y',
-            labels: @json($completion_labels),
-            datasets: [
-                {
-                    label: 'Trainings Completed',
-                    data: @json($completion_data),
-                    backgroundColor: ['#7841f7ff','#7d4af5ff','#7d4decff','#7642f0ff','#8b5cf6','#7d4ceeff'],
-                    borderRadius: 6
-                }
-            ]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: true,
-            scales: {
-                x: { beginAtZero: true, ticks: { stepSize: 1 } },
-                y: { grid: { display: false } }
-            },
-            plugins: { legend: { display: false } }
-        }
-    });
     
     // --- Broadcast Modal Form Submission Logic ---
     const broadcastForm = document.getElementById('broadcastForm');
@@ -913,6 +870,7 @@ document.getElementById('officeStaffBroadcastForm')?.addEventListener('submit', 
 
 <!-- Staff Profile Modal -->
 @include('staff.partials.profile_notification_modals')
+
 @include('staff.partials.modal_scripts')
 
 </body>

@@ -391,7 +391,10 @@
         @endif
         
         <!-- Modals -->
-    @include('office_head.partials.modals')
+    @include('office_head.partials.modals', [
+        'office_display' => $office_display,
+        'user' => $user
+    ])
     
     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
         @csrf
@@ -672,7 +675,10 @@
     })();
     </script>
     
-    @include('office_head.partials.modals')
+    @include('office_head.partials.modals', [
+        'office_display' => $office_display,
+        'user' => $user
+    ])
     
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">

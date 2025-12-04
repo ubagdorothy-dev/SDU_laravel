@@ -77,10 +77,7 @@
                             <p class="mb-1 text-muted small">{{ $office_display }}</p>
                         @endif
                     </div>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#profileModal">
-                            <i class="fas fa-user-circle me-2"></i> Profile
-                        </button>
+                    <div class="d-flex gap-2 flex-wrap">                       
                         <button class="btn btn-primary position-relative" data-bs-toggle="modal" data-bs-target="#notificationsModal">
                             <i class="fas fa-bell me-2"></i> Notifications
                             <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;"></span>
@@ -927,6 +924,9 @@
     </form>
     
     @include('staff.partials.profile_notification_modals')
+    
+    @include('staff.partials.profile_notification_modals')
+    
     @include('staff.partials.modal_scripts')
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -30,6 +30,14 @@ class ProfileController extends Controller
         $user = Auth::user();
         // Load the staff detail relationship
         $user->load('staffDetail');
+        
+        // For unit directors, load office relationship to display office name
+        if (in_array($user->role, ['unit_director', 'unit director'])) {
+            $user->load('office');
+            // Return a read-only profile view for unit directors
+            return view('profile.unit_director_show', compact('user'));
+        }
+        
         return view('profile.show', compact('user'));
     }
 
@@ -41,6 +49,13 @@ class ProfileController extends Controller
     public function edit()
     {
         $user = Auth::user();
+        
+        // Unit directors cannot edit their profile
+        if (in_array($user->role, ['unit_director', 'unit director'])) {
+            return redirect()->route('profile.show')
+                ->with('error', 'As a Unit Director, your profile information is managed by the system administrator.');
+        }
+        
         // Load office relationship for Office Heads to display office name
         if ($user->role === 'head') {
             $user->load('office');
@@ -59,6 +74,12 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
+        
+        // Unit directors cannot update their profile
+        if (in_array($user->role, ['unit_director', 'unit director'])) {
+            return redirect()->route('profile.show')
+                ->with('error', 'As a Unit Director, your profile information is managed by the system administrator.');
+        }
         
         try {
             // Validate based on user role
