@@ -210,7 +210,10 @@ body {
 }
 
 /* Broadcast Modal Enhancement */
-#broadcastModal .modal-content {
+/* Broadcast / Office Staff / Inbox Modal Enhancement */
+#broadcastModal .modal-content,
+#officeStaffBroadcastModal .modal-content,
+#inboxModal .modal-content {
     border-radius: 16px;
     padding: 0;
     border: none;
@@ -219,7 +222,9 @@ body {
     overflow: hidden;
 }
 
-#broadcastModal .modal-dialog { 
+#broadcastModal .modal-dialog,
+#officeStaffBroadcastModal .modal-dialog,
+#inboxModal .modal-dialog { 
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -228,14 +233,28 @@ body {
     margin: 0 auto;
 }
 
-#broadcastModal .modal-header {
+/* Make the inbox modal wider for better readability */
+#inboxModal .modal-dialog {
+    max-width: 1000px; /* wider than the other modals */
+    width: 95%;
+}
+
+@media (min-width: 1400px) {
+    #inboxModal .modal-dialog { max-width: 1200px; }
+}
+
+#broadcastModal .modal-header,
+#officeStaffBroadcastModal .modal-header,
+#inboxModal .modal-header {
     padding: 1.5rem 2rem;
     border-bottom: 1px solid #eef2ff;
     background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
     color: white;
 }
 
-#broadcastModal .modal-title { 
+#broadcastModal .modal-title,
+#officeStaffBroadcastModal .modal-title,
+#inboxModal .modal-title { 
     font-weight: 700; 
     color: #ffffff; 
     font-size: 1.5rem;
@@ -244,11 +263,15 @@ body {
     gap: 0.75rem;
 }
 
-#broadcastModal .modal-body { 
+#broadcastModal .modal-body,
+#officeStaffBroadcastModal .modal-body,
+#inboxModal .modal-body { 
     padding: 2rem;
 }
 
-#broadcastModal .modal-footer { 
+#broadcastModal .modal-footer,
+#officeStaffBroadcastModal .modal-footer,
+#inboxModal .modal-footer { 
     border-top: 1px solid #eef2ff;
     padding: 1.5rem 2rem;
     background: #f8fafc;
@@ -257,7 +280,9 @@ body {
     gap: 0.75rem;
 }
 
-#broadcastModal .form-label { 
+#broadcastModal .form-label,
+#officeStaffBroadcastModal .form-label,
+#inboxModal .form-label { 
     font-weight: 600; 
     color: #1e293b;
     margin-bottom: 0.5rem;
@@ -266,7 +291,13 @@ body {
 
 #broadcastModal .form-control, 
 #broadcastModal .form-select, 
-#broadcastModal textarea { 
+#broadcastModal textarea,
+#officeStaffBroadcastModal .form-control, 
+#officeStaffBroadcastModal .form-select, 
+#officeStaffBroadcastModal textarea,
+#inboxModal .form-control, 
+#inboxModal .form-select, 
+#inboxModal textarea { 
     border-radius: 10px;
     border: 2px solid #e6eef8;
     box-shadow: none;
@@ -277,18 +308,28 @@ body {
 
 #broadcastModal .form-control:focus, 
 #broadcastModal .form-select:focus, 
-#broadcastModal textarea:focus {
+#broadcastModal textarea:focus,
+#officeStaffBroadcastModal .form-control:focus, 
+#officeStaffBroadcastModal .form-select:focus, 
+#officeStaffBroadcastModal textarea:focus,
+#inboxModal .form-control:focus, 
+#inboxModal .form-select:focus, 
+#inboxModal textarea:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     outline: none;
 }
 
-#broadcastModal textarea { 
+#broadcastModal textarea,
+#officeStaffBroadcastModal textarea,
+#inboxModal textarea { 
     min-height: 150px;
     resize: vertical;
 }
 
-#broadcastModal .btn {
+#broadcastModal .btn,
+#officeStaffBroadcastModal .btn,
+#inboxModal .btn {
     border-radius: 10px;
     padding: 0.75rem 1.5rem;
     font-weight: 600;
@@ -296,24 +337,32 @@ body {
     transition: all 0.2s ease;
 }
 
-#broadcastModal .btn-primary { 
+#broadcastModal .btn-primary,
+#officeStaffBroadcastModal .btn-primary,
+#inboxModal .btn-primary { 
     background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
     border: none;
 }
 
-#broadcastModal .btn-primary:hover {
+#broadcastModal .btn-primary:hover,
+#officeStaffBroadcastModal .btn-primary:hover,
+#inboxModal .btn-primary:hover {
     background: linear-gradient(120deg, #1e40af 0%, #1e3a8a 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
 }
 
-#broadcastModal .btn-secondary {
+#broadcastModal .btn-secondary,
+#officeStaffBroadcastModal .btn-secondary,
+#inboxModal .btn-secondary {
     background: #e2e8f0;
     color: #475569;
     border: none;
 }
 
-#broadcastModal .btn-secondary:hover {
+#broadcastModal .btn-secondary:hover,
+#officeStaffBroadcastModal .btn-secondary:hover,
+#inboxModal .btn-secondary:hover {
     background: #cbd5e1;
     color: #1e293b;
     transform: translateY(-2px);
@@ -397,6 +446,29 @@ table tr:hover {
 
 .scrollable-section::-webkit-scrollbar {
     width: 8px;
+}
+
+/* Notification action buttons (icon-only) */
+.notification-actions { display: flex; gap: 0.5rem; }
+.notification-actions .notification-action {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+.notification-actions .notification-action i { font-size: 0.95rem; }
+.notification-actions .notification-action.btn-outline-danger { color: #dc3545; border-color: rgba(220,53,69,0.15); }
+.notification-actions .notification-action.btn-outline-primary { color: #0b5fff; border-color: rgba(11,95,255,0.12); }
+.notification-actions .notification-action.btn-outline-secondary { color: #6b7280; border-color: rgba(107,114,128,0.08); }
+.notification-actions .notification-action:disabled { opacity: 0.6; cursor: default; }
+.notification-actions .notification-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+
+@media (max-width: 576px) {
+    .notification-actions .notification-action { width: 32px; height: 32px; }
 }
 
 .scrollable-section::-webkit-scrollbar-track {

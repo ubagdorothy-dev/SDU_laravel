@@ -136,14 +136,28 @@ class NotificationController extends Controller
                     $senderInfo = '<small class="text-muted d-block mb-1">From: ' . e($senderName) . ' (' . e($senderRole) . ')</small>';
                 }
                 
-                $html .= '<div class="list-group-item ' . $isUnreadClass . '" data-notification-id="' . $notification->id . '">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h6 class="mb-1">' . $unreadIndicator . e($notification->title) . '</h6>
-                        <small class="text-muted">' . $notification->created_at->diffForHumans() . '</small>
-                    </div>
-                    ' . $senderInfo . '
-                    <p class="mb-1">' . $processedMessage . '</p>
-                </div>';
+                $html .= '<div class="list-group-item ' . $isUnreadClass . ' mb-2" data-notification-id="' . $notification->id . '">' .
+                    '<div class="d-flex w-100 justify-content-between align-items-start">' .
+                        '<div>' .
+                            '<h6 class="mb-1">' . $unreadIndicator . e($notification->title) . '</h6>' .
+                            $senderInfo .
+                        '</div>' .
+                        '<div class="text-end">' .
+                            '<small class="text-muted d-block">' . $notification->created_at->diffForHumans() . '</small>' .
+                            '<div class="notification-actions mt-2">' .
+                                // Mark Read button (disabled if already read)
+                                '<button class="notification-action btn btn-sm ' . (!$notification->is_read ? 'btn-outline-primary mark-read-btn' : 'btn-outline-secondary') . '" data-id="' . $notification->id . '" ' . (!$notification->is_read ? '' : 'disabled') . '>' .
+                                    '<i class="fas fa-check"></i>' .
+                                '</button>' .
+                                // Delete button
+                                '<button class="notification-action btn btn-sm btn-outline-danger delete-btn" data-id="' . $notification->id . '">' .
+                                    '<i class="fas fa-trash"></i>' .
+                                '</button>' .
+                            '</div>' .
+                        '</div>' .
+                    '</div>' .
+                    '<p class="mb-1 mt-2">' . $processedMessage . '</p>' .
+                '</div>';
             }
             
             $html .= '</div>';

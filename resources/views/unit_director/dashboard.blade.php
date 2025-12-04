@@ -363,9 +363,21 @@
                     <div class="mb-3">
                         <label class="form-label">Select Offices</label>
                         <div id="officesContainer" class="border rounded p-3 bg-light">
-                            <div class="text-center py-3">
-                                <div class="spinner-border spinner-border-sm" role="status"></div>
-                                <span class="ms-2">Loading offices...</span>
+                            <div class="row">
+                                @if(isset($offices) && $offices->count() > 0)
+                                    @foreach($offices as $office)
+                                        <div class="col-md-6 mb-2">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" name="offices[]" value="{{ $office->code }}" id="office_{{ $office->code }}">
+                                                <label class="form-check-label" for="office_{{ $office->code }}">
+                                                    {{ $office->name }} ({{ $office->code }})
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="col-12 text-muted">No offices available.</div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -447,54 +459,6 @@ document.addEventListener('DOMContentLoaded', function () {
     fetchInboxCount();
     var inboxModal = document.getElementById('inboxModal');
     if (inboxModal) inboxModal.addEventListener('show.bs.modal', loadInboxList);
-    
-    // Handle broadcast form submission
-    document.getElementById('broadcastForm')?.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const form = this;
-        const feedback = document.getElementById('broadcastFeedback');
-        const submitBtn = form.querySelector('button[type="submit"]');
-        
-        // Disable submit button
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
-        
-        // Clear previous feedback
-        feedback.innerHTML = '';
-        
-        fetch('{{ route('notifications.broadcast') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify(Object.fromEntries(new FormData(form)))
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                feedback.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-                form.reset();
-                
-                // Close modal after 2 seconds
-                setTimeout(() => {
-                    bootstrap.Modal.getInstance(document.getElementById('broadcastModal')).hide();
-                }, 2000);
-            } else {
-                feedback.innerHTML = `<div class="alert alert-danger">Error: ${data.message || 'Failed to send notification'}</div>`;
-            }
-        })
-        .catch(error => {
-            console.error('Error sending notification:', error);
-            feedback.innerHTML = '<div class="alert alert-danger">Error sending notification. Please try again.</div>';
-        })
-        .finally(() => {
-            // Re-enable submit button
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Send';
-        });
-    });
 });
 
 // Fetch inbox count
@@ -609,21 +573,24 @@ function renderNotifications(notifications) {
         
         html += `
             <div class="list-group-item ${isReadClass} mb-2" data-notification-id="${notification.id}">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">${notification.title || 'Notification'}</h6>
-                    <small>${formattedDate}</small>
+                <div class="d-flex w-100 justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">${notification.title || 'Notification'}</h6>
+                        ${senderInfo}
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">${formattedDate}</small>
+                        <div class="notification-actions mt-2">
+                            <button class="notification-action btn btn-sm ${notification.is_read ? 'btn-outline-secondary' : 'btn-outline-primary mark-read-btn'}" data-id="${notification.id}" aria-label="${notification.is_read ? 'Read' : 'Mark Read'}" title="${notification.is_read ? 'Read' : 'Mark Read'}" ${notification.is_read ? 'disabled' : ''}>
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="notification-action btn btn-sm btn-outline-danger delete-btn" data-id="${notification.id}" aria-label="Delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                ${senderInfo}
-                <p class="mb-1">${notification.message}</p>
-                <div class="d-flex justify-content-end gap-2 mt-2">
-                    ${!notification.is_read ? 
-                        `<button class="btn btn-sm btn-outline-primary mark-read-btn" data-id="${notification.id}">
-                            <i class="fas fa-check"></i> Mark Read
-                        </button>` : ''}
-                    <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${notification.id}">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                </div>
+                <p class="mb-1 mt-2">${notification.message}</p>
             </div>`;
     });
     html += '</div>';
@@ -654,13 +621,23 @@ function markNotificationAsRead(id, button) {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ id: id })
+        body: JSON.stringify({ ids: [id] })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            button.closest('.list-group-item').classList.remove('list-group-item-warning');
-            button.remove();
+            const item = button.closest('.list-group-item');
+            if (item) item.classList.remove('list-group-item-warning');
+            // disable and restyle the button instead of removing it
+            try {
+                button.disabled = true;
+                button.classList.remove('btn-outline-primary');
+                button.classList.remove('mark-read-btn');
+                button.classList.add('btn-outline-secondary');
+                button.setAttribute('title', 'Read');
+                button.setAttribute('aria-label', 'Read');
+                button.innerHTML = '<i class="fas fa-check"></i>';
+            } catch (e) { /* ignore */ }
             fetchInboxCount(); // Refresh count
         } else {
             alert('Failed to mark notification as read');
@@ -682,7 +659,7 @@ function deleteNotification(id, element) {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ id: id })
+        body: JSON.stringify({ ids: [id] })
     })
     .then(response => response.json())
     .then(data => {
@@ -707,12 +684,25 @@ document.getElementById('markAllReadBtn')?.addEventListener('click', function() 
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ mark_all: true })
+        body: JSON.stringify({ ids: 'all' })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            document.querySelectorAll('.mark-read-btn').forEach(btn => btn.closest('.list-group-item').remove());
+            // Find all mark-read buttons and convert them to disabled/read state
+            document.querySelectorAll('.mark-read-btn').forEach(btn => {
+                try {
+                    const item = btn.closest('.list-group-item');
+                    if (item) item.classList.remove('list-group-item-warning');
+                    btn.disabled = true;
+                    btn.classList.remove('btn-outline-primary');
+                    btn.classList.remove('mark-read-btn');
+                    btn.classList.add('btn-outline-secondary');
+                    btn.setAttribute('title', 'Read');
+                    btn.setAttribute('aria-label', 'Read');
+                    btn.innerHTML = '<i class="fas fa-check"></i>';
+                } catch (e) { /* ignore */ }
+            });
             fetchInboxCount(); // Refresh count
         } else {
             alert('Failed to mark all notifications as read');
@@ -722,7 +712,6 @@ document.getElementById('markAllReadBtn')?.addEventListener('click', function() 
         console.error('Error marking all notifications as read:', error);
         alert('Error marking all notifications as read');
     });
-});
 
 // Delete all notifications
 document.getElementById('deleteAllBtn')?.addEventListener('click', function() {
@@ -734,7 +723,7 @@ document.getElementById('deleteAllBtn')?.addEventListener('click', function() {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({ delete_all: true })
+        body: JSON.stringify({ ids: 'all' })
     })
     .then(response => response.json())
     .then(data => {
@@ -756,45 +745,7 @@ document.getElementById('deleteAllBtn')?.addEventListener('click', function() {
     });
 });
 
-// Load offices when office staff broadcast modal is shown
-var officeStaffBroadcastModal = document.getElementById('officeStaffBroadcastModal');
-if (officeStaffBroadcastModal) {
-    officeStaffBroadcastModal.addEventListener('show.bs.modal', function () {
-        loadOfficesForBroadcast();
-    });
-}
-
-// Load offices for broadcast
-function loadOfficesForBroadcast() {
-    const container = document.getElementById('officesContainer');
-    
-    fetch('{{ route('notifications.offices') }}')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success && data.offices.length > 0) {
-                let html = '<div class="row">';
-                data.offices.forEach(office => {
-                    html += `
-                        <div class="col-md-6 mb-2">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="offices[]" value="${office.code}" id="office_${office.code}">
-                                <label class="form-check-label" for="office_${office.code}">
-                                    ${office.name} (${office.code})
-                                </label>
-                            </div>
-                        </div>`;
-                });
-                html += '</div>';
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<div class="text-center text-muted">No offices found</div>';
-            }
-        })
-        .catch(error => {
-            console.error('Error loading offices:', error);
-            container.innerHTML = '<div class="alert alert-danger">Error loading offices. Please try again.</div>';
-        });
-}
+// (Offices are rendered server-side into #officesContainer)
 
 // Handle office staff broadcast form submission
 document.getElementById('officeStaffBroadcastForm')?.addEventListener('submit', function(e) {

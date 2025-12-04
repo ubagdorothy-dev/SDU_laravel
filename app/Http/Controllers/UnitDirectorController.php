@@ -224,6 +224,7 @@ class UnitDirectorController extends Controller
             'completion_data',
             'recent_trainings',
             'office_stats',
+            'offices',
             'pending_approvals',
             'pending_trainings',
             'pending_reports',
