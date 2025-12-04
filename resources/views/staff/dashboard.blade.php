@@ -13,54 +13,58 @@
 <input type="checkbox" id="sidebar-toggle-checkbox" style="display: none;">
 
     <div class="sidebar">
-        <div class="d-flex justify-content-between align-items-center px-3 mb-3">
+        <div class="sidebar-header d-flex justify-content-between align-items-center px-3 mb-3">
             <div class="d-flex align-items-center">
                 <img src="{{ asset('SDU_Logo.png') }}" alt="SDU Logo" class="sidebar-logo">
                 <h5 class="m-0 text-white"><span class="logo-text">SDU STAFF</span></h5>
             </div>
             <label for="sidebar-toggle-checkbox" id="sidebar-toggle" class="btn btn-toggle"><i class="fas fa-bars"></i></label>
         </div>
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link {{ !request()->has('view') || request()->get('view') === 'overview' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=overview">
-                    <i class="fas fa-chart-line me-2"></i> <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'active' : '' }}" href="#trainingSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'true' : 'false' }}" aria-controls="trainingSubmenu">
-                    <i class="fas fa-book-open me-2"></i> <span>Training</span>
-                </a>
-                <div class="collapse {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'show' : '' }}" id="trainingSubmenu">
-                    <ul class="nav flex-column ms-4">
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->get('view') === 'training-records' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=training-records">
-                                <i class="fas fa-list me-2"></i> <span>My Records</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->get('view') === 'assigned-trainings' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=assigned-trainings">
-                                <i class="fas fa-tasks me-2"></i> <span>Assigned Trainings</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->get('view') === 'uploaded-files' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=uploaded-files">
-                                <i class="fas fa-file-upload me-2"></i> <span>Uploaded Files</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
-                    <i class="fas fa-user-circle me-2"></i> <span>Profile</span>
-                </a>
-            </li>
-            <li class="nav-item mt-auto">
-                <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt me-2"></i> <span>Logout</span>
-                </a>
-            </li>
-        </ul>
+        <div class="sidebar-content">
+            <ul class="nav flex-column flex-grow-1">
+                <li class="nav-item">
+                    <a class="nav-link {{ !request()->has('view') || request()->get('view') === 'overview' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=overview">
+                        <i class="fas fa-chart-line me-2"></i> <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'active' : '' }}" href="#trainingSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'true' : 'false' }}" aria-controls="trainingSubmenu">
+                        <i class="fas fa-book-open me-2"></i> <span>Training</span>
+                    </a>
+                    <div class="collapse {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'show' : '' }}" id="trainingSubmenu">
+                        <ul class="nav flex-column ms-4">
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->get('view') === 'training-records' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=training-records">
+                                    <i class="fas fa-list me-2"></i> <span>My Records</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->get('view') === 'assigned-trainings' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=assigned-trainings">
+                                    <i class="fas fa-tasks me-2"></i> <span>Assigned Trainings</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->get('view') === 'uploaded-files' ? 'active' : '' }}" href="{{ route('staff.dashboard') }}?view=uploaded-files">
+                                    <i class="fas fa-file-upload me-2"></i> <span>Uploaded Files</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            <ul class="nav flex-column sidebar-footer">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+                        <i class="fas fa-user-circle me-2"></i> <span>Profile</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt me-2"></i> <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
 
     <div class="main-content">

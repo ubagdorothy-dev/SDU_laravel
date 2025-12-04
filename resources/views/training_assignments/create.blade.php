@@ -129,11 +129,16 @@
                                                 </div>
                                             </div>
                                             <div class="row g-3">
-                                                @foreach($members as $member)
+                                            @php
+                                                $members = collect($members)->sortByDesc(function($m) {
+                                                    return strtolower($m->role) === 'head' ? 1 : 0;
+                                                });
+                                            @endphp
+                                            @foreach($members as $member)
                                                     <div class="col-md-6 col-lg-4">
                                                         <div class="form-check highlight-on-hover">
-                                                            <input class="form-check-input staff-checkbox" type="checkbox" name="staff_ids[]" value="{{ $member->user_id }}" id="staff_{{ $member->user_id }}" data-office="{{ $officeCode }}">
-                                                            <label class="form-check-label d-block staff-checkbox-card" for="staff_{{ $member->user_id }}">
+                                                           <input class="form-check-input staff-checkbox" type="checkbox" name="staff_ids[]" value="{{ $member->user_id }}" id="staff_{{ $member->user_id }}" data-office="{{ $officeCode }}" data-role="{{ $member->role ?? '' }}">
+                                                            <label class="form-check-label d-block staff-checkbox-card" for="staff_{{ $member->user_id }}" tabindex="0" role="checkbox" aria-checked="false">
                                                                 <div class="d-flex align-items-center mb-1">
                                                                     <div class="me-2">
                                                                         <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
@@ -141,7 +146,13 @@
                                                                         </div>
                                                                     </div>
                                                                     <div>
-                                                                        <span class="fw-medium text-dark">{{ $member->full_name ?? 'N/A' }}</span>
+                                                                       <span class="fw-medium text-dark">{{ $member->full_name ?? 'N/A' }}</span>
+                                                                                    @php $roleLower = strtolower($member->role ?? ''); @endphp
+                                                                                    @if(in_array($roleLower, ['head','office_head','office head','office-head','manager','office-manager']))
+                                                                                        <span class="badge badge-head ms-2">Head</span>
+                                                                                    @elseif(in_array($roleLower, ['staff','employee','worker','']))
+                                                                                        <span class="badge badge-staff ms-2">Staff</span>
+                                                                                    @endif
                                                                     </div>
                                                                 </div>
                                                                 @if($member->office_code)
@@ -249,16 +260,36 @@
             });
         });
         
-        // Add click handler for staff cards
+       // Add click handler for staff cards — clicking anywhere on the card (avatar/name) toggles selection
+        // Use checkbox.click() so the native change events run consistently and UI updates via the existing change handler
         document.querySelectorAll('.staff-checkbox-card').forEach(card => {
             card.addEventListener('click', function(e) {
-                // Don't trigger if clicking on the checkbox itself
+                // If the click target is an explicit control that should not toggle (e.g., a link), skip
+                const ignoreToggle = e.target.closest('a') || e.target.closest('button');
+                if (ignoreToggle) return;
+
+                // If user clicked directly on the checkbox element, let the browser handle it
                 if (e.target.type === 'checkbox') return;
-                
+
                 const checkbox = this.previousElementSibling;
-                if (checkbox && checkbox.type === 'checkbox') {
+                if (checkbox && checkbox.type === 'checkbox' && !checkbox.disabled) {
+                    // Prevent the label's native toggle to avoid a double-toggle (label + programmatic click)
+                    e.preventDefault();
                     checkbox.checked = !checkbox.checked;
-                    this.classList.toggle('selected', checkbox.checked);
+                    // Fire change event so other handlers (and ARIA updates) run
+                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+
+            // Make Enter and Space toggle selection when the card is focused for keyboard users
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const checkbox = this.previousElementSibling;
+                    if (checkbox && checkbox.type === 'checkbox' && !checkbox.disabled) {
+                        checkbox.checked = !checkbox.checked;
+                        checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
                 }
             });
         });
@@ -269,6 +300,7 @@
                 const card = this.nextElementSibling;
                 if (card && card.classList.contains('staff-checkbox-card')) {
                     card.classList.toggle('selected', this.checked);
+                    card.setAttribute('aria-checked', this.checked ? 'true' : 'false');
                 }
             });
         });

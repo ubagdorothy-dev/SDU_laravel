@@ -13,7 +13,7 @@
 <body>
     <!-- Desktop Sidebar -->
     <div class="sidebar d-none d-lg-block">
-      <div class="d-flex justify-content-between align-items-center px-3 mb-3">
+      <div class="sidebar-header d-flex justify-content-between align-items-center px-3 mb-3">
         <div class="d-flex align-items-center">
           <img src="{{ asset('images/SDU_Logo.png') }}" class="sidebar-logo" alt="SDU">
           <h5 class="m-0 text-white">SDU OFFICE HEAD</h5>
@@ -22,43 +22,51 @@
             <i class="fas fa-bars"></i>
         </button>
       </div>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link {{ !request()->has('view') || request()->get('view') === 'overview' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=overview">
-                <i class="fas fa-chart-line me-2"></i> <span>Dashboard</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'active' : '' }}" href="#trainingSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'true' : 'false' }}" aria-controls="trainingSubmenu">
-                <i class="fas fa-book-open me-2"></i> <span>Training</span>
-            </a>
-            <div class="collapse {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'show' : '' }}" id="trainingSubmenu">
-                <ul class="nav flex-column ms-4">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->get('view') === 'training-records' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=training-records">
-                            <i class="fas fa-list me-2"></i> <span>My Records</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->get('view') === 'assigned-trainings' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=assigned-trainings">
-                            <i class="fas fa-tasks me-2"></i> <span>Assigned Trainings</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->get('view') === 'office-directory' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=office-directory">
-                <i class="fas fa-users me-2"></i> <span>Office Directory</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
-                <i class="fas fa-user-circle me-2"></i> <span>Profile</span>
-            </a>
-        </li>
-        <li class="nav-item mt-auto"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
-      </ul>
+      <div class="sidebar-content">
+        <ul class="nav flex-column flex-grow-1">
+          <li class="nav-item">
+              <a class="nav-link {{ !request()->has('view') || request()->get('view') === 'overview' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=overview">
+                  <i class="fas fa-chart-line me-2"></i> <span>Dashboard</span>
+              </a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'active' : '' }}" href="#trainingSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'true' : 'false' }}" aria-controls="trainingSubmenu">
+                  <i class="fas fa-book-open me-2"></i> <span>Training</span>
+              </a>
+              <div class="collapse {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'show' : '' }}" id="trainingSubmenu">
+                  <ul class="nav flex-column ms-4">
+                      <li class="nav-item">
+                          <a class="nav-link {{ request()->get('view') === 'training-records' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=training-records">
+                              <i class="fas fa-list me-2"></i> <span>My Records</span>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link {{ request()->get('view') === 'assigned-trainings' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=assigned-trainings">
+                              <i class="fas fa-tasks me-2"></i> <span>Assigned Trainings</span>
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link {{ request()->get('view') === 'office-directory' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=office-directory">
+                  <i class="fas fa-users me-2"></i> <span>Office Directory</span>
+              </a>
+          </li>
+        </ul>
+        <ul class="nav flex-column sidebar-footer">
+          <li class="nav-item">
+              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
+                  <i class="fas fa-user-circle me-2"></i> <span>Profile</span>
+              </a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                  <i class="fas fa-sign-out-alt me-2"></i> <span>Logout</span>
+              </a>
+          </li>
+        </ul>
+      </div>
     </div>
 
     <div class="main-content">
@@ -101,15 +109,15 @@
         @if (!request()->has('view') || request()->get('view') === 'overview')
             <div class="stats-cards">
                 <div class="card"><h3>Staff in Office</h3><p>{{ $total_staff_in_office }}</p></div>
-                <div class="card"><h3>Trainings Completed</h3><p>{{ $completed_trainings_in_office }}</p></div>
-                <div class="card"><h3>Trainings Upcoming</h3><p>{{ $training_pending }}</p></div>
-                <div class="card"><h3>Trainings Ongoing</h3><p>{{ $training_overdue }}</p></div>
+                <div class="card"><h3>Trainings Completed</h3><p>{{ $trainings_completed_in_office }}</p></div>
+                <div class="card"><h3>Trainings Upcoming</h3><p>{{ $trainings_upcoming_in_office }}</p></div>
+                <div class="card"><h3>Trainings Ongoing</h3><p>{{ $trainings_ongoing_in_office }}</p></div>
             </div>
 
             <div class="row g-3 mb-4">
                 <div class="col-lg-6">
                     <div class="content-box chart-card">
-                        <h2>Training Status</h2>
+                        <h2>My Training Status</h2>
                         <div class="chart-wrapper">
                             <canvas id="trainingStatusChart" class="chart-canvas" height="220"></canvas>
                         </div>
@@ -361,24 +369,11 @@
                                         <td>{{ $staff->degree_attained ?? 'N/A' }}</td>
                                         <td>{{ $staff->job_function ?? 'N/A' }}</td>
                                         <td>
-                                            <div class="btn-group" role="group">
-                                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewStaffModal" 
-                                                    data-staff-id="{{ $staff->user_id }}"
-                                                    data-full-name="{{ $staff->full_name }}"
-                                                    data-email="{{ $staff->email }}"
-                                                    data-position="{{ $staff->position ?? 'N/A' }}"
-                                                    data-program="{{ $staff->program ?? 'N/A' }}"
-                                                    data-employment-status="{{ $staff->employment_status ?? 'N/A' }}"
-                                                    data-degree-attained="{{ $staff->degree_attained ?? 'N/A' }}"
-                                                    data-job-function="{{ $staff->job_function ?? 'N/A' }}">
-                                                    <i class="fas fa-eye"></i> View
-                                                </button>
-                                                <button class="btn btn-info btn-sm btn-view-trainings" 
-                                                    data-user-id="{{ $staff->user_id }}" 
-                                                    data-user-name="{{ $staff->full_name }}">
-                                                    <i class="fas fa-graduation-cap"></i> View Trainings
-                                                </button>
-                                            </div>
+                                            <button class="btn btn-info btn-sm btn-view-trainings" 
+                                                data-user-id="{{ $staff->user_id }}" 
+                                                data-user-name="{{ $staff->full_name }}">
+                                                <i class="fas fa-graduation-cap"></i> View Trainings
+                                            </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -404,6 +399,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Debug: Check if logout button exists
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutButton = document.querySelector('.sidebar-footer .nav-link[href*="logout"]');
+            if (logoutButton) {
+                console.log('Logout button found in DOM');
+                // Add a temporary alert to confirm it exists
+                // alert('Logout button exists in DOM - check console for details');
+            } else {
+                console.log('ERROR: Logout button NOT found in DOM');
+                alert('ERROR: Logout button NOT found in DOM');
+            }
+        });
+    </script>
     
 
     
@@ -533,7 +542,7 @@
                 labels: ['Completed', 'Pending', 'Ongoing'],
                 datasets: [{
                     label: 'Training Status Distribution',
-                    data: [{{ $training_completed }}, {{ $training_pending }}, {{ $training_overdue }}],
+                    data: [{{ $trainings_completed_in_office }}, {{ $trainings_upcoming_in_office }}, {{ $trainings_ongoing_in_office }}],
                     backgroundColor: [
                         '#28a745',
                         '#ffc107',
@@ -685,56 +694,7 @@
         </div>
     </div>
     
-    <!-- View Staff Details Modal -->
-    <div class="modal fade" id="viewStaffModal" tabindex="-1" aria-labelledby="viewStaffModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="viewStaffModalLabel">Staff Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Full Name:</label>
-                                <p id="modalFullName" class="mb-0"></p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Email:</label>
-                                <p id="modalEmail" class="mb-0"></p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Position:</label>
-                                <p id="modalPosition" class="mb-0"></p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Program:</label>
-                                <p id="modalProgram" class="mb-0"></p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Employment Status:</label>
-                                <p id="modalEmploymentStatus" class="mb-0"></p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Degree Attained:</label>
-                                <p id="modalDegreeAttained" class="mb-0"></p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Job Function:</label>
-                                <p id="modalJobFunction" class="mb-0"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
     
     <!-- Trainings Modal -->
     <div class="modal fade" id="trainingsModal" tabindex="-1" aria-hidden="true">
@@ -774,34 +734,8 @@
     </div>
     
     <script>
-    // Handle view staff modal
+    // Handle view trainings clicks
     document.addEventListener('DOMContentLoaded', function() {
-        var viewStaffModal = document.getElementById('viewStaffModal');
-        if (viewStaffModal) {
-            viewStaffModal.addEventListener('show.bs.modal', function (event) {
-                var button = event.relatedTarget; // Button that triggered the modal
-                
-                // Extract info from data-* attributes
-                var fullName = button.getAttribute('data-full-name');
-                var email = button.getAttribute('data-email');
-                var position = button.getAttribute('data-position');
-                var program = button.getAttribute('data-program');
-                var employmentStatus = button.getAttribute('data-employment-status');
-                var degreeAttained = button.getAttribute('data-degree-attained');
-                var jobFunction = button.getAttribute('data-job-function');
-                
-                // Update the modal's content
-                document.getElementById('modalFullName').textContent = fullName;
-                document.getElementById('modalEmail').textContent = email;
-                document.getElementById('modalPosition').textContent = position;
-                document.getElementById('modalProgram').textContent = program;
-                document.getElementById('modalEmploymentStatus').textContent = employmentStatus;
-                document.getElementById('modalDegreeAttained').textContent = degreeAttained;
-                document.getElementById('modalJobFunction').textContent = jobFunction;
-            });
-        }
-        
-        // Handle view trainings clicks
         document.addEventListener('click', function(e) {
             const btn = e.target.closest('.btn-view-trainings');
             if (!btn) return;

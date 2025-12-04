@@ -16,23 +16,27 @@
 
 <!-- Desktop Sidebar -->
 <div class="sidebar-lg d-none d-lg-block">
-  <div class="d-flex justify-content-between align-items-center px-3 mb-3">
+  <div class="sidebar-header d-flex justify-content-between align-items-center px-3 mb-3">
     <div class="d-flex align-items-center">
       <img src="{{ asset('SDU_Logo.png') }}" class="sidebar-logo" alt="SDU">
       <h5 class="m-0 text-white">SDU UNIT DIRECTOR</h5>
     </div>
     <label for="sidebar-toggle-checkbox" class="btn btn-toggle" style="color:#fff;border:none;background:transparent"><i class="fas fa-bars"></i></label>
   </div>
-  <ul class="nav flex-column">
-    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
-    <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
-     @if(in_array($user->role, ['unit director', 'unit_director']))
-      <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
-      @endif
-    <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
-    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user-circle me-2"></i> <span> Profile</span></a></li>
-    <li class="nav-item mt-auto"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
-  </ul>
+  <div class="sidebar-content">
+    <ul class="nav flex-column flex-grow-1">
+      <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
+       @if(in_array($user->role, ['unit director', 'unit_director']))
+        <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
+        @endif
+      <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
+    </ul>
+    <ul class="nav flex-column sidebar-footer">
+      <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user-circle me-2"></i> <span> Profile</span></a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
+    </ul>
+  </div>
 </div>
 
 <div class="main-content">
@@ -541,7 +545,7 @@ function renderNotifications(notifications) {
         countElement.textContent = `${notifications.length} notifications`;
     }
     
-    if (notifications.length === 0) {
+    if (!notifications || notifications.length === 0) {
         container.innerHTML = `
             <div class="text-center py-5">
                 <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
@@ -551,8 +555,30 @@ function renderNotifications(notifications) {
         return;
     }
     
+    // Deduplicate notifications by id in case multiple fetches returned overlapping results
+    const unique = {};
+    const deduped = [];
+    notifications.forEach(n => {
+        if (!n || !n.id) return;
+        if (!unique[n.id]) { unique[n.id] = true; deduped.push(n); }
+    });
+    
+    if (deduped.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+                <h5>No notifications</h5>
+                <p class="text-muted">You don't have any notifications at the moment.</p>
+            </div>`;
+        return;
+    }
+    
+    if (countElement) {
+        countElement.textContent = `${deduped.length} notifications`;
+    }
+    
     let html = '<div class="list-group">';
-    notifications.forEach(notification => {
+    deduped.forEach(notification => {
         const isReadClass = notification.is_read ? '' : 'list-group-item-warning';
         const formattedDate = new Date(notification.created_at).toLocaleDateString('en-US', { 
             year: 'numeric', 

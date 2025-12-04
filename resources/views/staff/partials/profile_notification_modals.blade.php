@@ -50,7 +50,15 @@
                 <div class="text-center py-4" id="notificationsLoader">
                     <div class="spinner-border" role="status"></div>
                 </div>
-                <div id="notificationsList"></div>
+                <div id="notificationsList" class="scrollable-notifications"></div>
+                
+                <!-- Sent Items Tab (for roles that can send notifications) -->
+                <div id="sentItemsTab" style="display: none;">
+                    <div class="text-center py-4" id="sentItemsLoader" style="display: none;">
+                        <div class="spinner-border" role="status"></div>
+                    </div>
+                    <div id="sentItemsList" class="scrollable-notifications"></div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>

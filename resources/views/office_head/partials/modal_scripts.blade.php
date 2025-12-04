@@ -37,9 +37,29 @@
         // Handle notifications modal
         const notificationsModal = document.getElementById('notificationsModal');
         if (notificationsModal) {
+            let isFetching = false;
             notificationsModal.addEventListener('show.bs.modal', function () {
-                fetchNotifications();
+                if (!isFetching) {
+                    isFetching = true;
+                    fetchNotifications();
+                    // Reset the flag after a short delay to allow subsequent fetches
+                    setTimeout(() => {
+                        isFetching = false;
+                    }, 1000);
+                }
             });
+            
+            // Handle tab switching
+            const sentTab = document.getElementById('sent-tab');
+            console.log('Sent tab element:', sentTab);
+            if (sentTab) {
+                sentTab.addEventListener('shown.bs.tab', function () {
+                    console.log('Sent tab shown event triggered');
+                    fetchSentNotifications();
+                });
+            } else {
+                console.log('Sent tab not found');
+            }
         }
         
         // Update notification badge periodically
@@ -49,30 +69,179 @@
     
     // Fetch notifications and display them in the modal
     function fetchNotifications() {
-        const contentDiv = document.getElementById('notificationsContent');
-        if (!contentDiv) return;
+        const notificationsList = document.getElementById('notificationsList');
+        const loader = document.getElementById('notificationsLoader');
+        
+        console.log('fetchNotifications called');
+        
+        if (!notificationsList || !loader) {
+            console.log('Missing elements: notificationsList=', notificationsList, 'loader=', loader);
+            return;
+        }
         
         // Show loading spinner
-        contentDiv.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
+        loader.style.display = 'block';
+        notificationsList.innerHTML = '';
         
-        fetch("{{ route('notifications.get') }}", {
+        // Get the CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        console.log('CSRF Token:', csrfToken);
+        
+        const url = "{{ route('notifications.get') }}";
+        console.log('Fetching URL:', url);
+        
+        fetch(url, {
             method: 'GET',
             headers: {
-                'Accept': 'text/html',
-                'X-Requested-With': 'XMLHttpRequest'
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
             }
         })
-        .then(response => response.text())
-        .then(html => {
-            contentDiv.innerHTML = html;
+        .then(response => {
+            console.log('Notifications response status:', response.status);
+            console.log('Notifications response headers:', response.headers);
             
-            // Add event listeners for notification actions
-            initializeNotificationActions();
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Notifications data:', data);
+            loader.style.display = 'none';
+            if (data.success) {
+                renderNotifications(data.notifications);
+            } else {
+                notificationsList.innerHTML = '<div class="alert alert-danger">Failed to load notifications: ' + data.message + '</div>';
+            }
         })
         .catch(error => {
+            loader.style.display = 'none';
             console.error('Error fetching notifications:', error);
-            contentDiv.innerHTML = '<div class="alert alert-danger">Failed to load notifications. Please try again.</div>';
+            notificationsList.innerHTML = '<div class="alert alert-danger">Failed to load notifications. Please try again.</div>';
         });
+    }
+    
+    // Fetch sent notifications
+    function fetchSentNotifications() {
+        const sentNotificationsList = document.getElementById('sentNotificationsList');
+        const loader = document.getElementById('sentNotificationsLoader');
+        
+        console.log('fetchSentNotifications called');
+        
+        if (!sentNotificationsList || !loader) {
+            console.log('Missing elements: sentNotificationsList=', sentNotificationsList, 'loader=', loader);
+            return;
+        }
+        
+        console.log('Fetching sent notifications...');
+        
+        // Show loading spinner
+        loader.style.display = 'block';
+        sentNotificationsList.innerHTML = '';
+        
+        // Get the CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        console.log('CSRF Token:', csrfToken);
+        
+        const url = "{{ route('notifications.sent') }}";
+        console.log('Fetching URL:', url);
+        
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => {
+            console.log('Sent notifications response status:', response.status);
+            console.log('Sent notifications response headers:', response.headers);
+            
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status);
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Sent notifications data:', data);
+            loader.style.display = 'none';
+            if (data.success) {
+                renderSentNotifications(data.sent_notifications);
+            } else {
+                sentNotificationsList.innerHTML = '<div class="alert alert-danger">Failed to load sent notifications: ' + data.message + '</div>';
+            }
+        })
+        .catch(error => {
+            loader.style.display = 'none';
+            console.error('Error fetching sent notifications:', error);
+            sentNotificationsList.innerHTML = '<div class="alert alert-danger">Failed to load sent notifications. Please try again. Error: ' + error.message + '</div>';
+        });
+    }
+    
+    // Render received notifications
+    function renderNotifications(notifications) {
+        const notificationsList = document.getElementById('notificationsList');
+        if (!notificationsList) return;
+        
+        if (notifications.length === 0) {
+            notificationsList.innerHTML = '<div class="text-center py-5"><i class="fas fa-inbox fa-3x text-muted mb-3"></i><h5>No notifications</h5><p class="text-muted">You don\'t have any notifications yet.</p></div>';
+            return;
+        }
+        
+        let html = '<div class="list-group">';
+        notifications.forEach(notification => {
+            const isReadClass = notification.is_read ? '' : 'list-group-item-warning';
+            const senderInfo = notification.sender_name ? `<small class="text-muted">From: ${notification.sender_name} (${notification.sender_role})</small>` : '';
+            
+            html += `
+                <div class="list-group-item ${isReadClass} mb-2 rounded-3 border-0 shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${notification.title || 'Notification'}</h6>
+                        <small>${notification.created_at}</small>
+                    </div>
+                    <p class="mb-1">${notification.message}</p>
+                    ${senderInfo}
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        notificationsList.innerHTML = html;
+    }
+    
+    // Render sent notifications
+    function renderSentNotifications(sentNotifications) {
+        const sentNotificationsList = document.getElementById('sentNotificationsList');
+        if (!sentNotificationsList) return;
+        
+        if (sentNotifications.length === 0) {
+            sentNotificationsList.innerHTML = '<div class="text-center py-5"><i class="fas fa-paper-plane fa-3x text-muted mb-3"></i><h5>No sent items</h5><p class="text-muted">You haven\'t sent any notifications yet.</p></div>';
+            return;
+        }
+        
+        let html = '<div class="list-group">';
+        sentNotifications.forEach(notification => {
+            const recipientInfo = notification.recipient_name ? `<small class="text-muted">To: ${notification.recipient_name} (${notification.recipient_role})</small>` : '';
+            
+            html += `
+                <div class="list-group-item mb-2 rounded-3 border-0 shadow-sm">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${notification.title || 'Notification'}</h6>
+                        <small>${notification.created_at}</small>
+                    </div>
+                    <p class="mb-1">${notification.message}</p>
+                    ${recipientInfo}
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        sentNotificationsList.innerHTML = html;
     }
     
     // Initialize notification action buttons (mark as read, delete, etc.)

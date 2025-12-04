@@ -7,21 +7,44 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="notificationsContent">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <button id="markAllReadBtn" class="btn btn-sm btn-outline-primary me-2">
-                            <i class="fas fa-check-double me-1"></i>Mark All Read
-                        </button>
-                        <button id="deleteAllBtn" class="btn btn-sm btn-outline-danger">
-                            <i class="fas fa-trash-alt me-1"></i>Delete All
-                        </button>
+                <!-- Tab Navigation -->
+                <ul class="nav nav-tabs mb-3" id="notificationsTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab">Received</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button" role="tab">Sent Items</button>
+                    </li>
+                </ul>
+                
+                <!-- Tab Content -->
+                <div class="tab-content" id="notificationsTabContent">
+                    <!-- Received Notifications Tab -->
+                    <div class="tab-pane fade show active" id="received" role="tabpanel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <button id="markAllReadBtn" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-check-double me-1"></i>Mark All Read
+                                </button>
+                                <button id="deleteAllBtn" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash-alt me-1"></i>Delete All
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-center py-4" id="notificationsLoader">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                        <div id="notificationsList" class="scrollable-notifications"></div>
                     </div>
-                 
+                    
+                    <!-- Sent Notifications Tab -->
+                    <div class="tab-pane fade" id="sent" role="tabpanel">
+                        <div class="text-center py-4" id="sentNotificationsLoader">
+                            <div class="spinner-border" role="status"></div>
+                        </div>
+                        <div id="sentNotificationsList" class="scrollable-notifications"></div>
+                    </div>
                 </div>
-                <div class="text-center py-4" id="notificationsLoader">
-                    <div class="spinner-border" role="status"></div>
-                </div>
-                <div id="notificationsList"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
@@ -93,7 +116,20 @@ document.addEventListener('DOMContentLoaded', function () {
             const unreadIndicator = !n.is_read ? '<span class="badge bg-warning me-2">NEW</span>' : '';
             let senderInfo = '';
             if (n.sender_name && n.sender_role) senderInfo = `<small class="text-muted d-block mb-1">From: ${n.sender_name} (${n.sender_role})</small>`;
-            html += `<div class="list-group-item ${isUnreadClass}" data-notification-id="${n.id}"><div class="d-flex w-100 justify-content-between"><h6 class="mb-1">${unreadIndicator}${n.title || 'Notification'}</h6><small class="text-muted">${timeAgo(new Date(n.created_at))}</small></div>${senderInfo}<p class="mb-1">${n.message || ''}</p></div>`;
+            
+            // Format the timestamp properly
+            const formattedTimestamp = new Date(n.created_at).toLocaleString();
+            
+            html += `
+                <div class="list-group-item ${isUnreadClass}" data-notification-id="${n.id}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${unreadIndicator}${n.title || 'Notification'}</h6>
+                        <small class="text-muted">${timeAgo(new Date(n.created_at))}</small>
+                    </div>
+                    ${senderInfo}
+                    <p class="mb-1">${n.message || ''}</p>
+                    <small class="text-muted d-block mt-1">Sent: ${formattedTimestamp}</small>
+                </div>`;
         });
         html += '</div>';
         listDiv.innerHTML = html;

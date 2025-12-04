@@ -37,22 +37,11 @@ class OfficeHeadController extends Controller
         // Get current user's office
         $office = $user->office_code;
         
-        // Head-specific metrics
-        $head_trainings_completed = DB::table('training_records')
-            ->where('user_id', $user->user_id)
-            ->where('status', 'completed')
-            ->count();
-            
-        $head_trainings_upcoming = DB::table('training_records')
-            ->where('user_id', $user->user_id)
-            ->where('status', 'upcoming')
-            ->count();
-        
+        // Office-wide metrics for staff in this office
         $total_staff_in_office = 0;
-        $completed_trainings_in_office = 0;
-        $training_completed = 0;
-        $training_pending = 0;
-        $training_overdue = 0;
+        $trainings_completed_in_office = 0;
+        $trainings_upcoming_in_office = 0;
+        $trainings_ongoing_in_office = 0;
         
         if ($office) {
             $total_staff_in_office = DB::table('users')
@@ -60,23 +49,17 @@ class OfficeHeadController extends Controller
                 ->where('office_code', $office)
                 ->count();
                 
-            $completed_trainings_in_office = DB::table('training_records')
+            $trainings_completed_in_office = DB::table('training_records')
                 ->where('office_code', $office)
                 ->where('status', 'completed')
                 ->count();
                 
-            // Minimal training status breakdown (for chart): completed, pending, overdue
-            $training_completed = DB::table('training_records')
-                ->where('office_code', $office)
-                ->where('status', 'completed')
-                ->count();
-                
-            $training_pending = DB::table('training_records')
+            $trainings_upcoming_in_office = DB::table('training_records')
                 ->where('office_code', $office)
                 ->where('status', 'upcoming')
                 ->count();
                 
-            $training_overdue = DB::table('training_records')
+            $trainings_ongoing_in_office = DB::table('training_records')
                 ->where('office_code', $office)
                 ->where('status', 'ongoing')
                 ->count();
@@ -143,13 +126,10 @@ class OfficeHeadController extends Controller
             'user',
             'office',
             'office_display',
-            'head_trainings_completed',
-            'head_trainings_upcoming',
             'total_staff_in_office',
-            'completed_trainings_in_office',
-            'training_completed',
-            'training_pending',
-            'training_overdue',
+            'trainings_completed_in_office',
+            'trainings_upcoming_in_office',
+            'trainings_ongoing_in_office',
             'result_head_upcoming_list',
             'result_head_activities',
             'training_records',
