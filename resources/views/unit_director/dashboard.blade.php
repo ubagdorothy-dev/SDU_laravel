@@ -31,6 +31,7 @@
         <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
         @endif
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('training_proofs.review_index') }}"><i class="fas fa-file-alt me-2"></i> <span> Review Training Proofs</span></a></li>
     </ul>
     <ul class="nav flex-column sidebar-footer">
       <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user-circle me-2"></i> <span> Profile</span></a></li>
@@ -72,48 +73,101 @@
         </div>
     </div>
     
+    <!-- Stats Cards -->
     <div class="stats-cards">
         <div class="card"><h3>Total Staff</h3><p>{{ $total_staff }}</p></div>
         <div class="card"><h3>Total Heads</h3><p>{{ $total_heads }}</p></div>
         <div class="card"><h3>Trainings Completed</h3><p>{{ $training_completion_percentage }}%</p></div>
         <div class="card"><h3>Active Offices</h3><p>{{ $active_offices }}</p></div>
     </div>
-
+    
+    <!-- Quick Action Tiles -->
     <div class="row g-3 mb-4">
-        <div class="col-lg-7">
-            <div class="content-box chart-card">
-                <h2>Total Attendance</h2>
-                <p class="text-muted">Completed trainings across the last 6 months</p>
-                <div class="chart-wrapper"><canvas id="areaChart" class="chart-canvas" height="220"></canvas></div>
+        <div class="col-md-4">
+            <div class="card quick-action-card" onclick="window.location.href='{{ route('pending_approvals.index') }}'" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <div class="quick-action-icon bg-primary text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user-check fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">Pending Requests</h5>
+                    <p1>View and manage pending requests</p1>
+                    <h2 class="mb-0">{{ $pending_approvals }}</h2>
+                </div>
             </div>
         </div>
-        <div class="col-lg-5">
-            <div class="content-box chart-card">
-                <h2>Training Statistics</h2>
-                <p class="text-muted">Overview of training activity and completion trends</p>
-
-                <div class="row g-2 mb-3">
-                    <div class="col-12 col-md-4">
-                        <div class="card" style="padding:1rem; border-radius:12px;">
-                            <h3 style="font-size:0.8rem;">Most Attended</h3>
-                            <p style="font-size:1.3rem; font-weight:800; color:#6366f1; margin:0;">{{ $most_attended_title }}</p>
-                        </div>
+        <div class="col-md-4">
+            <div class="card quick-action-card" onclick="window.location.href='{{ route('training_proofs.review_index') }}'" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <div class="quick-action-icon bg-warning text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-file-alt fa-2x"></i>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <div class="card" style="padding:1rem; border-radius:12px;">
-                            <h3 style="font-size:0.8rem;">Least Attended</h3>
-                            <p style="font-size:1.3rem; font-weight:800; color:#10b981; margin:0;">{{ $least_attended_title }}</p>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <div class="card" style="padding:1rem; border-radius:12px;">
-                            <h3 style="font-size:0.8rem;">This Month</h3>
-                            <p style="font-size:1.3rem; font-weight:800; color:#f59e0b; margin:0;">{{ $this_month_count }} Trainings</p>
-                        </div>
-                    </div>
+                    <h5 class="card-title">Pending Reports</h5>
+                    <p1>Review and manage pending reports</p1>
+                    <h2 class="mb-0">{{ $pending_reports }}</h2>
                 </div>
-
-                <div class="chart-wrapper"><canvas id="horizontalBarChart" class="chart-canvas" height="220"></canvas></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card quick-action-card" onclick="window.location.href='{{ route('training_assignments.index') }}'" style="cursor: pointer;">
+                <div class="card-body text-center">
+                    <div class="quick-action-icon bg-info text-white rounded-circle mx-auto mb-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-tasks fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">Pending Trainings</h5>
+                    <p1>View and manage pending assigned trainings</p1>
+                    <h2 class="mb-0">{{ $pending_trainings }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Performers Card -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <div class="content-box">
+                <h2>Top Performers</h2>
+                <p class="text-muted">Staff with the most completed trainings</p>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Completed Trainings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($top_performers as $index => $performer)
+                                <tr onclick="console.log('View details for {{ $performer->full_name }}')" style="cursor: pointer;">
+                                    <td>
+                                        @if($index == 0)
+                                            <span class="badge bg-gold">1st</span>
+                                        @elseif($index == 1)
+                                            <span class="badge bg-silver">2nd</span>
+                                        @elseif($index == 2)
+                                            <span class="badge bg-bronze">3rd</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ $index + 1 }}</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $performer->full_name }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-2">{{ $performer->completed_count }}</span>
+                                            <div class="progress flex-grow-1" style="height: 8px; max-width: 100px;">
+                                                <div class="progress-bar" role="progressbar" style="width: {{ min(100, ($performer->completed_count / max(1, $top_performers->first()->completed_count)) * 100) }}%" aria-valuenow="{{ $performer->completed_count }}" aria-valuemin="0" aria-valuemax="{{ $top_performers->first()->completed_count ?? 1 }}"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center">No top performers data available</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -844,7 +898,17 @@ document.getElementById('officeStaffBroadcastForm')?.addEventListener('submit', 
         submitBtn.innerHTML = 'Send to Selected Offices';
     });
 });
-
+    // Handle top performers row clicks
+    document.querySelectorAll('table tr').forEach(row => {
+        row.addEventListener('click', function() {
+            // Check if this is a top performer row
+            if (this.querySelector('td:first-child .badge')) {
+                // In a real implementation, you would redirect to the user's detailed performance page
+                console.log('View details for user');
+            }
+        });
+    });
+});
 </script>
 
 <!-- Staff Profile Modal -->

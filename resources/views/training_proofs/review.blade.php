@@ -5,7 +5,6 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        @include('unit_director.sidebar')
         
         <div class="col-md-9 col-lg-10 ml-sm-auto px-4 main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">

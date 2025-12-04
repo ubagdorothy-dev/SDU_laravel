@@ -34,6 +34,7 @@ class TrainingProof extends Model
         'file_path',
         'status',
         'reviewed_by',
+        'remarks',
     ];
 
     /**

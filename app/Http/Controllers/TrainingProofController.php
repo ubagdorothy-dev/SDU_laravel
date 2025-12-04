@@ -312,6 +312,32 @@ class TrainingProofController extends Controller
     }
     
     /**
+     * Review a specific training proof in a modal.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $proof_id
+     * @return \Illuminate\Http\Response
+     */
+    public function reviewModal(Request $request, $proof_id)
+    {
+        $user = Auth::user();
+        
+        // Only unit directors can access this
+        if (!in_array($user->role, ['unit_director', 'unit director'])) {
+            abort(403, 'Unauthorized');
+        }
+        
+        // Find the training proof with related data
+        $trainingProof = TrainingProof::with(['trainingRecord', 'user'])
+            ->where('id', $proof_id)
+            ->where('status', 'pending')
+            ->firstOrFail();
+            
+        // Return only the modal content partial
+        return view('training_proofs.partials.review_modal', compact('trainingProof'));
+    }
+    
+    /**
      * Approve or reject a training proof.
      *
      * @param  \Illuminate\Http\Request  $request

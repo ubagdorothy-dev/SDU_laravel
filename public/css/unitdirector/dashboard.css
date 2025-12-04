@@ -338,3 +338,49 @@ body {
     border-radius: 10px; 
     background-color: #6366f1; 
 }
+
+/* Quick Action Cards */
+.quick-action-card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    height: 100%;
+}
+
+.quick-action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.quick-action-card .card-title {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.quick-action-card h2 {
+    font-weight: 700;
+    color: #1a202c;
+}
+
+/* Badge styling for rankings */
+.bg-gold {
+    background-color: #ffd700 !important;
+    color: #000 !important;
+}
+
+.bg-silver {
+    background-color: #c0c0c0 !important;
+    color: #000 !important;
+}
+
+.bg-bronze {
+    background-color: #cd7f32 !important;
+    color: #fff !important;
+}
+
+/* Table row hover effect */
+table tr:hover {
+    background-color: #f7fafc;
+}

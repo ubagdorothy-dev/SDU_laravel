@@ -182,6 +182,31 @@ class UnitDirectorController extends Controller
             ->whereIn('role', ['staff', 'head'])
             ->count();
         
+        // Pending training assignments count
+        $pending_trainings = DB::table('training_assignments')
+            ->where('status', 'pending')
+            ->count();
+        
+        // Pending training proofs (reports) count
+        $pending_reports = DB::table('training_proofs')
+            ->where('status', 'pending')
+            ->count();
+        
+        // Get top performers (staff with most completed trainings)
+        $top_performers = DB::table('training_records as tr')
+            ->join('users as u', 'tr.user_id', '=', 'u.user_id')
+            ->select(
+                'u.user_id',
+                'u.full_name',
+                DB::raw('COUNT(tr.id) as completed_count')
+            )
+            ->where('tr.status', 'completed')
+            ->whereIn('u.role', ['staff', 'head'])
+            ->groupBy('u.user_id', 'u.full_name')
+            ->orderBy('completed_count', 'desc')
+            ->limit(10)
+            ->get();
+        
         // Pass all data to the view
         return view('unit_director.dashboard', compact(
             'user',
@@ -199,7 +224,10 @@ class UnitDirectorController extends Controller
             'completion_data',
             'recent_trainings',
             'office_stats',
-            'pending_approvals'
+            'pending_approvals',
+            'pending_trainings',
+            'pending_reports',
+            'top_performers'
         ));
     }
 }
