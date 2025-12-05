@@ -182,6 +182,9 @@ class UnitDirectorController extends Controller
             ->whereIn('role', ['staff', 'head'])
             ->count();
         
+        // Also pass as pendingApprovalsCount for consistency
+        $pendingApprovalsCount = $pending_approvals;
+        
         // Pending training assignments count
         $pending_trainings = DB::table('training_assignments')
             ->where('status', 'pending')

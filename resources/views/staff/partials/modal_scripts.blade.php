@@ -259,17 +259,7 @@
         });
     }
     
-    // Initialize profile modal
-    function initializeProfileModal() {
-        // Add any profile modal initialization if needed
-        const profileModal = document.getElementById('profileModal');
-        if (profileModal) {
-            profileModal.addEventListener('shown.bs.modal', function () {
-                // Any actions when profile modal is shown
-                console.log('Profile modal is now visible');
-            });
-        }
-    }
+
     
     // Handle profile form submission
     function handleProfileFormSubmission() {

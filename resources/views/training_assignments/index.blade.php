@@ -42,12 +42,7 @@
 </div>
 <div class="main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Training Assignments</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <a href="{{ route('training_assignments.create') }}" class="btn btn-primary">
-                        <i class="fas fa-plus-circle me-1"></i> Assign Training
-                    </a>
-                </div>
+                
             </div>
             
             @if(session('success'))
@@ -149,6 +144,13 @@
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <!-- Assign Training Button below table -->
+                        <div class="mt-4 text-center">
+                            <a href="{{ route('training_assignments.create') }}" class="btn btn-primary px-4 py-2">
+                                <i class="fas fa-plus-circle me-2"></i> Assign Training
+                            </a>
+                        </div>
                     @else
                         <div class="empty-state">
                             <div class="empty-state-icon mb-4">
@@ -156,8 +158,12 @@
                             </div>
                             <h5 class="mb-3">No Training Assignments Found</h5>
                             <p class="text-muted mb-4">Get started by assigning training programs to staff members. Create your first assignment to begin tracking progress.</p>
+                        </div>
+                        
+                        <!-- Assign Training Button below table -->
+                        <div class="mt-4 text-center">
                             <a href="{{ route('training_assignments.create') }}" class="btn btn-primary px-4 py-2">
-                                <i class="fas fa-plus-circle me-2"></i> Create First Assignment
+                                <i class="fas fa-plus-circle me-2"></i> Assign Training
                             </a>
                         </div>
                     @endif

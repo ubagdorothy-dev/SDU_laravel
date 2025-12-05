@@ -124,9 +124,9 @@
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div class="content-box">
+                    <div class="content-box scrollable-content-box">
                         <h2>Staff in Office</h2>
-                        <div class="table-responsive">
+                        <div class="table-responsive" style="flex: 1; overflow-y: auto;">
                             @if($office_staff->count() > 0)
                                 <table class="table table-hover">
                                     <thead>
@@ -164,7 +164,7 @@
             
             <div class="row g-3 mb-4">
                 <div class="col-12">
-                    <div class="content-box">
+                    <div class="content-box non-scrollable">
                         <h2>Recent Activity</h2>
                         <div class="table-responsive">
                             @if(count($result_head_activities) > 0)
@@ -207,7 +207,7 @@
                 </div>
             </div>
         @elseif (request()->get('view') === 'training-records')
-            <div class="content-box">
+            <div class="content-box non-scrollable">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2>My Training Records</h2>
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTrainingModal">
@@ -216,67 +216,69 @@
                 </div>
                 
                 @if (count($training_records) > 0)
-                    <table class="table table-striped mt-4">
-                        <thead>
-                            <tr>
-                                <th scope="col">Training Title</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Start Date</th>
-                                <th scope="col">End Date</th>
-                                <th scope="col">Venue</th>
-                                <th scope="col">Nature of Training</th>
-                                <th scope="col">Scope</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($training_records as $record)
+                    <div class="table-responsive">
+                        <table class="table table-striped mt-4">
+                            <thead>
                                 <tr>
-                                    <td>{{ $record->title }}</td>
-                                    <td>{{ $record->description }}</td>
-                                    <td>{{ $record->start_date }}</td>
-                                    <td>{{ $record->end_date }}</td>
-                                    <td>{{ $record->venue ?? '' }}</td>
-                                    <td>{{ $record->nature ?? '' }}</td>
-                                    <td>{{ $record->scope ?? '' }}</td>
-                                    <td>
-                                        <span class="badge 
-                                            @if($record->status == 'completed') bg-success
-                                            @elseif($record->status == 'upcoming') bg-warning text-dark
-                                            @elseif($record->status == 'ongoing') bg-primary
-                                            @else bg-secondary
-                                            @endif">
-                                            {{ ucfirst($record->status) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group">
-                                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTrainingModal"
-                                                data-training-id="{{ $record->id }}"
-                                                data-title="{{ $record->title }}"
-                                                data-description="{{ $record->description }}"
-                                                data-start-date="{{ $record->start_date }}"
-                                                data-end-date="{{ $record->end_date }}"
-                                                data-venue="{{ $record->venue ?? '' }}"
-                                                data-nature="{{ $record->nature ?? '' }}"
-                                                data-scope="{{ $record->scope ?? '' }}">
-                                                <i class="fas fa-edit"></i> Edit
-                                            </button>
-                                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" data-training-id="{{ $record->id }}">
-                                                <i class="fas fa-trash"></i> Delete
-                                            </button>
-                                            @if ($record->status === 'completed' && empty($record->proof_uploaded))
-                                                <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadProofModal" data-training-id="{{ $record->id }}"> 
-                                                    <i class="fas fa-upload"></i> Upload Proof
-                                                </button>
-                                            @endif
-                                        </div>
-                                    </td>
+                                    <th scope="col">Training Title</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Start Date</th>
+                                    <th scope="col">End Date</th>
+                                    <th scope="col">Venue</th>
+                                    <th scope="col">Nature of Training</th>
+                                    <th scope="col">Scope</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Actions</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($training_records as $record)
+                                    <tr>
+                                        <td>{{ $record->title }}</td>
+                                        <td>{{ $record->description }}</td>
+                                        <td>{{ $record->start_date }}</td>
+                                        <td>{{ $record->end_date }}</td>
+                                        <td>{{ $record->venue ?? '' }}</td>
+                                        <td>{{ $record->nature ?? '' }}</td>
+                                        <td>{{ $record->scope ?? '' }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                @if($record->status == 'completed') bg-success
+                                                @elseif($record->status == 'upcoming') bg-warning text-dark
+                                                @elseif($record->status == 'ongoing') bg-primary
+                                                @else bg-secondary
+                                                @endif">
+                                                {{ ucfirst($record->status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editTrainingModal"
+                                                    data-training-id="{{ $record->id }}"
+                                                    data-title="{{ $record->title }}"
+                                                    data-description="{{ $record->description }}"
+                                                    data-start-date="{{ $record->start_date }}"
+                                                    data-end-date="{{ $record->end_date }}"
+                                                    data-venue="{{ $record->venue ?? '' }}"
+                                                    data-nature="{{ $record->nature ?? '' }}"
+                                                    data-scope="{{ $record->scope ?? '' }}">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" data-training-id="{{ $record->id }}">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                                @if ($record->status === 'completed' && empty($record->proof_uploaded))
+                                                    <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#uploadProofModal" data-training-id="{{ $record->id }}"> 
+                                                        <i class="fas fa-upload"></i> Upload Proof
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 @else
                     <div class="alert alert-info mt-4" role="alert">
                         You have not completed any trainings yet.
@@ -284,7 +286,7 @@
                 @endif
             </div>
         @elseif (request()->get('view') === 'assigned-trainings')
-            <div class="content-box">
+            <div class="content-box non-scrollable">
                 <h2>My Assigned Trainings</h2>
                 <p class="text-muted">Trainings assigned to you by your Unit Director.</p>
                 
@@ -339,7 +341,7 @@
                 @endif
             </div>
         @elseif (request()->get('view') === 'office-directory')
-            <div class="content-box">
+            <div class="content-box non-scrollable">
                 <h2>Office Directory</h2>
                 <p class="text-muted">Staff members in your office.</p>
                 

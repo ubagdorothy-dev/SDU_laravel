@@ -71,12 +71,8 @@
         <label class="form-label small text-muted mb-1">Period</label>
         <select id="filter-period" class="form-select form-select-sm">
           <option value="all">All</option>
-          @php
-              $currentYear = date('Y');
-          @endphp
-          @for ($y = $currentYear; $y >= $currentYear - 5; $y--)
-              <option value="{{ $y }}" {{ (request()->get('period') == (string)$y) ? 'selected' : '' }}>{{ $y }}</option>
-          @endfor
+          <option value="jan-jun" {{ (request()->get('period') == 'jan-jun') ? 'selected' : '' }}>(January-June)</option>
+          <option value="jul-dec" {{ (request()->get('period') == 'jul-dec') ? 'selected' : '' }}>(July-December)</option>
         </select>
       </div>
       <div class="me-2">
@@ -165,7 +161,6 @@
                                 <th scope="col">Role</th>
                                 <th scope="col">Email</th>
                                 <th scope="col">Office</th>
-                                <th scope="col">Position</th>
                                 <th scope="col">Program</th>
                                 <th scope="col">Job Function</th>
                                 <th scope="col">Employment Status</th>
@@ -181,7 +176,6 @@
                                 <td>{{ ucfirst($user->role) }}</td>
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->office ? $user->office->code : 'N/A' }}</td>
-                                <td>{{ $user->staffDetail ? $user->staffDetail->position : 'N/A' }}</td>
                                 <td>{{ $user->staffDetail ? $user->staffDetail->program : 'N/A' }}</td>
                                 <td>{{ $user->staffDetail ? $user->staffDetail->job_function : 'N/A' }}</td>
                                 <td>{{ $user->staffDetail ? ucfirst(str_replace('_', ' ', $user->staffDetail->employment_status)) : 'N/A' }}</td>
@@ -277,24 +271,111 @@
   </div>
 </div>
 
-
+<style>
+/* Hide all sections except combined report when printing */
+@media print {
+  body.print-combined-report * {
+    display: none !important;
+  }
+  
+  body.print-combined-report #combined-report-container {
+    display: block !important;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  body.print-combined-report #combined-report-container * {
+    display: block !important;
+  }
+  
+  body.print-combined-report #combined-report-container table {
+    display: table !important;
+    width: 100%;
+  }
+  
+  body.print-combined-report #combined-report-container thead {
+    display: table-header-group !important;
+  }
+  
+  body.print-combined-report #combined-report-container tbody {
+    display: table-row-group !important;
+  }
+  
+  body.print-combined-report #combined-report-container tr {
+    display: table-row !important;
+  }
+  
+  body.print-combined-report #combined-report-container th,
+  body.print-combined-report #combined-report-container td {
+    display: table-cell !important;
+  }
+}
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// CSV export helper
+// CSV export helper - Export combined user and training data
 function tableToCSV(filename) {
-  const rows = document.querySelectorAll('table tr');
-  const csv = [];
-  rows.forEach(row => {
-    const cols = row.querySelectorAll('th, td');
-    const rowData = [];
-    cols.forEach(col => {
-      let txt = col.innerText.replace(/\n/g,' ').replace(/\s+/g,' ').trim();
-      txt = '"' + txt.replace(/"/g,'""') + '"';
-      rowData.push(txt);
-    });
-    csv.push(rowData.join(','));
+  // Create header row with requested fields
+  const headers = [
+    'Full Name', 'Role', 'Email', 'Office', 'Program', 'Job Function', 
+    'Employment Status', 'Degree Attained', 'Training Title', 'Description', 
+    'Dates', 'Venue', 'Nature', 'Scope'
+  ];
+  
+  const csv = [headers.join(',')];
+  
+  // Process each user and their training records
+  staffList.forEach(user => {
+    const userId = user.id;
+    const trainings = trainingsByUser[userId] || [];
+    
+    if (trainings.length === 0) {
+      // User with no trainings - add one row with user info and empty training fields
+      const rowData = [
+        '"' + (user.name || '').replace(/"/g,'""') + '"',
+        '"' + (user.role || '').replace(/"/g,'""') + '"',
+        '"' + (user.email || '').replace(/"/g,'""') + '"',
+        '"' + (user.office || '').replace(/"/g,'""') + '"',
+        '"' + (user.program || '').replace(/"/g,'""') + '"',
+        '"' + (user.job_function || '').replace(/"/g,'""') + '"',
+        '"' + (user.employment_status || '').replace(/"/g,'""') + '"',
+        '"' + (user.degree_attained || '').replace(/"/g,'""') + '"',
+        '""', '""', '""', '""', '""', '""'  // Empty training fields
+      ];
+      csv.push(rowData.join(','));
+    } else {
+      // User with trainings - add one row for each training
+      trainings.forEach(training => {
+        // Format dates
+        let dates = '';
+        if (training.start_date || training.end_date) {
+          const startDate = training.start_date ? new Date(training.start_date).toLocaleDateString() : '';
+          const endDate = training.end_date ? new Date(training.end_date).toLocaleDateString() : '';
+          dates = startDate + (startDate && endDate ? ' - ' : '') + endDate;
+        }
+        
+        const rowData = [
+          '"' + (user.name || '').replace(/"/g,'""') + '"',
+          '"' + (user.role || '').replace(/"/g,'""') + '"',
+          '"' + (user.email || '').replace(/"/g,'""') + '"',
+          '"' + (user.office || '').replace(/"/g,'""') + '"',
+          '"' + (user.program || '').replace(/"/g,'""') + '"',
+          '"' + (user.job_function || '').replace(/"/g,'""') + '"',
+          '"' + (user.employment_status || '').replace(/"/g,'""') + '"',
+          '"' + (user.degree_attained || '').replace(/"/g,'""') + '"',
+          '"' + (training.title || '').replace(/"/g,'""') + '"',
+          '"' + (training.description || '').replace(/"/g,'""') + '"',
+          '"' + dates.replace(/"/g,'""') + '"',
+          '"' + (training.venue || '').replace(/"/g,'""') + '"',
+          '"' + (training.nature || '').replace(/"/g,'""') + '"',
+          '"' + (training.scope || '').replace(/"/g,'""') + '"'
+        ];
+        csv.push(rowData.join(','));
+      });
+    }
   });
+  
   const csvStr = csv.join('\n');
   const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
@@ -311,7 +392,17 @@ document.getElementById('exportCsv').addEventListener('click', function(e){
 });
 
 document.getElementById('printBtn').addEventListener('click', function(){
+  // Generate and show the combined report for printing
+  generateCombinedReportForPrint();
+  
+  // Add a class to hide other sections and show the combined report
+  document.body.classList.add('print-combined-report');
+  
+  // Trigger print
   window.print();
+  
+  // Remove the class after printing
+  document.body.classList.remove('print-combined-report');
 });
 
 // Filtering logic (client-side simple)
@@ -462,7 +553,7 @@ function showTrainingsFor(userId, userName) {
             const statusHtml = renderStatusBadgeClient(t.status || '');
             // Add proof preview if available
             const proofPreview = t.proof_document ? 
-                `<button class="btn btn-sm btn-info" onclick="previewProof('/storage/${t.proof_document}', ${t.proof_id}, '${t.proof_status}')">Preview</button>` : 
+                `<button class="btn btn-sm btn-info" onclick="previewProof('/storage/training_proofs/${t.proof_document.split('/').pop()}', ${t.proof_id}, '${t.proof_status}')">Preview</button>` : 
                 '<span class="text-muted">No proof</span>';
             const dates = (t.start_date || t.end_date) ? 
                 `${t.start_date ? formatDateClient(t.start_date) : ''}${t.start_date && t.end_date ? ' - ' : ''}${t.end_date ? formatDateClient(t.end_date) : ''}` : 
@@ -556,6 +647,121 @@ function onUploadProof(trainingId, btn) {
     input.click();
 }
 
+// Generate combined report for printing
+function generateCombinedReportForPrint() {
+  // Create the combined report container if it doesn't exist
+  let reportContainer = document.getElementById('combined-report-container');
+  if (!reportContainer) {
+    reportContainer = document.createElement('div');
+    reportContainer.id = 'combined-report-container';
+    reportContainer.style.display = 'none'; // Hidden by default
+    document.body.appendChild(reportContainer);
+  }
+  
+  // Clear previous content
+  reportContainer.innerHTML = '';
+  
+  // Create report header
+  const header = document.createElement('div');
+  header.innerHTML = `
+    <h1 style="text-align: center; margin-bottom: 20px;">Staff Directory & Training Report</h1>
+    <p style="text-align: center; margin-bottom: 30px;">Generated on: ${new Date().toLocaleDateString()}</p>
+  `;
+  reportContainer.appendChild(header);
+  
+  // Create the combined report table
+  const table = document.createElement('table');
+  table.className = 'table table-bordered';
+  table.style.width = '100%';
+  table.style.borderCollapse = 'collapse';
+  
+  // Create table header
+  const thead = document.createElement('thead');
+  thead.innerHTML = `
+    <tr>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Full Name</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Role</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Email</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Office</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Program</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Job Function</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Employment Status</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Degree Attained</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Training Title</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Description</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Dates</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Venue</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Nature</th>
+      <th style="border: 1px solid #ddd; padding: 8px; background-color: #f5f5f5;">Scope</th>
+    </tr>
+  `;
+  table.appendChild(thead);
+  
+  // Create table body
+  const tbody = document.createElement('tbody');
+  
+  // Process each user and their training records
+  staffList.forEach(user => {
+    const userId = user.id;
+    const trainings = trainingsByUser[userId] || [];
+    
+    if (trainings.length === 0) {
+      // User with no trainings - add one row with user info and empty training fields
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.name || '')}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.role || '')}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.email || '')}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.office || '')}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.program || '')}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.job_function || '')}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.employment_status || '')}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.degree_attained || '')}</td>
+        <td style="border: 1px solid #ddd; padding: 8px;"></td>
+        <td style="border: 1px solid #ddd; padding: 8px;"></td>
+        <td style="border: 1px solid #ddd; padding: 8px;"></td>
+        <td style="border: 1px solid #ddd; padding: 8px;"></td>
+        <td style="border: 1px solid #ddd; padding: 8px;"></td>
+        <td style="border: 1px solid #ddd; padding: 8px;"></td>
+      `;
+      tbody.appendChild(row);
+    } else {
+      // User with trainings - add one row for each training
+      trainings.forEach(training => {
+        // Format dates
+        let dates = '';
+        if (training.start_date || training.end_date) {
+          const startDate = training.start_date ? new Date(training.start_date).toLocaleDateString() : '';
+          const endDate = training.end_date ? new Date(training.end_date).toLocaleDateString() : '';
+          dates = startDate + (startDate && endDate ? ' - ' : '') + endDate;
+        }
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.name || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.role || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.email || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.office || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.program || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.job_function || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.employment_status || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(user.degree_attained || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(training.title || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(training.description || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(dates)}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(training.venue || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(training.nature || '')}</td>
+          <td style="border: 1px solid #ddd; padding: 8px;">${escapeHtml(training.scope || '')}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+  });
+  
+  table.appendChild(tbody);
+  reportContainer.appendChild(table);
+}
+
 function onMarkCompleted(trainingId, btn) {
     if (!trainingId) { 
         alert('No training ID available.'); 
@@ -604,8 +810,8 @@ function previewProof(filePath, proofId, proofStatus) {
     const content = document.getElementById('proofPreviewContent');
     const downloadLink = document.getElementById('downloadProofLink');
     
-    // Set download link
-    downloadLink.href = decodedPath;
+    // Set download link - use the proper Laravel storage URL
+    downloadLink.href = decodedPath.startsWith('/storage/') ? decodedPath : '/storage/' + decodedPath;
     
     // Show loading state
     content.innerHTML = `
@@ -645,7 +851,7 @@ function previewProof(filePath, proofId, proofStatus) {
                             <h5>File Not Found</h5>
                             <p class="text-muted">The requested file could not be found or accessed.</p>
                             <p class="small text-muted">Path: ${decodedPath}</p>
-                            <a href="${decodedPath}" class="btn btn-primary" download>Try Direct Download</a>
+                            <a href="${decodedPath.startsWith('/storage/') ? decodedPath : '/storage/' + decodedPath}" class="btn btn-primary" download>Try Direct Download</a>
                         </div>
                     </div>
                 `;
@@ -659,7 +865,7 @@ function previewProof(filePath, proofId, proofStatus) {
             // Initially show the image (will trigger onload or onerror)
             content.innerHTML = `
                 <div class="d-flex justify-content-center align-items-center" style="min-height: 500px;">
-                    <img src="${decodedPath}" class="img-fluid" style="max-height: 80vh; max-width: 100%; object-fit: contain;" alt="Proof Document">
+                    <img src="${decodedPath.startsWith('/storage/') ? decodedPath : '/storage/' + decodedPath}" class="img-fluid" style="max-height: 80vh; max-width: 100%; object-fit: contain;" alt="Proof Document">
                 </div>
             `;
         } else if (fileExtension === 'pdf') {
@@ -715,7 +921,7 @@ function displayProofContent(filePath, proofId, proofStatus) {
         // Image file
         content.innerHTML = `
             <div class="d-flex justify-content-center align-items-center" style="min-height: 500px;">
-                <img src="${filePath}" class="img-fluid" style="max-height: 60vh; max-width: 100%; object-fit: contain;" alt="Proof Document">
+                <img src="${filePath.startsWith('/storage/') ? filePath : '/storage/' + filePath}" class="img-fluid" style="max-height: 60vh; max-width: 100%; object-fit: contain;" alt="Proof Document">
             </div>
             ${approvalSection}
         `;
@@ -723,7 +929,7 @@ function displayProofContent(filePath, proofId, proofStatus) {
         // PDF file
         content.innerHTML = `
             <div style="height: 60vh;">
-                <iframe src="${filePath}" class="w-100 h-100" frameborder="0"></iframe>
+                <iframe src="${filePath.startsWith('/storage/') ? filePath : '/storage/' + filePath}" class="w-100 h-100" frameborder="0"></iframe>
             </div>
             ${approvalSection}
         `;
@@ -735,7 +941,7 @@ function displayProofContent(filePath, proofId, proofStatus) {
                     <i class="fas fa-file fa-5x mb-3 text-muted"></i>
                     <h5>File Preview Not Available</h5>
                     <p class="text-muted">This file type cannot be previewed directly.</p>
-                    <a href="${filePath}" class="btn btn-primary" download>Download File</a>
+                    <a href="${filePath.startsWith('/storage/') ? filePath : '/storage/' + filePath}" class="btn btn-primary" download>Download File</a>
                 </div>
             </div>
             ${approvalSection}

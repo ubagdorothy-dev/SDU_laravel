@@ -320,7 +320,7 @@ class TrainingProofController extends Controller
             ->where('status', 'pending')
             ->firstOrFail();
             
-        return view('training_proofs.review', compact('trainingProof'));
+        return view('training_proofs.review', compact('trainingProof', 'user'));
     }
     
     /**
@@ -346,7 +346,7 @@ class TrainingProofController extends Controller
             ->firstOrFail();
             
         // Return only the modal content partial
-        return view('training_proofs.partials.review_modal', compact('trainingProof'));
+        return view('training_proofs.partials.review_modal', compact('trainingProof', 'user'));
     }
     
     /**

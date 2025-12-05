@@ -35,7 +35,10 @@ class PendingApprovalsController extends Controller
             ->with('office')
             ->get();
         
-        return view('pending_approvals.index', compact('user', 'pendingUsers'));
+        // Calculate pending approvals count
+        $pendingApprovalsCount = $pendingUsers->count();
+        
+        return view('pending_approvals.index', compact('user', 'pendingUsers', 'pendingApprovalsCount'));
     }
     
     /**

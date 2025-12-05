@@ -260,11 +260,10 @@
                     <div class="profile-section">
                         <h5 class="section-title">Professional Information</h5>
 
-                        @if($user->staffDetail || $user->role === 'head')
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="profile_job_function" class="form-label mb-1">Job Function</label>
+                                    <label for="profile_job_function" class="form-label mb-1">Job Function *</label>
                                     @if($user->role === 'head')
                                         <!-- For Office Heads: Auto-assigned based on office, non-editable -->
                                         @php
@@ -278,8 +277,8 @@
                                         <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_job_function" name="job_function" required 
                                             @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) disabled @endif>
                                             <option value="">Select Job Function</option>
-                                            <option value="Program Officer" {{ old('job_function', $user->staffDetail->job_function ?? '') == 'Program Officer' ? 'selected' : '' }}>Program Officer</option>
-                                            <option value="Admin Officer" {{ old('job_function', $user->staffDetail->job_function ?? '') == 'Admin Officer' ? 'selected' : '' }}>Admin Officer</option>
+                                            <option value="Program Officer" {{ old('job_function', $user->staffDetail->job_function ?? $user->job_function ?? '') == 'Program Officer' ? 'selected' : '' }}>Program Officer</option>
+                                            <option value="Admin Officer" {{ old('job_function', $user->staffDetail->job_function ?? $user->job_function ?? '') == 'Admin Officer' ? 'selected' : '' }}>Admin Officer</option>
                                         </select>
                                     @endif
                                 </div>
@@ -287,133 +286,77 @@
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="profile_employment_status" class="form-label mb-1">Employment Status</label>
+                                    <label for="profile_employment_status" class="form-label mb-1">Employment Status *</label>
                                     @if($user->role === 'head')
                                         <!-- For Office Heads, show a readonly field -->
                                         <input type="text" class="form-control" value="Not Applicable for Office Heads" readonly>
                                         <input type="hidden" name="employment_status" value="">
-                                    @elseif($user->staffDetail)
-                                    <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_employment_status" name="employment_status" 
+                                    @else
+                                    <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_employment_status" name="employment_status" required
                                         @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) disabled @endif>
                                         <option value="">Select Employment Status</option>
-                                        <option value="Regular or Permanent Employment" {{ old('employment_status', $user->staffDetail->employment_status ?? '') == 'Regular or Permanent Employment' ? 'selected' : '' }}>Regular or Permanent Employment</option>
-                                        <option value="Probationary Employment" {{ old('employment_status', $user->staffDetail->employment_status ?? '') == 'Probationary Employment' ? 'selected' : '' }}>Probationary Employment</option>
-                                        <option value="Contractual and Fixed-Term Employment" {{ old('employment_status', $user->staffDetail->employment_status ?? '') == 'Contractual and Fixed-Term Employment' ? 'selected' : '' }}>Contractual and Fixed-Term Employment</option>
+                                        <option value="Regular or Permanent Employment" {{ old('employment_status', $user->staffDetail->employment_status ?? $user->employment_status ?? '') == 'Regular or Permanent Employment' ? 'selected' : '' }}>Regular or Permanent Employment</option>
+                                        <option value="Probationary Employment" {{ old('employment_status', $user->staffDetail->employment_status ?? $user->employment_status ?? '') == 'Probationary Employment' ? 'selected' : '' }}>Probationary Employment</option>
+                                        <option value="Contractual and Fixed-Term Employment" {{ old('employment_status', $user->staffDetail->employment_status ?? $user->employment_status ?? '') == 'Contractual and Fixed-Term Employment' ? 'selected' : '' }}>Contractual and Fixed-Term Employment</option>
                                     </select>
-                                    @else
-                                    <input type="text" class="form-control" value="Not Available" readonly>
                                     @endif
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="profile_degree_attained" class="form-label mb-1">Degree Attained</label>
+                                    <label for="profile_degree_attained" class="form-label mb-1">Degree Attained *</label>
                                     @if($user->role === 'head')
                                         <!-- For Office Heads, show a readonly field -->
                                         <input type="text" class="form-control" value="Not Applicable for Office Heads" readonly>
                                         <input type="hidden" name="degree_attained" value="">
-                                    @elseif($user->staffDetail)
-                                    <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_degree_attained" name="degree_attained" 
+                                    @else
+                                    <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_degree_attained" name="degree_attained" required
                                         @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) disabled @endif>
                                         <option value="">Select Degree</option>
-                                        <option value="Bachelors" {{ old('degree_attained', $user->staffDetail->degree_attained ?? '') == 'Bachelors' ? 'selected' : '' }}>Bachelors</option>
-                                        <option value="Masters" {{ old('degree_attained', $user->staffDetail->degree_attained ?? '') == 'Masters' ? 'selected' : '' }}>Master's</option>
-                                        <option value="Doctorate" {{ old('degree_attained', $user->staffDetail->degree_attained ?? '') == 'Doctorate' ? 'selected' : '' }}>Doctorate / PhD</option>
-                                        <option value="Other" {{ old('degree_attained', $user->staffDetail->degree_attained ?? '') == 'Other' ? 'selected' : '' }}>Other</option>
+                                        <option value="Bachelors" {{ old('degree_attained', $user->staffDetail->degree_attained ?? $user->degree_attained ?? '') == 'Bachelors' ? 'selected' : '' }}>Bachelors</option>
+                                        <option value="Masters" {{ old('degree_attained', $user->staffDetail->degree_attained ?? $user->degree_attained ?? '') == 'Masters' ? 'selected' : '' }}>Master's</option>
+                                        <option value="Doctorate" {{ old('degree_attained', $user->staffDetail->degree_attained ?? $user->degree_attained ?? '') == 'Doctorate' ? 'selected' : '' }}>Doctorate / PhD</option>
+                                        <option value="Other" {{ old('degree_attained', $user->staffDetail->degree_attained ?? $user->degree_attained ?? '') == 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
-                                    @else
-                                    <input type="text" class="form-control" value="Not Available" readonly>
                                     @endif
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3" id="profile_other_degree_group" style="display: none;">
-                                    <label for="profile_degree_other" class="form-label mb-1">Please specify</label>
+                                    <label for="profile_degree_other" class="form-label mb-1">Please specify *</label>
                                     @if($user->role === 'head')
                                         <!-- For Office Heads, show a readonly field -->
                                         <input type="text" class="form-control" value="Not Applicable for Office Heads" readonly>
                                         <input type="hidden" name="degree_other" value="">
-                                    @elseif($user->staffDetail)
-                                    <input type="text" class="form-control @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_degree_other" name="degree_other" value="{{ old('degree_other', $user->staffDetail->degree_other ?? '') }}" 
-                                        @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly @endif>
                                     @else
-                                    <input type="text" class="form-control" value="Not Available" readonly>
+                                    <input type="text" class="form-control @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_degree_other" name="degree_other" value="{{ old('degree_other', $user->staffDetail->degree_other ?? $user->degree_other ?? '') }}" 
+                                        @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly @endif required>
                                     @endif
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="profile_program" class="form-label mb-1">Program</label>
+                                    <label for="profile_program" class="form-label mb-1">Program *</label>
                                     @if($user->role === 'head')
                                         <!-- For Office Heads, show a readonly field -->
                                         <input type="text" class="form-control" value="Not Applicable for Office Heads" readonly>
                                         <input type="hidden" name="program" value="">
-                                    @elseif($user->staffDetail)
-                                    <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_program" name="program" 
+                                    @else
+                                    <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_program" name="program" required
                                         @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) disabled @endif>
                                         <option value="">Select Program</option>
-                                        <!-- Options will be populated by JavaScript -->
+                                        <option value="Undergraduate" {{ old('program', $user->staffDetail->program ?? $user->program ?? '') == 'Undergraduate' ? 'selected' : '' }}>Undergraduate</option>
+                                        <option value="Graduate" {{ old('program', $user->staffDetail->program ?? $user->program ?? '') == 'Graduate' ? 'selected' : '' }}>Graduate</option>
+                                        <option value="Post Graduate" {{ old('program', $user->staffDetail->program ?? $user->program ?? '') == 'Post Graduate' ? 'selected' : '' }}>Post Graduate</option>
+                                        <option value="Non-Degree" {{ old('program', $user->staffDetail->program ?? $user->program ?? '') == 'Non-Degree' ? 'selected' : '' }}>Non-Degree</option>
                                     </select>
-                                    @else
-                                    <input type="text" class="form-control" value="Not Available" readonly>
                                     @endif
                                 </div>
                             </div>
                         </div>
-                        @else
-                            @if($user->role === 'head')
-                            <!-- For Office Heads without staffDetail, show a simplified professional information section -->
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="profile_job_function" class="form-label mb-1">Job Function</label>
-                                        @php
-                                            $autoAssignedJobFunction = 'Director/Office Head - ' . ($user->office->name ?? 'Unknown Office');
-                                        @endphp
-                                        <input type="text" class="form-control" id="profile_job_function" name="job_function" value="{{ $autoAssignedJobFunction }}" readonly>
-                                        <input type="hidden" name="job_function" value="{{ $autoAssignedJobFunction }}">
-                                        <small class="form-text text-muted">Job function is automatically assigned based on your office and cannot be changed.</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label mb-1">Employment Status</label>
-                                        <input type="text" class="form-control" value="Not Applicable" readonly>
-                                        <input type="hidden" name="employment_status" value="">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label mb-1">Degree Attained</label>
-                                        <input type="text" class="form-control" value="Not Applicable" readonly>
-                                        <input type="hidden" name="degree_attained" value="">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label mb-1">Program</label>
-                                        <input type="text" class="form-control" value="Not Applicable" readonly>
-                                        <input type="hidden" name="program" value="">
-                                    </div>
-                                </div>
-                            </div>
-                            @else
-                            <div class="alert alert-info py-3 px-4">
-                                <div class="d-flex">
-                                    <div class="flex-shrink-0">
-                                        <i class="fas fa-info-circle fa-lg"></i>
-                                    </div>
-                                    <div class="flex-grow-1 ms-3">
-                                        <h5 class="alert-heading mb-1">Additional Information</h5>
-                                        <p class="mb-0">No additional profile information available.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
-                        @endif
                     </div>
                 </form>
             </div>

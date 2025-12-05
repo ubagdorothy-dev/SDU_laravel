@@ -93,20 +93,27 @@ class TrainingAssignmentController extends Controller
             'custom_training_title' => 'nullable|string|max:255',
             'staff_ids' => 'required|array|min:1',
             'staff_ids.*' => 'exists:users,user_id',
-            'deadline' => 'required|date|after:today',
-            'deadline_date' => 'nullable|date|after:today',
+            'deadline' => 'required|date',
+            'deadline_date' => 'nullable|date',
             'deadline_time' => 'nullable|date_format:H:i',
         ]);
         
         // Handle combined deadline if sent as separate date/time
-        if (!empty($validatedData['deadline_date'])) {
+        // If deadline is already provided (from JavaScript), use it directly
+        if (empty($validatedData['deadline']) && !empty($validatedData['deadline_date'])) {
             $deadlineTime = $validatedData['deadline_time'] ?? '23:59';
             $validatedData['deadline'] = $validatedData['deadline_date'] . ' ' . $deadlineTime;
         }
         
+        // Validate that deadline is today or in the future
+        $deadline = \DateTime::createFromFormat('Y-m-d H:i', $validatedData['deadline']);
+        if (!$deadline || $deadline < new \DateTime('today')) {
+            return redirect()->back()->withErrors(['deadline' => 'The deadline must be today or a future date.'])->withInput($request->except('password'));
+        }
+        
         // Custom validation to ensure either training_id or custom_training_title is provided
         if (empty($validatedData['training_id']) && empty($validatedData['custom_training_title'])) {
-            return redirect()->back()->withErrors(['training_id' => 'Either select a training or enter a custom training title.'])->withInput();
+            return redirect()->back()->withErrors(['training_id' => 'Either select a training or enter a custom training title.'])->withInput($request->except('password'));
         }
         
         // Handle custom training creation

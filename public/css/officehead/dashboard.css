@@ -8,7 +8,7 @@
             flex-grow: 1;
             padding: 2rem;
             margin-left: 250px;
-            transition: margin-left 0.3s ease-in-out;
+          
         }
         .sidebar {
             width: 250px;
@@ -17,9 +17,25 @@
             height: 100vh;
             position: fixed;
             padding-top: 2rem;
-            transition: width 0.3s ease-in-out;
+            
             display: flex;
             flex-direction: column;
+        }
+        
+        /* Push profile and logout buttons farther down */
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .sidebar-content .nav:first-child {
+            flex: 1;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto;
+            padding-bottom: 2rem;
         }
         .sidebar .nav-link { color: white; padding: 12px 20px; border-radius: 5px; margin: 5px 15px; transition: background-color 0.2s; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #3f51b5; }
@@ -31,6 +47,32 @@
             padding: 2rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Scrollable content box for views with lots of content */
+        .content-box.scrollable-content-box {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-box.scrollable-content-box .table-responsive {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        /* Non-scrollable content box for views with limited content */
+        .content-box.non-scrollable {
+            height: auto;
+            max-height: none;
+        }
+        
+        .content-box.non-scrollable .table-responsive {
+            overflow-y: visible;
+            max-height: none;
         }
         .content-box:hover {
             transform: translateY(-2px);
@@ -147,28 +189,118 @@
         }
 
         #broadcastModal .modal-content {
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 0;
             border: none;
             background: #ffffff;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
 
-        #broadcastModal .modal-dialog { display: flex; align-items: center; min-height: calc(100vh - 1rem); }
+        #broadcastModal .modal-dialog { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            min-height: calc(100vh - 1rem); 
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
         #broadcastModal .modal-header {
-            padding: 1rem 1.25rem;
+            padding: 1.5rem 2rem;
             border-bottom: 1px solid #eef2ff;
-            background: transparent;
+            background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
         }
 
-        #broadcastModal .modal-title { font-weight: 700; color: #1e293b; }
-        #broadcastModal .modal-body { padding: 1rem 1.25rem; }
-        #broadcastModal .modal-footer { border-top: none; padding: 0.75rem 1.25rem; background: transparent; }
+        #broadcastModal .modal-title { 
+            font-weight: 700; 
+            color: #ffffff; 
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
-        #broadcastModal .form-label { font-weight:600; color:#1e293b; }
-        #broadcastModal .form-control, #broadcastModal .form-select, #broadcastModal textarea { border-radius: 8px; border: 1px solid #e6eef8; box-shadow: none; }
-        #broadcastModal textarea { min-height: 120px; }
-        #broadcastModal .btn-primary { border-radius: 8px; padding: 0.5rem 1rem; }
+        #broadcastModal .modal-body { 
+            padding: 2rem;
+        }
+
+        #broadcastModal .modal-footer { 
+            border-top: 1px solid #eef2ff;
+            padding: 1.5rem 2rem;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+
+        #broadcastModal .form-label { 
+            font-weight: 600; 
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        #broadcastModal .form-control, 
+        #broadcastModal .form-select, 
+        #broadcastModal textarea { 
+            border-radius: 10px;
+            border: 2px solid #e6eef8;
+            box-shadow: none;
+            padding: 0.875rem 1.25rem;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        #broadcastModal .form-control:focus, 
+        #broadcastModal .form-select:focus, 
+        #broadcastModal textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+
+        #broadcastModal textarea { 
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        #broadcastModal .btn {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        #broadcastModal .btn-primary { 
+            background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
+            border: none;
+        }
+
+        #broadcastModal .btn-primary:hover {
+            background: linear-gradient(120deg, #1e40af 0%, #1e3a8a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
+        }
+
+        #broadcastModal .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+            border: none;
+        }
+
+        #broadcastModal .btn-secondary:hover {
+            background: #cbd5e1;
+            color: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
 
 /* Add Training Modal Styles */
 #addTrainingModal .modal-dialog {
@@ -643,6 +775,85 @@
             text-align: center;
             font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
             font-size: 0.8125rem;
+        }
+
+        /* Notifications Modal - Updated to match website styles and make wider */
+        #notificationsModal .modal-content {
+            border-radius: 16px;
+            padding: 0;
+            border: none;
+            background: #ffffff;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        #notificationsModal .modal-dialog { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            min-height: calc(100vh - 1rem); 
+            max-width: 1200px;
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        #notificationsModal .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #eef2ff;
+            background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        #notificationsModal .modal-title { 
+            font-weight: 700; 
+            color: #ffffff; 
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        #notificationsModal .modal-body { 
+            padding: 2rem;
+        }
+
+        #notificationsModal .modal-footer { 
+            border-top: 1px solid #eef2ff;
+            padding: 1.5rem 2rem;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+
+        #notificationsModal .nav-tabs {
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        #notificationsModal .nav-tabs .nav-link {
+            border: none;
+            color: #64748b;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        #notificationsModal .nav-tabs .nav-link:hover {
+            color: #3b82f6;
+            border-color: transparent;
+        }
+
+        #notificationsModal .nav-tabs .nav-link.active {
+            color: #3b82f6;
+            border-bottom: 3px solid #3b82f6;
+            background-color: transparent;
         }
 
         .modal-backdrop.show { opacity: 0.42; }

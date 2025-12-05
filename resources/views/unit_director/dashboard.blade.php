@@ -28,7 +28,7 @@
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
        @if(in_array($user->role, ['unit director', 'unit_director']))
-        <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pending_approvals ?? 0 }}</span></a></li>
         @endif
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
       <li class="nav-item"><a class="nav-link" href="{{ route('training_proofs.review_index') }}"><i class="fas fa-file-alt me-2"></i> <span> Review Training Proofs</span></a></li>
@@ -455,6 +455,71 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+    
+    // Handle office staff broadcast form submission
+    const officeStaffBroadcastForm = document.getElementById('officeStaffBroadcastForm');
+    if (officeStaffBroadcastForm) {
+        officeStaffBroadcastForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = this;
+            const feedback = document.getElementById('officeStaffBroadcastFeedback');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            // Get selected offices
+            const selectedOffices = Array.from(form.querySelectorAll('input[name="offices[]"]:checked'))
+                .map(checkbox => checkbox.value);
+            
+            if (selectedOffices.length === 0) {
+                feedback.innerHTML = '<div class="alert alert-warning">Please select at least one office.</div>';
+                return;
+            }
+            
+            // Get form data
+            const formData = new FormData(form);
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
+            
+            // Clear previous feedback
+            feedback.innerHTML = '';
+            
+            fetch('{{ route('notifications.office_staff_broadcast') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json',
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    feedback.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+                    form.reset();
+                    
+                    // Close modal after 2 seconds
+                    setTimeout(() => {
+                        const modalEl = document.getElementById('officeStaffBroadcastModal');
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) modal.hide();
+                    }, 2000);
+                } else {
+                    feedback.innerHTML = `<div class="alert alert-danger">Error: ${data.message || 'Failed to send notification'}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error sending notification:', error);
+                feedback.innerHTML = '<div class="alert alert-danger">Error sending notification. Please try again.</div>';
+            })
+            .finally(() => {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Send to Selected Offices';
+            });
+        });
+    }
 
     // Load count initially and when modal opened
     fetchInboxCount();
@@ -748,65 +813,6 @@ document.getElementById('deleteAllBtn')?.addEventListener('click', function() {
 
 // (Offices are rendered server-side into #officesContainer)
 
-// Handle office staff broadcast form submission
-document.getElementById('officeStaffBroadcastForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const form = this;
-    const feedback = document.getElementById('officeStaffBroadcastFeedback');
-    const submitBtn = form.querySelector('button[type="submit"]');
-    
-    // Get selected offices
-    const selectedOffices = Array.from(form.querySelectorAll('input[name="offices[]"]:checked'))
-        .map(checkbox => checkbox.value);
-    
-    if (selectedOffices.length === 0) {
-        feedback.innerHTML = '<div class="alert alert-warning">Please select at least one office.</div>';
-        return;
-    }
-    
-    // Get form data
-    const formData = new FormData(form);
-    
-    // Disable submit button
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...';
-    
-    // Clear previous feedback
-    feedback.innerHTML = '';
-    
-    fetch('{{ route('notifications.office_staff_broadcast') }}', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'Accept': 'application/json',
-        },
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            feedback.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-            form.reset();
-            
-            // Close modal after 2 seconds
-            setTimeout(() => {
-                bootstrap.Modal.getInstance(officeStaffBroadcastModal).hide();
-            }, 2000);
-        } else {
-            feedback.innerHTML = `<div class="alert alert-danger">Error: ${data.message || 'Failed to send notification'}</div>`;
-        }
-    })
-    .catch(error => {
-        console.error('Error sending notification:', error);
-        feedback.innerHTML = '<div class="alert alert-danger">Error sending notification. Please try again.</div>';
-    })
-    .finally(() => {
-        // Re-enable submit button
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Send to Selected Offices';
-    });
-});
     // Handle top performers row clicks
     document.querySelectorAll('table tr').forEach(row => {
         row.addEventListener('click', function() {

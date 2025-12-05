@@ -52,9 +52,22 @@ class DirectoryReportsController extends Controller
             $userQuery->where('role', $roleFilter);
         }
         
-        // Apply period filter (based on created_at year)
+        // Apply period filter (based on created_at year or bi-yearly periods)
         if ($periodFilter !== 'all') {
-            $userQuery->whereYear('created_at', $periodFilter);
+            if ($periodFilter === 'jan-jun') {
+                // January to June of current year
+                $userQuery->whereYear('created_at', date('Y'))
+                          ->whereMonth('created_at', '>=', 1)
+                          ->whereMonth('created_at', '<=', 6);
+            } elseif ($periodFilter === 'jul-dec') {
+                // July to December of current year
+                $userQuery->whereYear('created_at', date('Y'))
+                          ->whereMonth('created_at', '>=', 7)
+                          ->whereMonth('created_at', '<=', 12);
+            } else {
+                // Default to year-based filtering for backward compatibility
+                $userQuery->whereYear('created_at', $periodFilter);
+            }
         }
         
         // Get filtered users
@@ -116,10 +129,41 @@ class DirectoryReportsController extends Controller
         
         // Apply period filter if not 'all'
         if ($periodFilter !== 'all') {
-            $trainingQuery->whereYear('created_at', $periodFilter);
-            $completedQuery->whereYear('created_at', $periodFilter);
-            $upcomingQuery->whereYear('created_at', $periodFilter);
-            $ongoingQuery->whereYear('created_at', $periodFilter);
+            if ($periodFilter === 'jan-jun') {
+                // January to June of current year
+                $trainingQuery->whereYear('created_at', date('Y'))
+                              ->whereMonth('created_at', '>=', 1)
+                              ->whereMonth('created_at', '<=', 6);
+                $completedQuery->whereYear('created_at', date('Y'))
+                               ->whereMonth('created_at', '>=', 1)
+                               ->whereMonth('created_at', '<=', 6);
+                $upcomingQuery->whereYear('created_at', date('Y'))
+                              ->whereMonth('created_at', '>=', 1)
+                              ->whereMonth('created_at', '<=', 6);
+                $ongoingQuery->whereYear('created_at', date('Y'))
+                             ->whereMonth('created_at', '>=', 1)
+                             ->whereMonth('created_at', '<=', 6);
+            } elseif ($periodFilter === 'jul-dec') {
+                // July to December of current year
+                $trainingQuery->whereYear('created_at', date('Y'))
+                              ->whereMonth('created_at', '>=', 7)
+                              ->whereMonth('created_at', '<=', 12);
+                $completedQuery->whereYear('created_at', date('Y'))
+                               ->whereMonth('created_at', '>=', 7)
+                               ->whereMonth('created_at', '<=', 12);
+                $upcomingQuery->whereYear('created_at', date('Y'))
+                              ->whereMonth('created_at', '>=', 7)
+                              ->whereMonth('created_at', '<=', 12);
+                $ongoingQuery->whereYear('created_at', date('Y'))
+                             ->whereMonth('created_at', '>=', 7)
+                             ->whereMonth('created_at', '<=', 12);
+            } else {
+                // Default to year-based filtering for backward compatibility
+                $trainingQuery->whereYear('created_at', $periodFilter);
+                $completedQuery->whereYear('created_at', $periodFilter);
+                $upcomingQuery->whereYear('created_at', $periodFilter);
+                $ongoingQuery->whereYear('created_at', $periodFilter);
+            }
         }
         
         $totalTrainings = $trainingQuery->count();
@@ -165,7 +209,20 @@ class DirectoryReportsController extends Controller
             
             // Apply period filter if not 'all'
             if ($periodFilter !== 'all') {
-                $staffQuery->whereYear('created_at', $periodFilter);
+                if ($periodFilter === 'jan-jun') {
+                    // January to June of current year
+                    $staffQuery->whereYear('created_at', date('Y'))
+                              ->whereMonth('created_at', '>=', 1)
+                              ->whereMonth('created_at', '<=', 6);
+                } elseif ($periodFilter === 'jul-dec') {
+                    // July to December of current year
+                    $staffQuery->whereYear('created_at', date('Y'))
+                              ->whereMonth('created_at', '>=', 7)
+                              ->whereMonth('created_at', '<=', 12);
+                } else {
+                    // Default to year-based filtering for backward compatibility
+                    $staffQuery->whereYear('created_at', $periodFilter);
+                }
             }
             
             $staffCount = $staffQuery->count();
@@ -186,8 +243,27 @@ class DirectoryReportsController extends Controller
             
             // Apply period filter if not 'all'
             if ($periodFilter !== 'all') {
-                $trainingQuery->whereYear('created_at', $periodFilter);
-                $completedTrainingQuery->whereYear('created_at', $periodFilter);
+                if ($periodFilter === 'jan-jun') {
+                    // January to June of current year
+                    $trainingQuery->whereYear('created_at', date('Y'))
+                                  ->whereMonth('created_at', '>=', 1)
+                                  ->whereMonth('created_at', '<=', 6);
+                    $completedTrainingQuery->whereYear('created_at', date('Y'))
+                                           ->whereMonth('created_at', '>=', 1)
+                                           ->whereMonth('created_at', '<=', 6);
+                } elseif ($periodFilter === 'jul-dec') {
+                    // July to December of current year
+                    $trainingQuery->whereYear('created_at', date('Y'))
+                                  ->whereMonth('created_at', '>=', 7)
+                                  ->whereMonth('created_at', '<=', 12);
+                    $completedTrainingQuery->whereYear('created_at', date('Y'))
+                                           ->whereMonth('created_at', '>=', 7)
+                                           ->whereMonth('created_at', '<=', 12);
+                } else {
+                    // Default to year-based filtering for backward compatibility
+                    $trainingQuery->whereYear('created_at', $periodFilter);
+                    $completedTrainingQuery->whereYear('created_at', $periodFilter);
+                }
             }
                 
             $trainingCount = $trainingQuery->count();
