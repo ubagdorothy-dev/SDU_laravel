@@ -26,12 +26,12 @@
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
       @if(in_array($user->role, ['unit director', 'unit_director']))
-        <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i><span> Pending Approvals</span> <span class="badge bg-danger">{{ $pending_approvals ?? 0 }}</span></a></li>
       @endif
-      <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i><span> Training Assignments</span></a></li>
     </ul>
     <ul class="nav flex-column sidebar-footer">
-      <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user-circle me-2"></i> <span> Profile</span></a></li>
+      <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user-circle me-2"></i><span> Profile</span></a></li>
       <li class="nav-item"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
     </ul>
   </div>
@@ -68,11 +68,6 @@
                 <div class="p-4">
                     <form action="{{ route('training_assignments.store') }}" method="POST" id="assignmentForm">
                         @csrf
-                        
-                        <!-- Hidden form for logout -->
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
                         
                         <div class="form-group-spacing">
                             <label for="training_id" class="control-label">Select Training Program</label>
@@ -224,6 +219,7 @@
                 </div>
             </div>
         </div>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
@@ -297,7 +293,7 @@
         });
         
        // Add click handler for staff cards — clicking anywhere on the card (avatar/name) toggles selection
-        // Use checkbox.click() so the native change events run consistently and UI updates via the existing change handler
+       // Use checkbox.click() so the native change events run consistently and UI updates via the existing change handler
         document.querySelectorAll('.staff-checkbox-card').forEach(card => {
             card.addEventListener('click', function(e) {
                 // If the click target is an explicit control that should not toggle (e.g., a link), skip
@@ -442,7 +438,11 @@
             console.log('Training select disabled:', trainingSelect.disabled);
             console.log('Custom training value:', customTrainingInput.value);
             
-            if ((!trainingSelect || (trainingSelect.disabled || !trainingSelect.value)) && (!customTrainingInput || !customTrainingInput.value)) {
+            // Check if we're using custom training or selecting from list
+            const isUsingCustomTraining = customTrainingInput && customTrainingInput.value.trim() !== '';
+            const isUsingExistingTraining = trainingSelect && !trainingSelect.disabled && trainingSelect.value !== '';
+            
+            if (!isUsingCustomTraining && !isUsingExistingTraining) {
                 e.preventDefault();
                 alert('Please either select a training program or enter a custom training title.');
                 return;
@@ -452,12 +452,15 @@
             const deadlineDateTime = deadlineDateInput.value + ' ' + (deadlineTimeInput.value || '23:59');
             console.log('Combined deadline:', deadlineDateTime);
             
-            // Create a hidden input to send the combined datetime
-            const hiddenInput = document.createElement('input');
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'deadline';
+            // Create or update a hidden input to send the combined datetime
+            let hiddenInput = assignmentForm.querySelector('input[name="deadline"]');
+            if (!hiddenInput) {
+                hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'deadline';
+                assignmentForm.appendChild(hiddenInput);
+            }
             hiddenInput.value = deadlineDateTime;
-            assignmentForm.appendChild(hiddenInput);
             
             // Disable submit button to prevent double submission
             submitBtn.disabled = true;
@@ -477,8 +480,5 @@
         });
     });
 </script>
-<!-- Profile Modal -->
-@include('staff.partials.profile_notification_modals')
-@include('staff.partials.modal_scripts')
 </body>
 </html>

@@ -147,33 +147,7 @@
                     </div>
                 </div>
                 
-                <div class="col-md-6">
-                    <div class="profile-card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Professional Information</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="profile-info-label">Office:</div>
-                            <div class="profile-info-value">{{ $user->office ? $user->office->name : 'N/A' }}</div>
-                            
-                            <div class="profile-info-label">Office Code:</div>
-                            <div class="profile-info-value">{{ $user->office_code ?? 'N/A' }}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-card mt-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Account Details</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="profile-info-label">Member Since:</div>
-                            <div class="profile-info-value">{{ $user->created_at->format('M d, Y') }}</div>
-                            
-                            <div class="profile-info-label">Last Updated:</div>
-                            <div class="profile-info-value">{{ $user->updated_at->format('M d, Y H:i') }}</div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </main>
     </div>

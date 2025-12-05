@@ -185,19 +185,7 @@
                 }
             </style>
             <div class="modal-body">
-                @if(in_array($user->role ?? '', ['unit_director', 'unit director']))
-                    <div class="alert alert-info mb-4 py-3 px-4">
-                        <div class="d-flex">
-                            <div class="flex-shrink-0">
-                                <i class="fas fa-info-circle fa-lg"></i>
-                            </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="alert-heading mb-1">Profile Management</h5>
-                                <p class="mb-0">As a Unit Director, your profile information is managed by the system administrator. Contact your administrator if you need to update any information.</p>
-                            </div>
-                        </div>
-                    </div>
-                @endif
+
                 
                 <form id="profileEditForm" method="POST" action="{{ route('profile.update') }}">
                     @csrf
@@ -257,6 +245,7 @@
                         </div>
                     </div>
                     
+@if(!in_array($user->role ?? '', ['unit_director', 'unit director']))
                     <div class="profile-section">
                         <h5 class="section-title">Professional Information</h5>
 
@@ -287,11 +276,6 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="profile_employment_status" class="form-label mb-1">Employment Status *</label>
-                                    @if($user->role === 'head')
-                                        <!-- For Office Heads, show a readonly field -->
-                                        <input type="text" class="form-control" value="Not Applicable for Office Heads" readonly>
-                                        <input type="hidden" name="employment_status" value="">
-                                    @else
                                     <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_employment_status" name="employment_status" required
                                         @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) disabled @endif>
                                         <option value="">Select Employment Status</option>
@@ -299,18 +283,12 @@
                                         <option value="Probationary Employment" {{ old('employment_status', $user->staffDetail->employment_status ?? $user->employment_status ?? '') == 'Probationary Employment' ? 'selected' : '' }}>Probationary Employment</option>
                                         <option value="Contractual and Fixed-Term Employment" {{ old('employment_status', $user->staffDetail->employment_status ?? $user->employment_status ?? '') == 'Contractual and Fixed-Term Employment' ? 'selected' : '' }}>Contractual and Fixed-Term Employment</option>
                                     </select>
-                                    @endif
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="profile_degree_attained" class="form-label mb-1">Degree Attained *</label>
-                                    @if($user->role === 'head')
-                                        <!-- For Office Heads, show a readonly field -->
-                                        <input type="text" class="form-control" value="Not Applicable for Office Heads" readonly>
-                                        <input type="hidden" name="degree_attained" value="">
-                                    @else
                                     <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_degree_attained" name="degree_attained" required
                                         @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) disabled @endif>
                                         <option value="">Select Degree</option>
@@ -319,32 +297,20 @@
                                         <option value="Doctorate" {{ old('degree_attained', $user->staffDetail->degree_attained ?? $user->degree_attained ?? '') == 'Doctorate' ? 'selected' : '' }}>Doctorate / PhD</option>
                                         <option value="Other" {{ old('degree_attained', $user->staffDetail->degree_attained ?? $user->degree_attained ?? '') == 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
-                                    @endif
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3" id="profile_other_degree_group" style="display: none;">
                                     <label for="profile_degree_other" class="form-label mb-1">Please specify *</label>
-                                    @if($user->role === 'head')
-                                        <!-- For Office Heads, show a readonly field -->
-                                        <input type="text" class="form-control" value="Not Applicable for Office Heads" readonly>
-                                        <input type="hidden" name="degree_other" value="">
-                                    @else
                                     <input type="text" class="form-control @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_degree_other" name="degree_other" value="{{ old('degree_other', $user->staffDetail->degree_other ?? $user->degree_other ?? '') }}" 
                                         @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly @endif required>
-                                    @endif
                                 </div>
                             </div>
                             
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="profile_program" class="form-label mb-1">Program *</label>
-                                    @if($user->role === 'head')
-                                        <!-- For Office Heads, show a readonly field -->
-                                        <input type="text" class="form-control" value="Not Applicable for Office Heads" readonly>
-                                        <input type="hidden" name="program" value="">
-                                    @else
                                     <select class="form-select @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) readonly-field @endif" id="profile_program" name="program" required
                                         @if(in_array($user->role ?? '', ['unit_director', 'unit director'])) disabled @endif>
                                         <option value="">Select Program</option>
@@ -353,11 +319,11 @@
                                         <option value="Post Graduate" {{ old('program', $user->staffDetail->program ?? $user->program ?? '') == 'Post Graduate' ? 'selected' : '' }}>Post Graduate</option>
                                         <option value="Non-Degree" {{ old('program', $user->staffDetail->program ?? $user->program ?? '') == 'Non-Degree' ? 'selected' : '' }}>Non-Degree</option>
                                     </select>
-                                    @endif
                                 </div>
                             </div>
                         </div>
                     </div>
+                    @endif
                 </form>
             </div>
             <div class="modal-footer">

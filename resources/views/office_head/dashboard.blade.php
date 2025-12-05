@@ -26,23 +26,28 @@
         <ul class="nav flex-column flex-grow-1">
           <li class="nav-item">
               <a class="nav-link {{ !request()->has('view') || request()->get('view') === 'overview' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=overview">
-                  <i class="fas fa-chart-line me-2"></i> <span>Dashboard</span>
+                  <i class="fas fa-chart-line me-2"></i><span>Dashboard</span>
               </a>
           </li>
           <li class="nav-item">
-              <a class="nav-link {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'active' : '' }}" href="#trainingSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'true' : 'false' }}" aria-controls="trainingSubmenu">
-                  <i class="fas fa-book-open me-2"></i> <span>Training</span>
+              <a class="nav-link {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'active' : '' }}" href="#trainingSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'true' : 'false' }}" aria-controls="trainingSubmenu">
+                  <i class="fas fa-book-open me-2"></i><span>Training</span>
               </a>
-              <div class="collapse {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings') ? 'show' : '' }}" id="trainingSubmenu">
+              <div class="collapse {{ (request()->get('view') === 'training-records' || request()->get('view') === 'assigned-trainings' || request()->get('view') === 'uploaded-files') ? 'show' : '' }}" id="trainingSubmenu">
                   <ul class="nav flex-column ms-4">
                       <li class="nav-item">
                           <a class="nav-link {{ request()->get('view') === 'training-records' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=training-records">
-                              <i class="fas fa-list me-2"></i> <span>My Records</span>
+                              <i class="fas fa-list me-2"></i><span>My Records</span>
                           </a>
                       </li>
                       <li class="nav-item">
                           <a class="nav-link {{ request()->get('view') === 'assigned-trainings' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=assigned-trainings">
-                              <i class="fas fa-tasks me-2"></i> <span>Assigned Trainings</span>
+                              <i class="fas fa-tasks me-2"></i><span>Assigned Trainings</span>
+                          </a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="nav-link {{ request()->get('view') === 'uploaded-files' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=uploaded-files">
+                              <i class="fas fa-file-upload me-2"></i><span>Uploaded Files</span>
                           </a>
                       </li>
                   </ul>
@@ -51,19 +56,19 @@
           
           <li class="nav-item">
               <a class="nav-link {{ request()->get('view') === 'office-directory' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=office-directory">
-                  <i class="fas fa-users me-2"></i> <span>Office Directory</span>
+                  <i class="fas fa-users me-2"></i><span>Office Directory</span>
               </a>
           </li>
         </ul>
         <ul class="nav flex-column sidebar-footer">
           <li class="nav-item">
               <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
-                  <i class="fas fa-user-circle me-2"></i> <span>Profile</span>
+                  <i class="fas fa-user-circle me-2"></i><span>Profile</span>
               </a>
           </li>
           <li class="nav-item">
               <a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                  <i class="fas fa-sign-out-alt me-2"></i> <span>Logout</span>
+                  <i class="fas fa-sign-out-alt me-2"></i><span>Logout</span>
               </a>
           </li>
         </ul>
@@ -134,7 +139,6 @@
                                     <thead>
                                         <tr>
                                             <th>Name</th>
-                                            <th>Position</th>
                                             <th>Job Function</th>
                                             <th>Actions</th>
                                         </tr>
@@ -143,7 +147,6 @@
                                         @foreach($office_staff as $staff)
                                             <tr>
                                                 <td>{{ $staff->full_name }}</td>
-                                                <td>{{ $staff->position ?? 'N/A' }}</td>
                                                 <td>{{ $staff->job_function ?? 'N/A' }}</td>
                                                 <td>
                                                     <button class="btn btn-info btn-sm btn-view-trainings" 
@@ -389,6 +392,68 @@
                         <i class="fas fa-users fa-3x text-muted mb-3"></i>
                         <h5>No Staff Members</h5>
                         <p class="text-muted">There are no staff members in your office yet.</p>
+                    </div>
+                @endif
+            </div>
+        @elseif (request()->get('view') === 'uploaded-files')
+            <div class="content-box">
+                <h2>My Uploaded Files</h2>
+                <p class="text-muted">Files you have uploaded as proof of completed trainings.</p>
+                
+                @php
+                    // Get uploaded files for the current user
+                    $uploadedFiles = \App\Models\TrainingProof::with(['trainingRecord'])
+                        ->where('user_id', Auth::user()->user_id)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+                @endphp
+                
+                @if($uploadedFiles->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-striped mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Training</th>
+                                    <th>File Name</th>
+                                    <th>Upload Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($uploadedFiles as $file)
+                                    <tr>
+                                        <td>{{ $file->trainingRecord->title }}</td>
+                                        <td>{{ basename($file->file_path) }}</td>
+                                        <td>{{ $file->created_at->format('M d, Y') }}</td>
+                                        <td>
+                                            <span class="badge 
+                                                @if($file->status == 'approved') bg-success
+                                                @elseif($file->status == 'pending') bg-warning text-dark
+                                                @elseif($file->status == 'rejected') bg-primary
+                                                @else bg-secondary
+                                                @endif">
+                                                {{ ucfirst($file->status) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('training_proofs.view', $file->id) }}" class="btn btn-sm btn-primary" target="_blank">
+                                                <i class="fas fa-eye me-1"></i> View
+                                            </a>
+                                            <a href="{{ route('training_proofs.view', $file->id) }}?download=1" class="btn btn-sm btn-secondary">
+                                                <i class="fas fa-download me-1"></i> Download
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-5">
+                        <i class="fas fa-file-upload fa-3x text-muted mb-3"></i>
+                        <h5>No Uploaded Files</h5>
+                        <p class="text-muted">You haven't uploaded any files as proof of completed trainings yet.</p>
                     </div>
                 @endif
             </div>
