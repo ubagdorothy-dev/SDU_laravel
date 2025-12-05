@@ -1,43 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Assign Training</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="{{ asset('css/unitdirector/dashboard.css') }}">
-<link rel="stylesheet" href="{{ asset('css/Training/assignment.css') }}">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Training</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/unitdirector/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Training/assignment.css') }}">
 </head>
 <body id="body">
 <input type="checkbox" id="sidebar-toggle-checkbox" style="display: none;">
 
 <!-- Desktop Sidebar -->
 <div class="sidebar-lg d-none d-lg-block">
-  <div class="d-flex justify-content-between align-items-center px-3 mb-3">
+  <div class="sidebar-header d-flex justify-content-between align-items-center px-3 mb-3">
     <div class="d-flex align-items-center">
       <img src="{{ asset('SDU_Logo.png') }}" class="sidebar-logo" alt="SDU">
       <h5 class="m-0 text-white">SDU UNIT DIRECTOR</h5>
     </div>
     <label for="sidebar-toggle-checkbox" class="btn btn-toggle" style="color:#fff;border:none;background:transparent"><i class="fas fa-bars"></i></label>
   </div>
-  <ul class="nav flex-column">
-    <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
-    <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
-    @if(in_array($user->role, ['unit director', 'unit_director']))
-      <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
-    @endif
-    <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
-    <li class="nav-item mt-auto"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
-  </ul>
+  <div class="sidebar-content">
+    <ul class="nav flex-column flex-grow-1">
+      <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
+      <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
+      @if(in_array($user->role, ['unit director', 'unit_director']))
+        <li class="nav-item"><a class="nav-link" href="{{ route('pending_approvals.index') }}"><i class="fas fa-clipboard-check me-2"></i>Pending Approvals <span class="badge bg-danger">{{ $pendingApprovalsCount ?? 0 }}</span></a></li>
+      @endif
+      <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
+    </ul>
+    <ul class="nav flex-column sidebar-footer">
+      <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user-circle me-2"></i> <span> Profile</span></a></li>
+      <li class="nav-item"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
+    </ul>
+  </div>
 </div>
 
 <div class="main-content">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Assign Training</h1>
-            </div>
-            
+           
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
@@ -52,15 +53,16 @@
                             <h2 class="mb-2 fw-bold text-primary"><i class="fas fa-user-friends me-3"></i>Assign Training</h2>
                             <p class="text-muted mb-0">Assign training programs to staff members and office heads</p>
                         </div>
-                        <div class="bg-primary bg-opacity-10 px-4 py-3 rounded-pill d-flex align-items-center">
-                            <i class="fas fa-user-friends me-2 text-primary"></i>
-                            <span class="fw-bold text-primary fs-5">New Assignment</span>
-                        </div>
                     </div>
                 </div>
                 <div class="p-4">
                     <form action="{{ route('training_assignments.store') }}" method="POST" id="assignmentForm">
                         @csrf
+                        
+                        <!-- Hidden form for logout -->
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                         
                         <div class="form-group-spacing">
                             <label for="training_id" class="control-label">Select Training Program</label>
@@ -109,22 +111,22 @@
                                 </div>
                             </div>
                             
-                            <div class="staff-list-container bg-white">
+                            <div class="staff-list-container">
                                 <div id="staffList">
                                     @foreach($staff as $officeCode => $members)
                                         <div class="office-section" data-office="{{ $officeCode }}">
-                                            <div class="section-header d-flex justify-content-between align-items-center mb-3 py-2">
-                                                <h6 class="mb-0 fw-bold text-primary d-flex align-items-center">
+                                            <div class="section-header d-flex justify-content-between align-items-center mb-4 py-3">
+                                                <h5 class="mb-0 fw-bold text-primary d-flex align-items-center">
                                                     @if($members->first() && $members->first()->office)
-                                                        <i class="fas fa-building me-2"></i>{{ $members->first()->office->name }}
+                                                        <i class="fas fa-building me-3"></i>{{ $members->first()->office->name }}
                                                     @else
-                                                        <i class="fas fa-building me-2"></i>{{ $officeCode }}
+                                                        <i class="fas fa-building me-3"></i>{{ $officeCode }}
                                                     @endif
-                                                </h6>
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3">{{ $members->count() }} staff</span>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary select-all-office" data-office="{{ $officeCode }}">
-                                                        <i class="fas fa-check me-1"></i>Select All
+                                                </h5>
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <span class="badge bg-primary-subtle text-primary rounded-pill px-4 py-2 fw-bold">{{ $members->count() }} staff</span>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary select-all-office px-3" data-office="{{ $officeCode }}">
+                                                        <i class="fas fa-check me-2"></i>Select All
                                                     </button>
                                                 </div>
                                             </div>
@@ -139,20 +141,20 @@
                                                         <div class="form-check highlight-on-hover">
                                                            <input class="form-check-input staff-checkbox" type="checkbox" name="staff_ids[]" value="{{ $member->user_id }}" id="staff_{{ $member->user_id }}" data-office="{{ $officeCode }}" data-role="{{ $member->role ?? '' }}">
                                                             <label class="form-check-label d-block staff-checkbox-card" for="staff_{{ $member->user_id }}" tabindex="0" role="checkbox" aria-checked="false">
-                                                                <div class="d-flex align-items-center mb-1">
-                                                                    <div class="me-2">
-                                                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                                                            <i class="fas fa-user text-primary"></i>
+                                                                <div class="d-flex align-items-center mb-2">
+                                                                    <div class="me-3">
+                                                                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                                            <i class="fas fa-user text-primary fs-5"></i>
                                                                         </div>
                                                                     </div>
                                                                     <div>
-                                                                       <span class="fw-medium text-dark">{{ $member->full_name ?? 'N/A' }}</span>
-                                                                                    @php $roleLower = strtolower($member->role ?? ''); @endphp
-                                                                                    @if(in_array($roleLower, ['head','office_head','office head','office-head','manager','office-manager']))
-                                                                                        <span class="badge badge-head ms-2">Head</span>
-                                                                                    @elseif(in_array($roleLower, ['staff','employee','worker','']))
-                                                                                        <span class="badge badge-staff ms-2">Staff</span>
-                                                                                    @endif
+                                                                        <h6 class="mb-1 fw-bold text-dark">{{ $member->full_name ?? 'N/A' }}</h6>
+                                                                        @php $roleLower = strtolower($member->role ?? ''); @endphp
+                                                                        @if(in_array($roleLower, ['head','office_head','office head','office-head','manager','office-manager']))
+                                                                            <span class="badge badge-head">Head</span>
+                                                                        @elseif(in_array($roleLower, ['staff','employee','worker','']))
+                                                                            <span class="badge badge-staff">Staff</span>
+                                                                        @endif
                                                                     </div>
                                                                 </div>
                                                                 @if($member->office_code)
@@ -190,7 +192,7 @@
                             <button type="submit" class="btn btn-primary px-4" id="submitBtn">
                                 <i class="fas fa-paper-plane me-2"></i> Assign Training
                             </button>
-                            <a href="{{ route('training_assignments.index') }}" class="btn btn-light border px-4">
+                            <a href="{{ route('training_assignments.index') }}" class="btn btn-outline-secondary px-4">
                                 <i class="fas fa-arrow-left me-2"></i> Back to List
                             </a>
                         </div>
@@ -198,9 +200,14 @@
                 </div>
             </div>
         </div>
-    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Staff Profile Modal -->
+    @include('staff.partials.profile_notification_modals')
+    
+    @include('staff.partials.modal_scripts')
+    
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Office filter functionality
@@ -391,5 +398,8 @@
         });
     });
 </script>
+<!-- Profile Modal -->
+@include('staff.partials.profile_notification_modals')
+@include('staff.partials.modal_scripts')
 </body>
 </html>

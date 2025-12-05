@@ -22,7 +22,7 @@
     </div>
     <label for="sidebar-toggle-checkbox" class="btn btn-toggle" style="color:#fff;border:none;background:transparent"><i class="fas fa-bars"></i></label>
   </div>
-    <div class="sidebar-content d-flex flex-column flex-grow-1">
+  <div class="sidebar-content">
     <ul class="nav flex-column flex-grow-1">
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}"><i class="fas fa-chart-line me-2"></i><span> Dashboard</span></a></li>
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('directory_reports.index') ? 'active' : '' }}" href="{{ route('directory_reports.index') }}"><i class="fas fa-users me-2"></i><span> Directory & Reports</span></a></li>
@@ -32,17 +32,14 @@
       <li class="nav-item"><a class="nav-link {{ request()->routeIs('training_assignments.index') ? 'active' : '' }}" href="{{ route('training_assignments.index') }}"><i class="fas fa-tasks me-2"></i> <span> Training Assignments</span></a></li>
       <li class="nav-item"><a class="nav-link" href="{{ route('training_proofs.review_index') }}"><i class="fas fa-file-alt me-2"></i> <span> Review Training Proofs</span></a></li>
     </ul>
-    <div class="footer">
     <ul class="nav flex-column sidebar-footer">
       <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal"><i class="fas fa-user-circle me-2"></i> <span> Profile</span></a></li>
       <li class="nav-item"><a class="nav-link" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt me-2"></i><span> Logout</span></a></li>
     </ul>
   </div>
 </div>
-</div>
 <div class="main-content">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Training Assignments</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <a href="{{ route('training_assignments.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus-circle me-1"></i> Assign Training
@@ -167,5 +164,8 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Profile Modal -->
+@include('staff.partials.profile_notification_modals')
+@include('staff.partials.modal_scripts')
 </body>
 </html>

@@ -320,33 +320,15 @@ class TrainingProofController extends Controller
             ->where('status', 'pending')
             ->firstOrFail();
             
-        return view('training_proofs.review', compact('trainingProof'));
-    }
-    
-    /**
-     * Review a specific training proof in a modal.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $proof_id
-     * @return \Illuminate\Http\Response
-     */
-    public function reviewModal(Request $request, $proof_id)
-    {
-        $user = Auth::user();
-        
-        // Only unit directors can access this
-        if (!in_array($user->role, ['unit_director', 'unit director'])) {
-            abort(403, 'Unauthorized');
+        // Get pending approvals count for unit directors
+        $pendingApprovalsCount = 0;
+        if (in_array($user->role, ['unit director', 'unit_director'])) {
+            $pendingApprovalsCount = User::where('is_approved', 0)
+                ->whereIn('role', ['staff', 'head'])
+                ->count();
         }
-        
-        // Find the training proof with related data
-        $trainingProof = TrainingProof::with(['trainingRecord', 'user'])
-            ->where('id', $proof_id)
-            ->where('status', 'pending')
-            ->firstOrFail();
             
-        // Return only the modal content partial
-        return view('training_proofs.partials.review_modal', compact('trainingProof'));
+        return view('training_proofs.review', compact('trainingProof', 'user', 'pendingApprovalsCount'));
     }
     
     /**
