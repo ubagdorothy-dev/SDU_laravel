@@ -216,7 +216,8 @@ body {
 /* Broadcast / Office Staff / Inbox Modal Enhancement */
 #broadcastModal .modal-content,
 #officeStaffBroadcastModal .modal-content,
-#inboxModal .modal-content {
+#inboxModal .modal-content,
+#officeNotificationModal .modal-content {
     border-radius: 16px;
     padding: 0;
     border: none;
@@ -227,7 +228,8 @@ body {
 
 #broadcastModal .modal-dialog,
 #officeStaffBroadcastModal .modal-dialog,
-#inboxModal .modal-dialog { 
+#inboxModal .modal-dialog,
+#officeNotificationModal .modal-dialog { 
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -248,7 +250,8 @@ body {
 
 #broadcastModal .modal-header,
 #officeStaffBroadcastModal .modal-header,
-#inboxModal .modal-header {
+#inboxModal .modal-header,
+#officeNotificationModal .modal-header {
     padding: 1.5rem 2rem;
     border-bottom: 1px solid #eef2ff;
     background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
@@ -257,7 +260,8 @@ body {
 
 #broadcastModal .modal-title,
 #officeStaffBroadcastModal .modal-title,
-#inboxModal .modal-title { 
+#inboxModal .modal-title,
+#officeNotificationModal .modal-title { 
     font-weight: 700; 
     color: #ffffff; 
     font-size: 1.5rem;
@@ -268,13 +272,15 @@ body {
 
 #broadcastModal .modal-body,
 #officeStaffBroadcastModal .modal-body,
-#inboxModal .modal-body { 
+#inboxModal .modal-body,
+#officeNotificationModal .modal-body { 
     padding: 2rem;
 }
 
 #broadcastModal .modal-footer,
 #officeStaffBroadcastModal .modal-footer,
-#inboxModal .modal-footer { 
+#inboxModal .modal-footer,
+#officeNotificationModal .modal-footer { 
     border-top: 1px solid #eef2ff;
     padding: 1.5rem 2rem;
     background: #f8fafc;
@@ -285,7 +291,8 @@ body {
 
 #broadcastModal .form-label,
 #officeStaffBroadcastModal .form-label,
-#inboxModal .form-label { 
+#inboxModal .form-label,
+#officeNotificationModal .form-label { 
     font-weight: 600; 
     color: #1e293b;
     margin-bottom: 0.5rem;
@@ -300,7 +307,10 @@ body {
 #officeStaffBroadcastModal textarea,
 #inboxModal .form-control, 
 #inboxModal .form-select, 
-#inboxModal textarea { 
+#inboxModal textarea,
+#officeNotificationModal .form-control,
+#officeNotificationModal .form-select,
+#officeNotificationModal textarea { 
     border-radius: 10px;
     border: 2px solid #e6eef8;
     box-shadow: none;
@@ -317,7 +327,10 @@ body {
 #officeStaffBroadcastModal textarea:focus,
 #inboxModal .form-control:focus, 
 #inboxModal .form-select:focus, 
-#inboxModal textarea:focus {
+#inboxModal textarea:focus,
+#officeNotificationModal .form-control:focus,
+#officeNotificationModal .form-select:focus,
+#officeNotificationModal textarea:focus {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     outline: none;
@@ -325,14 +338,16 @@ body {
 
 #broadcastModal textarea,
 #officeStaffBroadcastModal textarea,
-#inboxModal textarea { 
+#inboxModal textarea,
+#officeNotificationModal textarea { 
     min-height: 150px;
     resize: vertical;
 }
 
 #broadcastModal .btn,
 #officeStaffBroadcastModal .btn,
-#inboxModal .btn {
+#inboxModal .btn,
+#officeNotificationModal .btn {
     border-radius: 10px;
     padding: 0.75rem 1.5rem;
     font-weight: 600;
@@ -342,14 +357,16 @@ body {
 
 #broadcastModal .btn-primary,
 #officeStaffBroadcastModal .btn-primary,
-#inboxModal .btn-primary { 
+#inboxModal .btn-primary,
+#officeNotificationModal .btn-primary { 
     background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
     border: none;
 }
 
 #broadcastModal .btn-primary:hover,
 #officeStaffBroadcastModal .btn-primary:hover,
-#inboxModal .btn-primary:hover {
+#inboxModal .btn-primary:hover,
+#officeNotificationModal .btn-primary:hover {
     background: linear-gradient(120deg, #1e40af 0%, #1e3a8a 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
@@ -357,7 +374,8 @@ body {
 
 #broadcastModal .btn-secondary,
 #officeStaffBroadcastModal .btn-secondary,
-#inboxModal .btn-secondary {
+#inboxModal .btn-secondary,
+#officeNotificationModal .btn-secondary {
     background: #e2e8f0;
     color: #475569;
     border: none;
@@ -365,7 +383,8 @@ body {
 
 #broadcastModal .btn-secondary:hover,
 #officeStaffBroadcastModal .btn-secondary:hover,
-#inboxModal .btn-secondary:hover {
+#inboxModal .btn-secondary:hover,
+#officeNotificationModal .btn-secondary:hover {
     background: #cbd5e1;
     color: #1e293b;
     transform: translateY(-2px);

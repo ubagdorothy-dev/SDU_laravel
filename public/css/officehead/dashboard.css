@@ -8,7 +8,7 @@
             flex-grow: 1;
             padding: 2rem;
             margin-left: 250px;
-            transition: margin-left 0.3s ease-in-out;
+           
         }
         .sidebar {
             width: 250px;
@@ -17,9 +17,19 @@
             height: 100vh;
             position: fixed;
             padding-top: 2rem;
-            transition: width 0.3s ease-in-out;
             display: flex;
             flex-direction: column;
+        }
+        
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto;
+            padding-bottom: 70px;
         }
         .sidebar .nav-link { color: white; padding: 12px 20px; border-radius: 5px; margin: 5px 15px; transition: background-color 0.2s; }
         .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: #3f51b5; }
@@ -31,6 +41,30 @@
             padding: 2rem;
             border: 1px solid rgba(255, 255, 255, 0.2);
             transition: all 0.3s ease;
+            height: 350px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Flexible content-box for views with scrollable tables */
+        .content-box.scrollable-content-box {
+            height: auto;
+            min-height: 350px;
+            max-height: 70vh;
+        }
+        
+        .content-box .table-responsive {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .content-box .table thead {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            z-index: 10;
+            
         }
         .content-box:hover {
             transform: translateY(-2px);
@@ -146,29 +180,202 @@
             background-color: #6366f1; 
         }
 
-        #broadcastModal .modal-content {
-            border-radius: 12px;
-            padding: 0;
-            border: none;
-            background: #ffffff;
-        }
+        /* Broadcast Modal - Updated to match unit director styles */
+#broadcastModal .modal-content {
+    border-radius: 16px;
+    padding: 0;
+    border: none;
+    background: #ffffff;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
 
-        #broadcastModal .modal-dialog { display: flex; align-items: center; min-height: calc(100vh - 1rem); }
+#broadcastModal .modal-dialog { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    min-height: calc(100vh - 1rem); 
+    max-width: 600px;
+    margin: 0 auto;
+}
 
-        #broadcastModal .modal-header {
-            padding: 1rem 1.25rem;
-            border-bottom: 1px solid #eef2ff;
-            background: transparent;
-        }
+#broadcastModal .modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #eef2ff;
+    background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
+    color: white;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
 
-        #broadcastModal .modal-title { font-weight: 700; color: #1e293b; }
-        #broadcastModal .modal-body { padding: 1rem 1.25rem; }
-        #broadcastModal .modal-footer { border-top: none; padding: 0.75rem 1.25rem; background: transparent; }
+#broadcastModal .modal-title { 
+    font-weight: 700; 
+    color: #ffffff; 
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
 
-        #broadcastModal .form-label { font-weight:600; color:#1e293b; }
-        #broadcastModal .form-control, #broadcastModal .form-select, #broadcastModal textarea { border-radius: 8px; border: 1px solid #e6eef8; box-shadow: none; }
-        #broadcastModal textarea { min-height: 120px; }
-        #broadcastModal .btn-primary { border-radius: 8px; padding: 0.5rem 1rem; }
+#broadcastModal .modal-body { 
+    padding: 2rem;
+}
+
+#broadcastModal .modal-footer { 
+    border-top: 1px solid #eef2ff;
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+}
+
+#broadcastModal .form-label { 
+    font-weight: 600; 
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+#broadcastModal .form-control, 
+#broadcastModal .form-select, 
+#broadcastModal textarea { 
+    border-radius: 10px;
+    border: 2px solid #e6eef8;
+    box-shadow: none;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+#broadcastModal .form-control:focus, 
+#broadcastModal .form-select:focus, 
+#broadcastModal textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    outline: none;
+}
+
+#broadcastModal textarea { 
+    min-height: 150px;
+    resize: vertical;
+}
+
+#broadcastModal .btn {
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+#broadcastModal .btn-primary { 
+    background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
+    border: none;
+}
+
+#broadcastModal .btn-primary:hover {
+    background: linear-gradient(120deg, #1e40af 0%, #1e3a8a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
+}
+
+#broadcastModal .btn-secondary {
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+}
+
+#broadcastModal .btn-secondary:hover {
+    background: #cbd5e1;
+    color: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Office Notification Modal - match Unit Director / Broadcast modal styles */
+#officeNotificationModal .modal-content {
+    border-radius: 16px;
+    padding: 0;
+    border: none;
+    background: #ffffff;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+#officeNotificationModal .modal-dialog {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: calc(100vh - 1rem) !important;
+    max-width: 600px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+}
+
+#officeNotificationModal .modal-header {
+    padding: 1.5rem 2rem !important;
+    border-bottom: 1px solid #eef2ff !important;
+    background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%) !important;
+    color: white !important;
+}
+
+#officeNotificationModal .modal-title { 
+    font-weight: 700; 
+    color: #ffffff; 
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+#officeNotificationModal .modal-body { padding: 1.5rem 2rem; }
+
+#officeNotificationModal .modal-footer { 
+    border-top: 1px solid #eef2ff;
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+#officeNotificationModal .form-control, #officeNotificationModal .form-select, #officeNotificationModal textarea { 
+    border-radius: 10px;
+    border: 2px solid #e6eef8;
+    box-shadow: none;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+#officeNotificationModal .modal-footer .btn-primary, #officeNotificationModal .btn-primary { 
+    background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.65rem 1.25rem !important;
+    color: #fff !important;
+}
+
+#officeNotificationModal .modal-footer .btn-primary:hover, #officeNotificationModal .btn-primary:hover {
+    background: linear-gradient(120deg, #1e40af 0%, #1e3a8a 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25) !important;
+}
+
+#officeNotificationModal .btn-secondary {
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+}
+
+#officeNotificationModal .btn-secondary:hover {
+    background: #cbd5e1;
+    color: #1e293b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
 
 /* Add Training Modal Styles */
 #addTrainingModal .modal-dialog {
@@ -319,6 +526,119 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(59,130,246,0.25);
 }
+
+/* --- Ensure Office Notification modal exactly matches Unit Director broadcast modal --- */
+#officeNotificationModal .modal-content {
+    border-radius: 16px !important;
+    padding: 0 !important;
+    border: none !important;
+    background: #ffffff !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden !important;
+}
+
+#officeNotificationModal .modal-dialog { 
+    display: flex !important; 
+    align-items: center !important; 
+    justify-content: center !important;
+    min-height: calc(100vh - 1rem) !important; 
+    max-width: 600px !important;
+    margin: 0 auto !important;
+}
+
+/* Wider inbox-like modal behavior (keeps consistency if used) */
+#officeNotificationModal .modal-body { padding: 2rem !important; }
+
+#officeNotificationModal .modal-header {
+    padding: 1.5rem 2rem !important;
+    border-bottom: 1px solid #eef2ff !important;
+    background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%) !important;
+    color: white !important;
+}
+
+#officeNotificationModal .modal-title { 
+    font-weight: 700 !important; 
+    color: #ffffff !important; 
+    font-size: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+#officeNotificationModal .modal-footer { 
+    border-top: 1px solid #eef2ff !important;
+    padding: 1.5rem 2rem !important;
+    background: #f8fafc !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+}
+
+#officeNotificationModal .form-label { 
+    font-weight: 600 !important; 
+    color: #1e293b !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 0.95rem !important;
+}
+
+#officeNotificationModal .form-control, 
+#officeNotificationModal .form-select, 
+#officeNotificationModal textarea { 
+    border-radius: 10px !important;
+    border: 2px solid #e6eef8 !important;
+    box-shadow: none !important;
+    padding: 0.875rem 1.25rem !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease !important;
+}
+
+#officeNotificationModal .form-control:focus, 
+#officeNotificationModal .form-select:focus, 
+#officeNotificationModal textarea:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+    outline: none !important;
+}
+
+#officeNotificationModal textarea { 
+    min-height: 150px !important;
+    resize: vertical !important;
+}
+
+#officeNotificationModal .btn { 
+    border-radius: 10px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease !important;
+}
+
+#officeNotificationModal .btn-primary { 
+    background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%) !important;
+    border: none !important;
+    color: #fff !important;
+}
+
+#officeNotificationModal .btn-primary:hover {
+    background: linear-gradient(120deg, #1e40af 0%, #1e3a8a 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25) !important;
+}
+
+#officeNotificationModal .btn-secondary {
+    background: #e2e8f0 !important;
+    color: #475569 !important;
+    border: none !important;
+}
+
+#officeNotificationModal .btn-secondary:hover {
+    background: #cbd5e1 !important;
+    color: #1e293b !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* end parity block */
 
 #addTrainingModal .btn-secondary {
     background-color: #e2e8f0;
@@ -645,6 +965,104 @@
             font-size: 0.8125rem;
         }
 
+        /* Notifications Modal - Updated to match website styles but keep wide */
+        #notificationsModal .modal-content {
+            border-radius: 16px;
+            padding: 0;
+            border: none;
+            background: #ffffff;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        #notificationsModal .modal-dialog { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            min-height: calc(100vh - 1rem); 
+            max-width: 1200px;
+            width: 95%;
+            margin: 0 auto;
+        }
+
+        #notificationsModal .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #eef2ff;
+            background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+        }
+
+        #notificationsModal .modal-title { 
+            font-weight: 700; 
+            color: #ffffff; 
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        #notificationsModal .modal-body { 
+            padding: 2rem;
+        }
+
+        #notificationsModal .modal-footer { 
+            border-top: 1px solid #eef2ff;
+            padding: 1.5rem 2rem;
+            background: #f8fafc;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+
+        #notificationsModal .nav-tabs {
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        #notificationsModal .nav-tabs .nav-link {
+            border: none;
+            color: #64748b;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        #notificationsModal .nav-tabs .nav-link:hover {
+            color: #3b82f6;
+            border-color: transparent;
+        }
+
+        #notificationsModal .nav-tabs .nav-link.active {
+            color: #3b82f6;
+            border-bottom: 3px solid #3b82f6;
+            background-color: transparent;
+        }
+        .content-box-2 {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            height: 900px;
+        }
+        
+        .content-box-2 h2 {
+            margin-top: 0;
+            color: #1e293b;
+            border-bottom: 3px solid #e2e8f0;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
         .modal-backdrop.show { opacity: 0.42; }
 
         @media (min-width: 1400px) {

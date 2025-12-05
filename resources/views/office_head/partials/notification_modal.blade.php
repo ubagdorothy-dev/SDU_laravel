@@ -12,9 +12,7 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="received-tab" data-bs-toggle="tab" data-bs-target="#received" type="button" role="tab">Received</button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="sent-tab" data-bs-toggle="tab" data-bs-target="#sent" type="button" role="tab">Sent Items</button>
-                    </li>
+                   
                 </ul>
                 
                 <!-- Tab Content -->

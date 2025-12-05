@@ -3,9 +3,9 @@
 <div class="modal fade" id="officeNotificationModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%); color: #fff;">
                 <h5 class="modal-title"><i class="fas fa-paper-plane me-2"></i>Send Notification to Office</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
             </div>
             <form id="officeNotificationForm">
                 <div class="modal-body">
@@ -35,7 +35,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Send</button>
+                    <button type="submit" class="btn btn-primary" style="background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%); border: none; border-radius: 10px; padding: 0.75rem 1.5rem; color: #ffffff;">Send</button>
                 </div>
             </form>
         </div>
