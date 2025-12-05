@@ -22,7 +22,7 @@
             <i class="fas fa-bars"></i>
         </button>
       </div>
-      <div class="sidebar-content">
+    <div class="sidebar-content d-flex flex-column flex-grow-1">
         <ul class="nav flex-column flex-grow-1">
           <li class="nav-item">
               <a class="nav-link {{ !request()->has('view') || request()->get('view') === 'overview' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=overview">

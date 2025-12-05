@@ -37,7 +37,7 @@
         </label>
     </div>
 
-    <div class="sidebar-content flex-grow-1">
+    <div class="sidebar-content d-flex flex-column flex-grow-1">
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">

@@ -354,3 +354,74 @@ body {
     background-color: #dbeafe; /* indigo-100 */
     color: #3730a3; /* indigo-800 */
 }
+
+/* ========= Table Styles ========= */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    padding: 1rem 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    background: #fafafa;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.table td {
+    padding: 1.1rem 1.25rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+    background-color: #f7f9fc;
+}
+
+.data-highlight {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* ========= Status Badge ========= */
+.status-badge {
+    padding: 0.45rem 0.85rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.status-badge.bg-success {
+    background-color: #dcfce7 !important;
+    color: #15803d !important;
+}
+
+.status-badge.bg-warning {
+    background-color: #fef08a !important;
+    color: #b45309 !important;
+}
+
+.status-badge.bg-primary {
+    background-color: #dbeafe !important;
+    color: #1d4ed8 !important;
+}
+
+.status-badge.bg-secondary {
+    background-color: #f3f4f6 !important;
+    color: #4b5563 !important;
+}

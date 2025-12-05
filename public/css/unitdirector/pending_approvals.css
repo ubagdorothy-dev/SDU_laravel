@@ -28,9 +28,12 @@ body {
         display: flex;
         flex-direction: column;
         justify-content: center;
+        
     }
     .sidebar-lg .d-flex.justify-content-between { 
         padding: 0.75rem 1rem; 
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        
     }
     .main-content { margin-left: 250px; }
 }
@@ -181,4 +184,8 @@ body {
     .card p { font-size: 2rem; }
     .content-box { padding: 1.5rem; border-radius: 16px; }
     .pending-users-box { padding: 20px; }
+}
+
+.footer {
+    padding: 410px 20px;
 }

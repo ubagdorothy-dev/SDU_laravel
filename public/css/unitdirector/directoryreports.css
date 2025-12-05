@@ -23,6 +23,7 @@ body {
     }
     .sidebar-lg .d-flex.justify-content-between { 
         padding: 0.75rem 1rem; 
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
     }
     .main-content { margin-left: 250px; }
 }
@@ -149,4 +150,6 @@ body {
     .me-2 { margin-bottom: 1rem; }
 }
 
-
+.footer {
+    padding: 410px 20px;
+}
