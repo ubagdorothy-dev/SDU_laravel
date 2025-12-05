@@ -69,6 +69,11 @@
                     <form action="{{ route('training_assignments.store') }}" method="POST" id="assignmentForm">
                         @csrf
                         
+                        <!-- Hidden form for logout -->
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                        
                         <div class="form-group-spacing">
                             <label for="training_id" class="control-label">Select Training Program</label>
                             <div class="input-group">

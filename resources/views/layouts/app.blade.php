@@ -18,6 +18,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/unitdirector/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Training/proofs.css') }}">
 
     @yield('styles')
 </head>
@@ -87,19 +88,6 @@
 
 <!-- Main Content -->
 <div class="main-content">
-
-    <div class="header mb-4">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <div>
-                <h1 class="fw-bold mb-3" style="color: #1e293b; font-size: 2.2rem;">
-                    Welcome, {{ auth()->user()->full_name ?? 'Unit Director' }}!
-                </h1>
-                <p class="mb-0" style="color: #6b7280; font-size: 1.2rem;">
-                    Here's what's happening with your organization today.
-                </p>
-            </div>
-        </div>
-    </div>
 
     @yield('content')
 

@@ -338,12 +338,6 @@ class TrainingProofController extends Controller
         if (!in_array($user->role, ['unit_director', 'unit director'])) {
             abort(403, 'Unauthorized');
         }
-        
-        // Find the training proof with related data
-        $trainingProof = TrainingProof::with(['trainingRecord', 'user'])
-            ->where('id', $proof_id)
-            ->where('status', 'pending')
-            ->firstOrFail();
             
         // Return only the modal content partial
         return view('training_proofs.partials.review_modal', compact('trainingProof', 'user'));

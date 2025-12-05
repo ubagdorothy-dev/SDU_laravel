@@ -452,6 +452,119 @@
     box-shadow: 0 6px 16px rgba(59,130,246,0.25);
 }
 
+/* --- Ensure Office Notification modal exactly matches Unit Director broadcast modal --- */
+#officeNotificationModal .modal-content {
+    border-radius: 16px !important;
+    padding: 0 !important;
+    border: none !important;
+    background: #ffffff !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden !important;
+}
+
+#officeNotificationModal .modal-dialog { 
+    display: flex !important; 
+    align-items: center !important; 
+    justify-content: center !important;
+    min-height: calc(100vh - 1rem) !important; 
+    max-width: 600px !important;
+    margin: 0 auto !important;
+}
+
+/* Wider inbox-like modal behavior (keeps consistency if used) */
+#officeNotificationModal .modal-body { padding: 2rem !important; }
+
+#officeNotificationModal .modal-header {
+    padding: 1.5rem 2rem !important;
+    border-bottom: 1px solid #eef2ff !important;
+    background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%) !important;
+    color: white !important;
+}
+
+#officeNotificationModal .modal-title { 
+    font-weight: 700 !important; 
+    color: #ffffff !important; 
+    font-size: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+#officeNotificationModal .modal-footer { 
+    border-top: 1px solid #eef2ff !important;
+    padding: 1.5rem 2rem !important;
+    background: #f8fafc !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+}
+
+#officeNotificationModal .form-label { 
+    font-weight: 600 !important; 
+    color: #1e293b !important;
+    margin-bottom: 0.5rem !important;
+    font-size: 0.95rem !important;
+}
+
+#officeNotificationModal .form-control, 
+#officeNotificationModal .form-select, 
+#officeNotificationModal textarea { 
+    border-radius: 10px !important;
+    border: 2px solid #e6eef8 !important;
+    box-shadow: none !important;
+    padding: 0.875rem 1.25rem !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease !important;
+}
+
+#officeNotificationModal .form-control:focus, 
+#officeNotificationModal .form-select:focus, 
+#officeNotificationModal textarea:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+    outline: none !important;
+}
+
+#officeNotificationModal textarea { 
+    min-height: 150px !important;
+    resize: vertical !important;
+}
+
+#officeNotificationModal .btn { 
+    border-radius: 10px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    transition: all 0.2s ease !important;
+}
+
+#officeNotificationModal .btn-primary { 
+    background: linear-gradient(120deg, #3b82f6 0%, #1e40af 100%) !important;
+    border: none !important;
+    color: #fff !important;
+}
+
+#officeNotificationModal .btn-primary:hover {
+    background: linear-gradient(120deg, #1e40af 0%, #1e3a8a 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25) !important;
+}
+
+#officeNotificationModal .btn-secondary {
+    background: #e2e8f0 !important;
+    color: #475569 !important;
+    border: none !important;
+}
+
+#officeNotificationModal .btn-secondary:hover {
+    background: #cbd5e1 !important;
+    color: #1e293b !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* end parity block */
+
 #addTrainingModal .btn-secondary {
     background-color: #e2e8f0;
     border: none;
@@ -855,7 +968,6 @@
             border-bottom: 3px solid #3b82f6;
             background-color: transparent;
         }
-
         .modal-backdrop.show { opacity: 0.42; }
 
         @media (min-width: 1400px) {

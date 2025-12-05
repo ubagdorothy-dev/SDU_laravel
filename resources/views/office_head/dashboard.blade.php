@@ -48,6 +48,7 @@
                   </ul>
               </div>
           </li>
+          
           <li class="nav-item">
               <a class="nav-link {{ request()->get('view') === 'office-directory' ? 'active' : '' }}" href="{{ route('office_head.dashboard') }}?view=office-directory">
                   <i class="fas fa-users me-2"></i> <span>Office Directory</span>
@@ -68,6 +69,7 @@
         </ul>
       </div>
     </div>
+
 
     <div class="main-content">
         <button class="btn btn-primary d-lg-none mb-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
