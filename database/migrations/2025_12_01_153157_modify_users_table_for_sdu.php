@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Add missing columns if they don't exist
             if (!Schema::hasColumn('users', 'full_name')) {
-                $table->string('full_name')->after('password');
+                $table->string('full_name')->after('password_hash');
             }
             if (!Schema::hasColumn('users', 'office_code')) {
                 $table->string('office_code')->nullable()->after('role');

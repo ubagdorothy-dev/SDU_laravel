@@ -124,7 +124,7 @@
             <div class="row g-3 mb-4">
                 <div class="col-lg-6">
                     <div class="content-box chart-card">
-                        <h2>My Training Status</h2>
+                        <h2> Training Status</h2>
                         <div class="chart-wrapper">
                             <canvas id="trainingStatusChart" class="chart-canvas" height="220"></canvas>
                         </div>

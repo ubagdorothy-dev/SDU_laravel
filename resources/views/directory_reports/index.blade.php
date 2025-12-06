@@ -939,7 +939,7 @@ function displayProofContent(filePath, proofId, proofStatus) {
                     <i class="fas fa-file fa-5x mb-3 text-muted"></i>
                     <h5>File Preview Not Available</h5>
                     <p class="text-muted">This file type cannot be previewed directly.</p>
-                    <a href="${filePath.startsWith('/storage/') ? filePath : '/storage/' + filePath}" class="btn btn-primary" download>Download File</a>
+                    <a href="${filePath.startsWith('/storage/app/public/training_proofs') ? filePath : '/storage/app/public/training_proofs' + filePath}" class="btn btn-primary" download>Download File</a>
                 </div>
             </div>
             ${approvalSection}
