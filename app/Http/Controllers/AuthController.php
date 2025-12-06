@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\Office; // <-- 1. IMPORT Office Model
+use App\Models\Office; 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException; // For custom error messages
+use Illuminate\Validation\ValidationException; 
 
 class AuthController extends Controller
 {
@@ -20,26 +20,23 @@ class AuthController extends Controller
     // Show the registration form
     public function showRegisterForm()
     {
-        // 2. FETCH office codes from the database
-        // This queries the 'offices' table and returns an array of only the 'code' values.
+    
         $officeCodes = Office::pluck('code')->toArray(); 
 
         return view('auth.register', [
-            'offices' => $officeCodes // <-- 3. PASS the array to the view
+            'offices' => $officeCodes 
         ]); 
     }
 
-    /**
-     * Handle the registration request, including custom validation and role assignment.
-     */
+   
     public function register(Request $request)
     {
         // 1. Basic Laravel Validation
         $request->validate([
-            'full_name' => 'required|string|max:255', // Changed from 'name'
+            'full_name' => 'required|string|max:255', 
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            // 4. ADD 'exists:offices,code' rule for database validation
+            
             'office_code' => 'required|string|max:10|exists:offices,code',
         ], [
             // Custom message for the office code if needed
@@ -60,7 +57,7 @@ class AuthController extends Controller
             } elseif (strpos($local_part, self::STAFF_IDENTIFIER) !== false) {
                 $assigned_role = 'staff';
             } else {
-                // Email from official domain but no staff.*/head.* prefix = REJECT
+                
                 throw ValidationException::withMessages([
                     'email' => "Error: Email must start with 'staff.' or 'head.' prefix (e.g., staff.yourname@sdu.edu.ph).",
                 ]);
@@ -72,7 +69,7 @@ class AuthController extends Controller
             ]);
         }
 
-        // 3. Create User with Assigned Role and Pending Approval
+        // 3. User with Assigned Role and Pending Approval
         $user = User::create([
             'full_name' => $request->full_name,
             'email' => $email,
@@ -95,9 +92,7 @@ class AuthController extends Controller
         return view('auth.login'); 
     }
 
-    /**
-     * Handle the login request, including checking for account approval.
-     */
+   
     public function login(Request $request)
     {
         // Log the request for debugging
