@@ -51,8 +51,6 @@
                         </ul>
                     </div>
                 </li>
-            </ul>
-            <ul class="nav flex-column sidebar-footer">
                 <li class="nav-item">
                     <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#profileModal">
                         <i class="fas fa-user-circle me-2"></i> <span>Profile</span>

@@ -8,6 +8,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/unitdirector/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/Training/assignment.css') }}">
+    <style>
+        .office-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .office-section:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .section-header {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .office-section {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+            }
+        }
+    </style>
 </head>
 <body id="body">
 <input type="checkbox" id="sidebar-toggle-checkbox" style="display: none;">
